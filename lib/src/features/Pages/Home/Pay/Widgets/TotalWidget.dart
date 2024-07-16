@@ -8,7 +8,7 @@ Widget buildTotalWidget() {
     color: Colors.white,
     child: Column(
       children: [
-        SizedBox(height: 5.w),
+        SizedBox(height: 3.w),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

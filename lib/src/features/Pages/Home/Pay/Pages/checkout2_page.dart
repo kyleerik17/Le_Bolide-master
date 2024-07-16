@@ -10,22 +10,22 @@ class Pay2Page extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-           leading: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const PayPage(),
-                ),
-              );
-            },
-            child: Image.asset(
-              'assets/icons/gc.png',
-              width: 15.w,
-              height: 15.w,
-              color: Colors.black,
-            ),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PayPage(),
+              ),
+            );
+          },
+          child: Image.asset(
+            'assets/icons/gc.png',
+            width: 15.w,
+            height: 15.w,
+            color: Colors.black,
           ),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
@@ -38,7 +38,8 @@ class Pay2Page extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Padding(
+      body: Container(
+        color: Colors.white,
         padding: EdgeInsets.all(4.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -83,12 +83,10 @@ class _AppBarWidgetState extends State<AppBarWidget>
               ),
             ),
 
-            
             Image.asset(
               'assets/icons/ll.png',
               fit: BoxFit.contain,
-
-              height: 13.w, 
+              height: 13.w,
             ),
 
             // Right: Payment Icon

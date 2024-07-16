@@ -50,7 +50,7 @@ class _Add2PageState extends State<Add2Page> {
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),
                     padding:
-                        EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 7.w),
+                        EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 6.w),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(1.5.w),
                     ),

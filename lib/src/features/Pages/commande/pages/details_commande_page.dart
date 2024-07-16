@@ -272,7 +272,6 @@ class DetailsCommandePage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 1.h),
                   Center(
                     child: SizedBox(
                       width: 88.w,

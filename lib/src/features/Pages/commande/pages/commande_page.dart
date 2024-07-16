@@ -255,36 +255,41 @@ class _CommandePageState extends State<CommandePage> {
       bottomNavigationBar: ReservBottomNavBar(
         onTap: (int) {},
       ),
-      floatingActionButton: SizedBox(
-        width: 20.w,
-        height: 20.w,
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                transitionDuration: const Duration(milliseconds: 300),
-                pageBuilder: (_, __, ___) => const SearchLoadPage(),
-                transitionsBuilder: (_, animation, __, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0.0, 1.0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                },
-              ),
-            );
-          },
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(13.w),
-          ),
-          backgroundColor: Colors.black,
-          child: Image.asset(
-            'assets/icons/home.png',
-            width: 10.w,
-            height: 10.h,
+      floatingActionButton: Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          margin: EdgeInsets.only(
+              bottom: 7.h), // Ajustez cette valeur selon vos besoins
+          width: 20.w,
+          height: 20.w,
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  transitionDuration: const Duration(milliseconds: 300),
+                  pageBuilder: (_, __, ___) => const SearchLoadPage(),
+                  transitionsBuilder: (_, animation, __, child) {
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0.0, 1.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(13.w),
+            ),
+            backgroundColor: Colors.black,
+            child: Image.asset(
+              'assets/icons/home.png',
+              width: 10.w,
+              height: 10.h,
+            ),
           ),
         ),
       ),

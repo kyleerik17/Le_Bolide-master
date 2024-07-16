@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:le_bolide/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
 import 'package:le_bolide/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
 import 'package:le_bolide/src/features/Pages/registration/pages/pages.dart';
 import 'package:le_bolide/src/features/Pages/splash_screen/pages/splash_screen_page.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return const MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: SplashScreenPage(),
+          home: Pay3Page(),
         );
       },
     );

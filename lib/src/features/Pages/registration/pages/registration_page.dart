@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:le_bolide/src/features/Pages/Onboarding/onboarding.dart';
 import 'package:le_bolide/src/features/Pages/registration/pages/pages.dart';
 import 'package:le_bolide/src/features/Widgets/inputs/inputs.dart';
-
 import 'package:sizer/sizer.dart';
 
 class RegistrationPage extends StatelessWidget {
@@ -54,7 +53,7 @@ class RegistrationPage extends StatelessWidget {
                     height: 4.h,
                     fit: BoxFit.contain,
                   ),
-                  Spacer(flex: 3),
+                  const Spacer(flex: 3),
                 ],
               ),
               SizedBox(height: 3.h),
@@ -115,11 +114,38 @@ class RegistrationPage extends StatelessWidget {
                                 ],
                               ),
                             ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 3.w),
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '+221 ',
+                                      style: TextStyle(
+                                        color: const Color(0xFF1A1A1A),
+                                        fontFamily: 'Cabin',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12.sp,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: '78 444 56 78',
+                                      style: TextStyle(
+                                        color: const Color(0xFF1A1A1A),
+                                        fontFamily: 'Cabin',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12.sp,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                             Expanded(
                               child: TextField(
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: "+221 78 444 56 78",
+                                  hintText: "",
                                   contentPadding: EdgeInsets.symmetric(
                                     vertical: 3.w,
                                   ),
@@ -128,7 +154,7 @@ class RegistrationPage extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(0),
+                              padding: const EdgeInsets.all(5),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
