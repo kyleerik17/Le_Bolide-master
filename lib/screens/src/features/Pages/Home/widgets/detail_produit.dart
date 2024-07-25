@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/commande/widgets/slider1.dart';
 
@@ -7,7 +8,7 @@ import 'package:sizer/sizer.dart';
 import '../../Home/widgets/bouton_ajouter.dart';
 
 class Details1ProduitsPage extends StatelessWidget {
-  const Details1ProduitsPage({Key? key}) : super(key: key);
+  const Details1ProduitsPage({Key? key, required String partId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +123,10 @@ class Details1ProduitsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
                   Text(
                     "38 000 F",
@@ -138,9 +139,8 @@ class Details1ProduitsPage extends StatelessWidget {
                   ),
                 ],
               ),
-              QuantityWidget(
-                userId: '',
-                partId: '',
+              Add3Page(
+                
               )
             ],
           ),

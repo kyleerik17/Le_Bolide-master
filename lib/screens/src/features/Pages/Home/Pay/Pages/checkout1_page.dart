@@ -6,7 +6,7 @@ import '../Widgets/formulaire_livraison.dart';
 import 'pages.dart';
 
 class Pay1Page extends StatelessWidget {
-  const Pay1Page({Key? key}) : super(key: key);
+  const Pay1Page({Key? key, required String partId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

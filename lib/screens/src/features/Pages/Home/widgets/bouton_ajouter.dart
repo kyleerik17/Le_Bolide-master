@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:le_bolide/data/models/api_services.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
 import 'dart:convert';
 import 'package:sizer/sizer.dart';
@@ -7,10 +8,12 @@ import 'package:sizer/sizer.dart';
 // ignore: must_be_immutable
 class QuantityWidget extends StatefulWidget {
   final String partId; // ID de l'article
+  final int userId; // ID utilisateur
 
   QuantityWidget({
     Key? key,
-    required this.partId, required String userId,
+    required this.partId,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -20,38 +23,42 @@ class QuantityWidget extends StatefulWidget {
 class _QuantityWidgetState extends State<QuantityWidget> {
   bool _showQuantityControls = false;
   int _quantity = 1;
-  
-  final String _userId = '2'; // ID utilisateur fixe
 
   // Function to send quantity update to the API
   Future<void> _sendQuantityUpdate() async {
-  const url = 'http://192.168.1.11/rest-api/api/cart/add';
+    final url = '${baseUrl}rest-api/api/cart/add';
 
-  final data = {
-    'user_id': _userId,
-    'part_id': widget.partId,
-    'quantity': _quantity.toString(),
-  };
+    final data = {
+      'user_id': widget.userId.toString(),
+      'part_id': widget.partId.toString(),
+      'quantity': _quantity.toString(),
+    };
 
-  try {
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: jsonEncode(data),
-    );
+    try {
+      print('Envoi de la requête à $url');
+      print('Données envoyées: ${jsonEncode(data)}');
 
-    if (response.statusCode == 200) {
-      print('Quantité mise à jour avec succès: user_id: ${data['user_id']}, part_id: ${data['part_id']}, quantity: ${data['quantity']}');
-    } else {
-      print('Échec de la mise à jour de la quantité, code de statut: ${response.statusCode}');
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+
+      print('Code de statut reçu: ${response.statusCode}');
+      print('Corps de la réponse: ${response.body}');
+
+      if (response.statusCode == 200) {
+        print('Quantité mise à jour avec succès: user_id: ${data['user_id']}, part_id: ${data['part_id']}, quantity: ${data['quantity']}');
+      } else {
+        print('Échec de la mise à jour de la quantité, code de statut: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erreur lors de l\'envoi de la requête: $e');
     }
-  } catch (e) {
-    print('Erreur lors de l\'envoi de la requête: $e');
   }
-}
 
   // Increment quantity and possibly navigate to another page
   void _incrementQuantity() {
@@ -60,7 +67,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
         _quantity++;
       });
       _sendQuantityUpdate().then((_) {
-        print('user_id: $_userId, part_id: ${widget.partId}, quantity: $_quantity');
+        print('user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
         if (_quantity >= 3) {
           _navigateToPay1Page();
         }
@@ -75,7 +82,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
         _quantity--;
       });
       _sendQuantityUpdate().then((_) {
-        print('user_id: $_userId, part_id: ${widget.partId}, quantity: $_quantity');
+        print('user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
       });
     } else {
       setState(() {
@@ -83,7 +90,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
         _showQuantityControls = false; // Hide controls and show "Ajouter" button
       });
       _sendQuantityUpdate().then((_) {
-        print('user_id: $_userId, part_id: ${widget.partId}, quantity: $_quantity');
+        print('user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
       });
     }
   }
@@ -94,7 +101,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            const Details1ProduitsPage(),
+            const Details1ProduitsPage(partId: '',),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
           const end = Offset.zero;
@@ -130,7 +137,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
                     _toggleQuantityControls();
                     print('Article ajouté avec quantité $_quantity');
                     _sendQuantityUpdate().then((_) {
-                      print('user_id: $_userId, part_id: ${widget.partId}, quantity: $_quantity');
+                      print('user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
                     });
                   },
                   style: TextButton.styleFrom(
@@ -164,7 +171,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
                     IconButton(
                       onPressed: () {
                         _decrementQuantity();
-                        print('user_id: $_userId, part_id: ${widget.partId}, quantity: $_quantity');
+                        print('user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
                       },
                       icon: const Icon(Icons.remove),
                       padding: EdgeInsets.zero,
@@ -193,7 +200,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
                     IconButton(
                       onPressed: () {
                         _incrementQuantity();
-                        print('user_id: $_userId, part_id: ${widget.partId}, quantity: $_quantity');
+                        print('user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
                       },
                       icon: const Icon(Icons.add),
                       padding: EdgeInsets.zero,

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:http/http.dart' as http;
+import 'package:le_bolide/data/models/api_services.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/article3.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/pages/Categories/widgets/search_pneu.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
@@ -25,7 +26,7 @@ class _CategorieState extends State<Categorie> {
 
   Future<List<Map<String, dynamic>>> fetchCategories() async {
     final response = await http
-        .get(Uri.parse('http://192.168.1.11/rest-api/api/categorie/parts'));
+        .get(Uri.parse('${baseUrl}api/categorie/parts'));
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
       return data
@@ -113,7 +114,6 @@ class _CategorieState extends State<Categorie> {
             ),
             textAlign: TextAlign.center,
           ),
-          Gap(3.w),
         ],
       ),
     );
@@ -142,7 +142,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
 
   Future<Map<String, dynamic>> fetchCategoryDetail(String categoryId) async {
     final response = await http.get(Uri.parse(
-        'http://192.168.1.11/rest-api/api/pieces/category/$categoryId'));
+        '${baseUrl}/api/pieces/category/$categoryId'));
     if (response.statusCode == 200) {
       return jsonDecode(response.body)[0];
     } else {
@@ -216,7 +216,6 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
               } else if (!snapshot.hasData) {
                 return const Center(child: Text('Aucune donnée trouvée'));
               } else {
-                final category = snapshot.data!;
                 return Container(
                   color: const Color(0xFFF7F8F9),
                   padding: EdgeInsets.all(4.w),

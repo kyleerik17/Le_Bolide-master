@@ -4,10 +4,6 @@ class Piece {
   final String libelle;
   final String description;
   final String price;
-  final int categoryId;
-  final int vehicleId;
-  final String createdAt;
-  final String? updatedAt;
 
   Piece({
     required this.id,
@@ -15,25 +11,20 @@ class Piece {
     required this.libelle,
     required this.description,
     required this.price,
-    required this.categoryId,
-    required this.vehicleId,
-    required this.createdAt,
-    this.updatedAt,
   });
 
   factory Piece.fromJson(Map<String, dynamic> json) {
     return Piece(
-      id: int.parse(json['id']),
-      img: json['img'],
-      libelle: json['libelle'],
-      description: json['description'],
-      price: json['price'],
-      categoryId: int.parse(json['category_id']),
-      vehicleId: int.parse(json['vehicle_id']),
-      createdAt: json['created_at'],
-      updatedAt: json['update_at'],
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0,
+      img: json['img'] ?? '',
+      libelle: json['libelle'] ?? '',
+      description: json['description'] ?? '',
+      price: json['price']?.toString() ?? '',
     );
   }
 }
 
-
+// const String baseUrl = 'https://bolide.armasoft.ci/bolide_services/index.php/';
+const String baseUrl = 'http://192.168.1.4/rest-api/';

@@ -32,7 +32,7 @@ class InputText extends StatelessWidget {
     this.capitalization,
     this.onChanged,
     this.readOnly = false,
-    this.onTap,
+    this.onTap, required TextEditingController controller,
   }) : super(key: key);
 
   @override

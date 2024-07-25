@@ -1,12 +1,91 @@
 import 'package:flutter/material.dart';
-
 import 'package:sizer/sizer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
+import '../../../../../../data/models/api_services.dart';
 import '../../Onboarding/pages/pages.dart';
 import 'pages.dart';
 
-class RegistrationPage extends StatelessWidget {
+class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
+
+  @override
+  _RegistrationPageState createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  final TextEditingController _phoneController = TextEditingController();
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _generateOTP() async {
+    final url = Uri.parse('${baseUrl}api/otp/generate');
+    final phoneNumber = _phoneController.text.trim();
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'phone': phoneNumber}),
+      );
+
+      // Afficher la réponse dans la console
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 300),
+            pageBuilder: (_, __, ___) => RegistrationAuthPage(
+              phoneNumber: phoneNumber, // Passez le numéro de téléphone ici
+            ),
+            transitionsBuilder: (_, animation, __, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(-1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            },
+          ),
+        );
+      } else {
+        _showErrorDialog('Une erreur est survenue lors de la génération du code OTP.');
+      }
+    } catch (e) {
+      _showErrorDialog('Erreur de connexion. Veuillez réessayer.');
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Erreur'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +174,7 @@ class RegistrationPage extends StatelessWidget {
                           border: Border.all(
                             color: Colors.grey.withOpacity(0.5),
                           ),
-                          borderRadius: BorderRadius.circular(
-                              8.0), // Ajoute un rayon de bordure si nécessaire
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Row(
                           children: [
@@ -117,41 +195,28 @@ class RegistrationPage extends StatelessWidget {
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 3.w),
-                              child: RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: '+221 ',
-                                      style: TextStyle(
-                                        color: const Color(0xFF1A1A1A),
-                                        fontFamily: 'Cabin',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12.sp,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: '78 444 56 78',
-                                      style: TextStyle(
-                                        color: const Color(0xFF1A1A1A),
-                                        fontFamily: 'Cabin',
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12.sp,
-                                      ),
-                                    ),
-                                  ],
+                              child: Text(
+                                '+221 ',
+                                style: TextStyle(
+                                  color: const Color(0xFF1A1A1A),
+                                  fontFamily: 'Cabin',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12.sp,
                                 ),
                               ),
                             ),
                             Expanded(
                               child: TextField(
+                                controller: _phoneController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: "",
+                                  hintText: "78 444 56 78",
                                   contentPadding: EdgeInsets.symmetric(
                                     vertical: 3.w,
                                   ),
                                 ),
-                                textCapitalization: TextCapitalization.words,
+                                keyboardType: TextInputType.phone,
+                                textCapitalization: TextCapitalization.none,
                               ),
                             ),
                             Padding(
@@ -195,26 +260,7 @@ class RegistrationPage extends StatelessWidget {
                       SizedBox(height: 20.h),
                       Center(
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              PageRouteBuilder(
-                                transitionDuration:
-                                    const Duration(milliseconds: 300),
-                                pageBuilder: (_, __, ___) =>
-                                    const RegistrationAuthPage(),
-                                transitionsBuilder: (_, animation, __, child) {
-                                  return SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(1.0, 0.0),
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            );
-                          },
+                          onPressed: _generateOTP,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1A1A1A),
                             padding: EdgeInsets.symmetric(
@@ -244,3 +290,4 @@ class RegistrationPage extends StatelessWidget {
     );
   }
 }
+

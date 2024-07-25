@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:le_bolide/data/models/api_services.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,7 +22,7 @@ class _MarquePopuState extends State<MarquePopu> {
 
   Future<List<Map<String, dynamic>>> fetchMarques() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.11/rest-api/api/marques'));
+      final response = await http.get(Uri.parse('${baseUrl}api/marques'));
       
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);

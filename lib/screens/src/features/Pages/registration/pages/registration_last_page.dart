@@ -1,12 +1,144 @@
 import 'package:flutter/material.dart';
-
+import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration-auth_page.dart';
+import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration_congratulation_page.dart';
+import 'package:le_bolide/screens/src/features/Widgets/inputs/input_text.dart';
 import 'package:sizer/sizer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-import '../../../Widgets/inputs/inputs.dart';
-import 'pages.dart';
+import '../../../../../../data/models/api_services.dart';
 
-class RegistrationLastPage extends StatelessWidget {
-  const RegistrationLastPage({Key? key}) : super(key: key);
+class RegistrationLastPage extends StatefulWidget {
+  final String phoneNumber;
+
+  const RegistrationLastPage({Key? key, required this.phoneNumber})
+      : super(key: key);
+
+  @override
+  _RegistrationLastPageState createState() => _RegistrationLastPageState();
+}
+
+class _RegistrationLastPageState extends State<RegistrationLastPage> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController surnameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+
+  String name = '';
+  String surname = '';
+
+  @override
+  void initState() {
+    super.initState();
+    phoneController.text = widget.phoneNumber;
+
+    nameController.addListener(() {
+      setState(() {
+        name = nameController.text;
+      });
+      print("Nom changé (listener): $name");
+    });
+
+    surnameController.addListener(() {
+      setState(() {
+        surname = surnameController.text;
+      });
+      print("Prénom changé (listener): $surname");
+    });
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    surnameController.dispose();
+    phoneController.dispose();
+    super.dispose();
+  }
+
+  Future<void> registerUser() async {
+    String phoneNumber = phoneController.text;
+
+    print('Valeurs avant enregistrement :');
+    print('Numéro de téléphone : "$phoneNumber"');
+    print('Nom : "$name"');
+    print('Prénom : "$surname"');
+
+    // Appliquer trim() et vérifier à nouveau
+    phoneNumber = phoneNumber.trim();
+    name = name.trim();
+    surname = surname.trim();
+
+    print('Valeurs après trim() :');
+    print('Numéro de téléphone : "$phoneNumber"');
+    print('Nom : "$name"');
+    print('Prénom : "$surname"');
+
+    if (phoneNumber.isEmpty) {
+      print('Le champ Numéro de téléphone est vide.');
+      return;
+    }
+    if (name.isEmpty) {
+      print('Le champ Nom est vide.');
+      return;
+    }
+    if (surname.isEmpty) {
+      print('Le champ Prénom est vide.');
+      return;
+    }
+
+    final fullPhoneNumber = '+221$phoneNumber';
+    final url = Uri.parse(
+        '${baseUrl}api/auth/register');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'phone': fullPhoneNumber,
+          'name': name,
+          'surname': surname,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        print('Données de la réponse : $responseBody');
+
+        if (responseBody['name'] == name && responseBody['surname'] == surname && responseBody['phone'] == phoneNumber) {
+          print('Les données renvoyées par l\'API sont correctes.');
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              transitionDuration: const Duration(milliseconds: 300),
+              pageBuilder: (_, __, ___) =>
+                  const RegistrationCongratulationPage(),
+              transitionsBuilder: (_, animation, __, child) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: child,
+                );
+              },
+            ),
+          );
+        } else {
+          print('Les données renvoyées par l\'API ne correspondent pas.');
+          // Affichez un message d'erreur à l'utilisateur ici
+        }
+      } else {
+        print('Erreur : ${response.statusCode}');
+        print('Données de la réponse : ${response.body}');
+        // Affichez un message d'erreur à l'utilisateur ici
+      }
+    } catch (e) {
+      print('Erreur lors de la requête : $e');
+      // Affichez un message d'erreur à l'utilisateur ici
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +158,9 @@ class RegistrationLastPage extends StatelessWidget {
                         context,
                         PageRouteBuilder(
                           transitionDuration: const Duration(milliseconds: 300),
-                          pageBuilder: (_, __, ___) =>
-                              const RegistrationAuthPage(),
+                          pageBuilder: (_, __, ___) => RegistrationAuthPage(
+                            phoneNumber: widget.phoneNumber,
+                          ),
                           transitionsBuilder: (_, animation, __, child) {
                             return SlideTransition(
                               position: Tween<Offset>(
@@ -92,180 +225,101 @@ class RegistrationLastPage extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 1.5.h),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey.withOpacity(0.5),
-                          ),
-                          borderRadius: BorderRadius.circular(
-                              8.0), // Ajoute un rayon de bordure si nécessaire
-                        ),
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(0.w),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(width: 1.5.h),
-                                  Image.asset(
-                                    'assets/icons/sng.png',
-                                    width: 5.w,
-                                    height: 5.w,
-                                  ),
-                                  SizedBox(width: 2.w),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 3.w),
-                              child: RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: '+221 ',
-                                      style: TextStyle(
-                                        color: const Color(0xFF1A1A1A),
-                                        fontFamily: 'Cabin',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12.sp,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: '78 444 56 78',
-                                      style: TextStyle(
-                                        color: const Color(0xFF1A1A1A),
-                                        fontFamily: 'Cabin',
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12.sp,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "",
-                                  contentPadding: EdgeInsets.symmetric(
-                                    vertical: 3.w,
-                                  ),
-                                ),
-                                textCapitalization: TextCapitalization.words,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(5),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.asset(
-                                    'assets/icons/check.png',
-                                    width: 5.w,
-                                    height: 5.w,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 1.h),
                       InputText(
-                        hintText: "",
                         prefixIcon: Padding(
                           padding: EdgeInsets.all(0.w),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              SizedBox(width: 1.5.h),
                               Image.asset(
-                                'assets/icons/crt.png',
+                                'assets/icons/sng.png',
                                 width: 5.w,
                               ),
-                              SizedBox(width: 2.w),
+                              SizedBox(width: 1.5.h),
                               Text(
-                                "Nom(s) ",
+                                widget.phoneNumber,
                                 style: TextStyle(
-                                  fontSize: 12.sp,
+                                  color: const Color(0xFF1A1A1A),
+                                  fontFamily: 'Cabin',
                                   fontWeight: FontWeight.w400,
-                                  fontFamily: "Cabin",
+                                  fontSize: 12.sp,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      SizedBox(height: 1.h),
-                      InputText(
-                        hintText: "",
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.all(0.w),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(width: 1.5.h),
-                              Image.asset(
-                                'assets/icons/crt.png',
-                                width: 5.w,
-                              ),
-                              SizedBox(width: 2.w),
-                              Text(
-                                "Prenom(s) ",
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w400,
-                                  fontFamily: "Cabin",
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16.h),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              PageRouteBuilder(
-                                transitionDuration:
-                                    const Duration(milliseconds: 300),
-                                pageBuilder: (_, __, ___) =>
-                                    const RegistrationCongratulationPage(),
-                                transitionsBuilder: (_, animation, __, child) {
-                                  return SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(1.0, 0.0),
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1A1A1A),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 1.5.h, horizontal: 10.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(1.5.w),
-                            ),
-                          ),
-                          child: Text(
-                            "Suivant",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12.sp,
-                                fontFamily: "Cabin",
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ),
+                        controller: phoneController,
+                        enabled: false,
                       ),
                       SizedBox(height: 2.h),
+                      InputText(
+                        hintText: "Nom(s)",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.all(0.w),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                'assets/icons/crt.png',
+                                width: 5.w,
+                              ),
+                              SizedBox(width: 1.5.h),
+                            ],
+                          ),
+                        ),
+                        controller: nameController,
+                        onChanged: (value) {
+                          setState(() {
+                            name = value!;
+                          });
+                          print("Nom onChanged: $value");
+                        },
+                      ),
+                      SizedBox(height: 2.h),
+                      InputText(
+                        hintText: "Prénom(s)",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.all(0.w),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                'assets/icons/crt.png',
+                                width: 5.w,
+                              ),
+                              SizedBox(width: 1.5.h),
+                            ],
+                          ),
+                        ),
+                        controller: surnameController,
+                        onChanged: (value) {
+                          setState(() {
+                            surname = value!;
+                          });
+                          print("Prénom onChanged: $value");
+                        },
+                      ),
+                      SizedBox(height: 3.h),
+                      ElevatedButton(
+                        onPressed: registerUser,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1A1A1A),
+                          padding: EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 10.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(1.5.w),
+                          ),
+                        ),
+                        child: Text(
+                          "Suivant",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.sp,
+                            fontFamily: "Cabin",
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 5.h),
                     ],
                   ),
                 ),

@@ -167,7 +167,7 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
                   fontFamily: "Cabin",
                 ),
               ),
-             QuantityWidget(userId: '', partId: '',), // Ensure this is defined elsewhere
+           // Ensure this is defined elsewhere
             ],
           ),
           SizedBox(height: 1.h),

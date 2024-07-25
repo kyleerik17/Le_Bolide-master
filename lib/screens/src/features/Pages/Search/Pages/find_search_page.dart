@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bar_search1.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/find_search_full_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
 import 'package:sizer/sizer.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal2_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal_page.dart';
@@ -34,7 +32,7 @@ class _FindSearchPageState extends State<FindSearchPage> {
   Future<List<Piece>> _fetchPieces() async {
     try {
       final response =
-          await http.get(Uri.parse('http://192.168.1.11/rest-api/api/pieces'));
+          await http.get(Uri.parse('${baseUrl}api/pieces'));
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse.containsKey('Liste des pieces')) {
@@ -139,7 +137,7 @@ class _FindSearchPageState extends State<FindSearchPage> {
                           title: piece.libelle,
                           description: piece.description,
                           price: piece.price,
-                          partId: piece.id.toString(), // Convertir l'ID en String
+                          partId: piece.id, // Passer l'ID en tant qu'int
                         );
                       }).toList(),
                     );
@@ -222,7 +220,7 @@ class ArticleCard extends StatelessWidget {
   final String title;
   final String description;
   final String price;
-  final String partId; // ID de l'article
+  final int partId; // ID de l'article en tant qu'int
 
   const ArticleCard({
     Key? key,
@@ -253,7 +251,7 @@ class ArticleCard extends StatelessWidget {
 
               return SlideTransition(
                 position: offsetAnimation,
-                child: const Details1ProduitsPage(),
+                child: Details1ProduitsPage(partId: ''), // Convertir l'ID en String ici
               );
             },
           ),
@@ -331,7 +329,7 @@ class ArticleCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      QuantityWidget(userId: '2', partId: partId) // Passer l'ID ici
+                      QuantityWidget(userId: 2, partId: '') // Passer l'ID ici en tant qu'int
                     ],
                   ),
                 ],
