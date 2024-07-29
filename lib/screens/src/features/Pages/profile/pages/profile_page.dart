@@ -7,7 +7,14 @@ import 'package:sizer/sizer.dart';
 import '../../Home/pages/home_page.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+
+  const ProfilePage(
+    this.partId,
+    this.userId, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -47,7 +54,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   context,
                   PageRouteBuilder(
                     transitionDuration: const Duration(milliseconds: 300),
-                    pageBuilder: (_, __, ___) => const HomePage(),
+                    pageBuilder: (_, __, ___) => HomePage(
+                      partId: widget.partId,
+                      userId: widget.userId
+                    ),
                     transitionsBuilder: (_, animation, __, child) {
                       return SlideTransition(
                         position: Tween<Offset>(

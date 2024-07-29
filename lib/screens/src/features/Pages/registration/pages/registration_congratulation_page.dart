@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-
 import 'package:sizer/sizer.dart';
-
 import '../../Home/pages/pages.dart';
 
 class RegistrationCongratulationPage extends StatelessWidget {
-  const RegistrationCongratulationPage({super.key});
+  final int partId;
+  final int userId;
+  const RegistrationCongratulationPage(
+      {super.key, required this.partId, required this.userId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
+          // Fond d'écran
           Container(
             height: 100.h,
-            width: 100.h,
+            width: 100.w, // Correction de la largeur
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/carr.png'),
@@ -22,6 +24,7 @@ class RegistrationCongratulationPage extends StatelessWidget {
               ),
             ),
           ),
+          // Contenu de la page
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -63,20 +66,14 @@ class RegistrationCongratulationPage extends StatelessWidget {
               SizedBox(height: 50.w),
               ElevatedButton(
                 onPressed: () {
+                  print('Navigating to HomePage with partId: $partId');
                   Navigator.pushReplacement(
                     context,
-                    PageRouteBuilder(
-                      transitionDuration: const Duration(milliseconds: 300),
-                      pageBuilder: (_, __, ___) => const HomePage(),
-                      transitionsBuilder: (_, animation, __, child) {
-                        return SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
-                        );
-                      },
+                    MaterialPageRoute(
+                      builder: (context) => HomePage(
+                        partId: partId,
+                        userId: userId,
+                      ),
                     ),
                   );
                 },

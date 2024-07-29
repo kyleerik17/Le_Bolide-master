@@ -3,9 +3,15 @@ import 'package:flutter/material.dart';
 import '../../home_page.dart';
 import 'pneu_page.dart';
 
-
 class CategoriesPage extends StatelessWidget {
-  const CategoriesPage({super.key});
+  final int partId;
+  final int userId;
+
+  const CategoriesPage({
+    super.key,
+    required this.partId,
+    required this.userId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,27 +20,30 @@ class CategoriesPage extends StatelessWidget {
         leading: GestureDetector(
           onTap: () {
             Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const HomePage(),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        const begin = Offset(-1.0, 0.0);
-                        const end = Offset.zero;
-                        const curve = Curves.ease;
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    HomePage(
+                  partId: partId,
+                  userId: userId,
+                ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(-1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
 
-                        final tween = Tween(begin: begin, end: end)
-                            .chain(CurveTween(curve: curve));
-                        final offsetAnimation = animation.drive(tween);
+                  final tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  final offsetAnimation = animation.drive(tween);
 
-                        return SlideTransition(
-                          position: offsetAnimation,
-                          child: child,
-                        );
-                      },
-                    ),
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
                   );
+                },
+              ),
+            );
           },
           child: Image.asset(
             'assets/icons/gc.png',
@@ -66,37 +75,36 @@ class CategoriesPage extends StatelessWidget {
             const CategoryItem(
                 icon: 'assets/icons/voiture.png', label: 'Voiture'),
             const CategoryItem(icon: 'assets/icons/moto.png', label: 'Moto'),
-           GestureDetector(
-  onTap: () {
-    Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const PneuPage(categoryId: '', categoryDetails: {},),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        const begin = Offset(1.0, 0.0);
-                        const end = Offset.zero;
-                        const curve = Curves.ease;
+            GestureDetector(
+              onTap: () {
+                // Navigator.pushReplacement(
+                //                 context,
+                //                 PageRouteBuilder(
+                //                   pageBuilder: (context, animation, secondaryAnimation) =>
+                //                       const PneuPage(categoryId: '', categoryDetails: {},),
+                //                   transitionsBuilder:
+                //                       (context, animation, secondaryAnimation, child) {
+                //                     const begin = Offset(1.0, 0.0);
+                //                     const end = Offset.zero;
+                //                     const curve = Curves.ease;
 
-                        final tween = Tween(begin: begin, end: end)
-                            .chain(CurveTween(curve: curve));
-                        final offsetAnimation = animation.drive(tween);
+                //                     final tween = Tween(begin: begin, end: end)
+                //                         .chain(CurveTween(curve: curve));
+                //                     final offsetAnimation = animation.drive(tween);
 
-                        return SlideTransition(
-                          position: offsetAnimation,
-                          child: child,
-                        );
-                      },
-                    ),
-                  );
-  },
-  child: const CategoryItem(
-    icon: 'assets/icons/rng.png', 
-    label: 'Pneus',
-  ),
-),
-
+                //                     return SlideTransition(
+                //                       position: offsetAnimation,
+                //                       child: child,
+                //                     );
+                //                   },
+                //                 ),
+                //               );
+              },
+              child: const CategoryItem(
+                icon: 'assets/icons/rng.png',
+                label: 'Pneus',
+              ),
+            ),
             const CategoryItem(icon: 'assets/icons/tl.png', label: 'Outillage'),
             const CategoryItem(
                 icon: 'assets/icons/acc.png', label: 'Accessoires Auto'),

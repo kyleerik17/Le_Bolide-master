@@ -6,7 +6,6 @@ import 'package:sizer/sizer.dart';
 import '../../../../../../gen/assets.gen.dart';
 import '../../registration/pages/pages.dart';
 
-
 List<String> titles = [
   "Trouvez vos pièces détachées devient si simple",
   "Explorez le catalogue le plus complet au Sénégal",
@@ -25,7 +24,13 @@ List<String> descriptions = [
 ];
 
 class OnboardingPage extends StatefulWidget {
-  const OnboardingPage({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  const OnboardingPage({
+    Key? key,
+    required this.partId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   State<OnboardingPage> createState() => _OnboardingPageState();
@@ -178,7 +183,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                             transitionDuration: const Duration(
                                                 milliseconds: 300),
                                             pageBuilder: (_, __, ___) =>
-                                                const RegistrationPage(),
+                                                RegistrationPage(
+                                              partId: widget.partId,
+                                              userId: widget.userId
+                                            ),
                                             transitionsBuilder:
                                                 (_, animation, __, child) {
                                               return SlideTransition(

@@ -1,23 +1,50 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
-import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/article4.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/quantity_widget_fav.dart';
 import 'package:sizer/sizer.dart';
-
 import '../../Home/widgets/appbar.dart';
 import '../../loading modal/pages/pages.dart';
 import '../Widgets/bottom.dart';
 
 class FavorisPage extends StatefulWidget {
-  const FavorisPage({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+
+  const FavorisPage({
+    Key? key,
+    required this.partId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   _FavorisPageState createState() => _FavorisPageState();
 }
 
 class _FavorisPageState extends State<FavorisPage> {
- 
+  late Future<List<Item>> _futureFavorites;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureFavorites = fetchFavorites();
+  }
+
+  Future<List<Item>> fetchFavorites() async {
+    final response = await http.get(
+      Uri.parse(
+          'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/user/${widget.userId}'),
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      List favoritesJson = jsonResponse['favorites'];
+      return favoritesJson.map((data) => Item.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load favorites');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +59,7 @@ class _FavorisPageState extends State<FavorisPage> {
         child: Column(
           children: [
             SizedBox(height: 3.h),
-            const AppBarWidget(),
+            AppBarWidget(partId: widget.partId, userId: widget.userId),
             SizedBox(height: 2.h),
             Padding(
               padding: EdgeInsets.all(2.w),
@@ -62,7 +89,36 @@ class _FavorisPageState extends State<FavorisPage> {
                       color: Colors.black,
                     ),
                   ),
-              const Article4Page(),
+                  FutureBuilder<List<Item>>(
+                    future: _futureFavorites,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No favorites found',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontFamily: "Cabin",
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            return _buildItem(context, snapshot.data![index]);
+                          },
+                        );
+                      }
+                    },
+                  )
                 ],
               ),
             ),
@@ -71,6 +127,8 @@ class _FavorisPageState extends State<FavorisPage> {
       ),
       bottomNavigationBar: FavorisBottomNavBar(
         onTap: (int) {},
+        partId: widget.partId,
+        userId: widget.userId,
       ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
@@ -85,7 +143,8 @@ class _FavorisPageState extends State<FavorisPage> {
                 context,
                 PageRouteBuilder(
                   transitionDuration: const Duration(milliseconds: 300),
-                  pageBuilder: (_, __, ___) => const SearchLoadPage(),
+                  pageBuilder: (_, __, ___) => SearchLoadPage(
+                      partId: widget.partId, userId: widget.userId),
                   transitionsBuilder: (_, animation, __, child) {
                     return SlideTransition(
                       position: Tween<Offset>(
@@ -133,7 +192,7 @@ class _FavorisPageState extends State<FavorisPage> {
                 height: 84,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(item.imagePath),
+                    image: NetworkImage(item.imagePath),
                     fit: BoxFit.contain,
                   ),
                   borderRadius: BorderRadius.circular(0.5.h),
@@ -154,7 +213,7 @@ class _FavorisPageState extends State<FavorisPage> {
                     ),
                     Row(
                       children: [
-                        Image.asset(
+                        Image.network(
                           item.subtitleIconPath,
                           width: 6.w,
                           height: 6.w,
@@ -172,19 +231,18 @@ class _FavorisPageState extends State<FavorisPage> {
                     ),
                     Row(
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              item.price,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontFamily: "Cabin",
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            const Add3Page(),
-                          ],
+                        Text(
+                          item.price,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontFamily: "Cabin",
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(width: 10.w),
+                        QuantityWidgetFav(
+                          userId: widget.userId,
+                          partId: widget.partId,
                         ),
                       ],
                     ),
@@ -230,6 +288,17 @@ class Item {
     required this.subtitleIconPath,
     required this.price,
   });
+
+  factory Item.fromJson(Map<String, dynamic> json) {
+    return Item(
+      title: json['libelle'] ?? '', // Updated to match the new key
+      imagePath: json['img'] ?? '', // Updated to match the new key
+      subtitle: json['description'] ?? '', // Updated to match the new key
+      subtitleIconPath:
+          '', // No equivalent in the new response, can be left as empty string
+      price: json['price'] ?? '', // Updated to match the new key
+    );
+  }
 
   void toggleIcon() {
     if (iconPath == 'assets/icons/hrt2.png') {

@@ -1,8 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class ModalPage extends StatelessWidget {
+class ModalPage extends StatefulWidget {
   const ModalPage({super.key});
+
+  @override
+  _ModalPageState createState() => _ModalPageState();
+}
+
+class _ModalPageState extends State<ModalPage> {
+  bool _isLoading = false;
+  List<dynamic> _items = [];
+  String _selectedFilter = '';
+  String? _selectedItemId; // Variable pour l'élément sélectionné
+
+  Future<void> _fetchItems() async {
+    final url =
+        'https://bolide.armasoft.ci/bolide_services/index.php/api/pieces/category/1';
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          _items = data;
+        });
+      } else {
+        // Handle errors
+        print('Failed to load items. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching items: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +109,7 @@ class ModalPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const FilterSection(
+                  FilterSection(
                     title: 'Marques',
                     options: [
                       'Michelin',
@@ -79,7 +120,7 @@ class ModalPage extends StatelessWidget {
                       'Maxxis'
                     ],
                   ),
-                  const FilterSection(
+                  FilterSection(
                     title: 'Types de véhicules',
                     options: [
                       'Auto',
@@ -89,46 +130,50 @@ class ModalPage extends StatelessWidget {
                       'Moto/Scooter'
                     ],
                   ),
-                  const FilterSection(
+                  FilterSection(
                     title: 'Types de pneus',
-                    options: [
-                      'Toutes saisons',
-                      'Pneus été',
-                      'Pneus hiver'
-                    ],
+                    options: ['Toutes saisons', 'Pneus été', 'Pneus hiver'],
+                    onOptionSelected: (option) {
+                      if (option == 'Toutes saisons') {
+                        _fetchItems();
+                      }
+                      setState(() {
+                        _selectedFilter = option;
+                      });
+                    },
                   ),
                   const SizedBox(height: 16),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
+                  if (_isLoading)
+                    Center(child: CircularProgressIndicator())
+                  else if (_selectedFilter == 'Toutes saisons' &&
+                      _items.isNotEmpty)
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Dimensions',
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Poppins',
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                      children: _items.map((item) {
+                        return ListTile(
+                          title: Text(item['libelle']),
+                          subtitle: Text(item['description']),
+                          trailing: Text('${item['price']}'),
+                          tileColor: item['id'] == _selectedItemId
+                              ? Colors.grey[300]
+                              : Colors.transparent,
+                          onTap: () {
+                            setState(() {
+                              _selectedItemId = item['id'];
+                            });
+                          },
+                        );
+                      }).toList(),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      DimensionInput(label: 'Largeur', options: ['205']),
-                      DimensionInput(label: 'Hauteur', options: ['55']),
-                      DimensionInput(label: 'Diamètre', options: ['55']),
-                    ],
-                  ),
                   SizedBox(height: 4.w),
                   Center(
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (_selectedItemId != null) {
+                          // Handle validation or submission with the selected item
+                          print('Selected item ID: $_selectedItemId');
+                        }
+                      },
                       style: TextButton.styleFrom(
                         backgroundColor: const Color(0xFF1A1A1A),
                         padding: EdgeInsets.symmetric(
@@ -161,8 +206,15 @@ class ModalPage extends StatelessWidget {
 class FilterSection extends StatefulWidget {
   final String title;
   final List<String> options;
+  final void Function(String)?
+      onOptionSelected; // Callback pour la sélection des options
 
-  const FilterSection({super.key, required this.title, required this.options});
+  const FilterSection({
+    super.key,
+    required this.title,
+    required this.options,
+    this.onOptionSelected,
+  });
 
   @override
   _FilterSectionState createState() => _FilterSectionState();
@@ -226,10 +278,12 @@ class _FilterSectionState extends State<FilterSection> {
                   ),
                   borderRadius: BorderRadius.circular(4),
                 ),
-           
                 onSelected: (bool value) {
                   setState(() {
                     selectedOptions[option] = value;
+                    if (widget.onOptionSelected != null) {
+                      widget.onOptionSelected!(option);
+                    }
                   });
                 },
               );

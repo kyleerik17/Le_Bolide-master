@@ -13,7 +13,10 @@ import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal_page.dar
 import 'package:le_bolide/data/models/api_services.dart';
 
 class FindSearchPage extends StatefulWidget {
-  const FindSearchPage({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  const FindSearchPage({Key? key, required this.partId, required this.userId})
+      : super(key: key);
 
   @override
   _FindSearchPageState createState() => _FindSearchPageState();
@@ -31,8 +34,7 @@ class _FindSearchPageState extends State<FindSearchPage> {
 
   Future<List<Piece>> _fetchPieces() async {
     try {
-      final response =
-          await http.get(Uri.parse('${baseUrl}api/pieces'));
+      final response = await http.get(Uri.parse('${baseUrl}api/pieces'));
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse.containsKey('Liste des pieces')) {
@@ -91,7 +93,11 @@ class _FindSearchPageState extends State<FindSearchPage> {
                   GestureDetector(
                     onTap: () => Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
+                      MaterialPageRoute(
+                          builder: (context) => HomePage(
+                                partId: widget.partId,
+                                userId: widget.userId
+                              )),
                     ),
                     child: Container(
                       decoration: const BoxDecoration(
@@ -137,7 +143,8 @@ class _FindSearchPageState extends State<FindSearchPage> {
                           title: piece.libelle,
                           description: piece.description,
                           price: piece.price,
-                          partId: piece.id, // Passer l'ID en tant qu'int
+                          partId: piece.id,
+                          userId: widget.userId // Passer l'ID en tant qu'int
                         );
                       }).toList(),
                     );
@@ -153,7 +160,10 @@ class _FindSearchPageState extends State<FindSearchPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const FindSearchPlusPage()),
+                          builder: (context) => FindSearchPlusPage(
+                                partId: widget.partId,
+                                userId: widget.userId
+                              )),
                     );
                   },
                   style: TextButton.styleFrom(
@@ -221,6 +231,7 @@ class ArticleCard extends StatelessWidget {
   final String description;
   final String price;
   final int partId; // ID de l'article en tant qu'int
+  final int userId;
 
   const ArticleCard({
     Key? key,
@@ -228,7 +239,8 @@ class ArticleCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.price,
-    required this.partId, // Ajout de l'ID de l'article
+    required this.partId,
+    required this.userId, // Ajout de l'ID de l'article
   }) : super(key: key);
 
   @override
@@ -251,7 +263,10 @@ class ArticleCard extends StatelessWidget {
 
               return SlideTransition(
                 position: offsetAnimation,
-                child: Details1ProduitsPage(partId: ''), // Convertir l'ID en String ici
+                child: Details1ProduitsPage(
+                  partId: partId,
+                  userId: userId,
+                ), // Convertir l'ID en String ici
               );
             },
           ),
@@ -329,7 +344,9 @@ class ArticleCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      QuantityWidget(userId: 2, partId: '') // Passer l'ID ici en tant qu'int
+                      QuantityWidget(
+                          userId: userId,
+                          partId: partId) // Passer l'ID ici en tant qu'int
                     ],
                   ),
                 ],

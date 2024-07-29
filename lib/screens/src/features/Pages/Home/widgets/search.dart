@@ -5,7 +5,13 @@ import 'package:sizer/sizer.dart';
 import '../../Search/Pages/find_search_page.dart';
 
 class SearchBarWidget extends StatelessWidget {
-  const SearchBarWidget({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  const SearchBarWidget({
+    Key? key,
+    required this.partId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +20,11 @@ class SearchBarWidget extends StatelessWidget {
         Navigator.push(
           context,
           PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 300),
-            pageBuilder: (_, __, ___) => const FindSearchPage(),
+            transitionDuration: Duration(milliseconds: 300),
+            pageBuilder: (_, __, ___) => FindSearchPage(
+              partId: partId,
+              userId: userId,
+            ),
             transitionsBuilder: (_, animation, __, child) {
               return SlideTransition(
                 position: Tween<Offset>(

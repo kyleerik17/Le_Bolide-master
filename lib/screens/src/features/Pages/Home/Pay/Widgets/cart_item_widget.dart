@@ -6,7 +6,8 @@ class CartItemWidget extends StatelessWidget {
   final double prix; // Assurez-vous que le type est double
   final int quantite;
   final String userId;
-  final String partId;
+  final int partId;
+
 
   const CartItemWidget({
     Key? key,
@@ -16,6 +17,7 @@ class CartItemWidget extends StatelessWidget {
     required this.quantite,
     required this.userId,
     required this.partId,
+    required void Function(int partId) onRemove,
   }) : super(key: key);
 
   @override
@@ -31,7 +33,8 @@ class CartItemWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(libelle, style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Prix: ${prix.toStringAsFixed(2)} F'), // Affiche avec deux décimales
+                Text(
+                    'Prix: ${prix.toStringAsFixed(2)} F'), // Affiche avec deux décimales
                 Text('Quantité: $quantite'),
               ],
             ),

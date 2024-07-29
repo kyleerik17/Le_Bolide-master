@@ -4,7 +4,15 @@ import 'package:sizer/sizer.dart';
 import 'find_search_page.dart';
 
 class SearchPage extends StatelessWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  final int partId;
+  final int quantity;
+  final int userId;
+  const SearchPage(
+      {Key? key,
+      required this.partId,
+      required this.quantity,
+      required this.userId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -46,21 +54,20 @@ class SearchPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const FindSearchPage()),
+                      builder: (context) => FindSearchPage(
+                            partId: partId,
+                            userId: userId,
+                          )),
                 );
               },
               child: TextField(
-                
                 decoration: InputDecoration(
                   hintText: 'Rechercher',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(1.5.w),
-                    
                   ),
-                  
                 ),
-                
               ),
             ),
           ],

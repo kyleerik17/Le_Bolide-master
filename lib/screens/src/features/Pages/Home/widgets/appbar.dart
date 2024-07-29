@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-
 import '../Menu/pages/menu.dart';
 import '../Pay/Pages/pages.dart';
 
 class AppBarWidget extends StatefulWidget {
-  const AppBarWidget({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  const AppBarWidget({Key? key, required this.partId, required this.userId})
+      : super(key: key);
 
   @override
   _AppBarWidgetState createState() => _AppBarWidgetState();
@@ -67,7 +69,8 @@ class _AppBarWidgetState extends State<AppBarWidget>
                           type: MaterialType.transparency,
                           child: Container(
                             color: Colors.white,
-                            child: const MenuPage(),
+                            child:
+                                MenuPage(partId: widget.partId, userId: widget.userId),
                           ),
                         ),
                       ),
@@ -95,7 +98,12 @@ class _AppBarWidgetState extends State<AppBarWidget>
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const PayPage(partId: '',)),
+                  MaterialPageRoute(
+                      builder: (context) => PayPage(
+                            partId: widget.partId,
+                            userId: widget.userId,
+                            cartItems: [],
+                          )),
                 );
               },
               child: Padding(

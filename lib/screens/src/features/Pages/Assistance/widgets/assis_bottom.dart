@@ -7,11 +7,16 @@ import '../../Home/pages/home_page.dart';
 import '../../commande/pages/pages.dart';
 
 class AssisBottom extends StatefulWidget {
+  final int partId;
+  final int userId;
+
   final Function(int) onTap;
 
   const AssisBottom({
     Key? key,
     required this.onTap,
+    required this.partId,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -55,9 +60,13 @@ class _AssisBottomState extends State<AssisBottom> {
                     _selectedIndex = 0;
                   });
                   widget.onTap(0);
-                   Navigator.pushReplacement(
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    MaterialPageRoute(
+                        builder: (context) => HomePage(
+                              partId: widget.partId,
+                              userId: widget.userId
+                            )),
                   );
                 },
                 child: Padding(
@@ -89,9 +98,13 @@ class _AssisBottomState extends State<AssisBottom> {
                     _selectedIndex = 1;
                   });
                   widget.onTap(1);
-  Navigator.pushReplacement(
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => CommandePage()),
+                    MaterialPageRoute(
+                        builder: (context) => CommandePage(
+                              partId: widget.partId,
+                              userId: widget.userId
+                            )),
                   );
                 },
                 child: Padding(
@@ -162,10 +175,11 @@ class _AssisBottomState extends State<AssisBottom> {
                     _selectedIndex = 4;
                   });
                   widget.onTap(4);
-                   Navigator.pushReplacement(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const FavorisPage()),
+                        builder: (context) =>
+                            FavorisPage(partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(

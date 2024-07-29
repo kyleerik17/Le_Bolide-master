@@ -6,11 +6,15 @@ import '../../Home/pages/home_page.dart';
 import '../../commande/pages/pages.dart';
 
 class FavorisBottomNavBar extends StatefulWidget {
+  final int partId;
+  final int userId;
   final Function(int) onTap;
 
   const FavorisBottomNavBar({
     Key? key,
     required this.onTap,
+    required this.partId,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -54,9 +58,11 @@ class _FavorisBottomNavBarState extends State<FavorisBottomNavBar> {
                     _selectedIndex = 0;
                   });
                   widget.onTap(0);
-                 Navigator.pushReplacement(
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            HomePage(partId: widget.partId, userId:widget.userId)),
                   );
                 },
                 child: Padding(
@@ -90,10 +96,11 @@ class _FavorisBottomNavBarState extends State<FavorisBottomNavBar> {
                     _selectedIndex = 1;
                   });
                   widget.onTap(1);
-                 Navigator.pushReplacement(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const CommandePage()),
+                        builder: (context) => CommandePage(
+                            partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(
@@ -128,10 +135,13 @@ class _FavorisBottomNavBarState extends State<FavorisBottomNavBar> {
                     _selectedIndex = 3;
                   });
                   widget.onTap(3);
-                 Navigator.pushReplacement(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const AssistancePage()),
+                        builder: (context) => AssistancePage(
+                              partId: widget.partId,
+                              userId: widget.userId
+                            )),
                   );
                 },
                 child: Padding(

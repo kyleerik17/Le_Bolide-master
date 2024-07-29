@@ -5,15 +5,17 @@ import 'package:le_bolide/screens/src/features/Pages/loading%20modal/pages/searc
 
 import 'package:sizer/sizer.dart';
 
-
 import '../widgets/assis_bottom.dart';
 
 class AssistancePage extends StatelessWidget {
-  const AssistancePage({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  const AssistancePage({Key? key, required this.partId, required this.userId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.white,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.dark,
@@ -23,8 +25,11 @@ class AssistancePage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           SizedBox(height: 3.h),
-          const AppBarWidget(),
+          SizedBox(height: 3.h),
+          AppBarWidget(
+            partId: partId,
+            userId: userId,
+          ),
           SizedBox(height: 2.h),
           Center(
             child: Column(
@@ -170,8 +175,10 @@ class AssistancePage extends StatelessWidget {
       ),
       bottomNavigationBar: AssisBottom(
         onTap: (int) {},
+        partId: partId,
+        userId:userId,
       ),
-     floatingActionButton: Align(
+      floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
         child: Container(
           margin: EdgeInsets.only(
@@ -184,7 +191,10 @@ class AssistancePage extends StatelessWidget {
                 context,
                 PageRouteBuilder(
                   transitionDuration: const Duration(milliseconds: 300),
-                  pageBuilder: (_, __, ___) => const SearchLoadPage(),
+                  pageBuilder: (_, __, ___) => SearchLoadPage(
+                    partId: partId,
+                    userId:userId,
+                  ),
                   transitionsBuilder: (_, animation, __, child) {
                     return SlideTransition(
                       position: Tween<Offset>(

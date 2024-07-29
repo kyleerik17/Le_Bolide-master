@@ -1,18 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration-auth_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration_congratulation_page.dart';
-import 'package:le_bolide/screens/src/features/Widgets/inputs/input_text.dart';
-import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:sizer/sizer.dart';
 
-import '../../../../../../data/models/api_services.dart';
+import '../../../Widgets/inputs/inputs.dart';
 
 class RegistrationLastPage extends StatefulWidget {
+  final int partId;
+  final int userId;
   final String phoneNumber;
+  final String flag;
 
-  const RegistrationLastPage({Key? key, required this.phoneNumber})
-      : super(key: key);
+  const RegistrationLastPage({
+    Key? key,
+    required this.phoneNumber,
+    required this.partId,
+    required this.userId,
+    required this.flag,
+  }) : super(key: key);
 
   @override
   _RegistrationLastPageState createState() => _RegistrationLastPageState();
@@ -21,99 +29,112 @@ class RegistrationLastPage extends StatefulWidget {
 class _RegistrationLastPageState extends State<RegistrationLastPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
 
-  String name = '';
-  String surname = '';
+  String? nameError;
+  String? surnameError;
+  String? emailError;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    phoneController.text = widget.phoneNumber;
-
-    nameController.addListener(() {
-      setState(() {
-        name = nameController.text;
-      });
-      print("Nom changé (listener): $name");
-    });
-
-    surnameController.addListener(() {
-      setState(() {
-        surname = surnameController.text;
-      });
-      print("Prénom changé (listener): $surname");
-    });
+    phoneNumberController.text = widget.phoneNumber;
   }
 
   @override
   void dispose() {
     nameController.dispose();
     surnameController.dispose();
-    phoneController.dispose();
+    emailController.dispose();
+    phoneNumberController.dispose();
     super.dispose();
   }
 
+  String? validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Ce champ est requis';
+    }
+    final regex = RegExp(r'^[a-zA-ZÀ-ÿ\s-]+$');
+    if (!regex.hasMatch(value)) {
+      return 'Le nom ne peut contenir que des lettres, espaces et tirets';
+    }
+    return null;
+  }
+
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Ce champ est requis';
+    }
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    if (!regex.hasMatch(value)) {
+      return 'Veuillez entrer un email valide';
+    }
+    return null;
+  }
+
   Future<void> registerUser() async {
-    String phoneNumber = phoneController.text;
+    print('Bouton "Enregistrer" pressé');
 
-    print('Valeurs avant enregistrement :');
-    print('Numéro de téléphone : "$phoneNumber"');
-    print('Nom : "$name"');
-    print('Prénom : "$surname"');
-
-    // Appliquer trim() et vérifier à nouveau
-    phoneNumber = phoneNumber.trim();
-    name = name.trim();
-    surname = surname.trim();
-
-    print('Valeurs après trim() :');
-    print('Numéro de téléphone : "$phoneNumber"');
-    print('Nom : "$name"');
-    print('Prénom : "$surname"');
-
-    if (phoneNumber.isEmpty) {
-      print('Le champ Numéro de téléphone est vide.');
-      return;
-    }
-    if (name.isEmpty) {
-      print('Le champ Nom est vide.');
-      return;
-    }
-    if (surname.isEmpty) {
-      print('Le champ Prénom est vide.');
+    if (!_validateForm()) {
+      print('Erreur de validation des données');
       return;
     }
 
-    final fullPhoneNumber = '+221$phoneNumber';
+    setState(() {
+      isLoading = true;
+    });
+
     final url = Uri.parse(
-        '${baseUrl}api/auth/register');
+        'https://bolide.armasoft.ci/bolide_services/index.php/api/auth/register');
 
     try {
+      final String name = nameController.text.trim();
+      final String surname = surnameController.text.trim();
+      final String email = emailController.text.trim();
+      final String phone =
+          phoneNumberController.text.replaceAll(RegExp(r'[^\d]'), '');
+
+      final requestBody = {
+        'phone': phone,
+        'name': name,
+        'surname': surname,
+        'email': email,
+      };
+
+      print('Payload envoyé à l\'API: $requestBody');
+
       final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          'phone': fullPhoneNumber,
-          'name': name,
-          'surname': surname,
-        }),
+        body: jsonEncode(requestBody),
       );
+
+      print('Réponse de l\'API: ${response.body}');
+      print('Code de statut: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        print('Données de la réponse : $responseBody');
+        print('Réponse décodée: $responseBody');
 
-        if (responseBody['name'] == name && responseBody['surname'] == surname && responseBody['phone'] == phoneNumber) {
-          print('Les données renvoyées par l\'API sont correctes.');
+        if (responseBody['message'] == 'Inscription reussie') {
+          final data = responseBody['data'];
+          final userId = data['id'];
+          final userName = data['name'];
+          final userSurname = data['surname'];
+          final userPhone = data['phone'];
+
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
               transitionDuration: const Duration(milliseconds: 300),
-              pageBuilder: (_, __, ___) =>
-                  const RegistrationCongratulationPage(),
+              pageBuilder: (_, __, ___) => RegistrationCongratulationPage(
+                partId: widget.partId,
+                userId: userId, // Pass the userId from the API response
+              ),
               transitionsBuilder: (_, animation, __, child) {
                 return SlideTransition(
                   position: Tween<Offset>(
@@ -126,18 +147,37 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
             ),
           );
         } else {
-          print('Les données renvoyées par l\'API ne correspondent pas.');
-          // Affichez un message d'erreur à l'utilisateur ici
+          _showErrorSnackBar(
+              'Erreur lors de l\'inscription. Veuillez réessayer.');
         }
       } else {
-        print('Erreur : ${response.statusCode}');
-        print('Données de la réponse : ${response.body}');
-        // Affichez un message d'erreur à l'utilisateur ici
+        _showErrorSnackBar('Erreur serveur. Veuillez réessayer plus tard.');
       }
     } catch (e) {
-      print('Erreur lors de la requête : $e');
-      // Affichez un message d'erreur à l'utilisateur ici
+      print('Erreur de connexion: $e');
+      _showErrorSnackBar(
+          'Erreur de connexion. Vérifiez votre connexion internet.');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  bool _validateForm() {
+    setState(() {
+      nameError = validateName(nameController.text);
+      surnameError = validateName(surnameController.text);
+      emailError = validateEmail(emailController.text);
+    });
+
+    return nameError == null && surnameError == null && emailError == null;
   }
 
   @override
@@ -160,6 +200,8 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
                           transitionDuration: const Duration(milliseconds: 300),
                           pageBuilder: (_, __, ___) => RegistrationAuthPage(
                             phoneNumber: widget.phoneNumber,
+                            partId: widget.partId,
+                            userId: widget.userId, flag: widget.flag,
                           ),
                           transitionsBuilder: (_, animation, __, child) {
                             return SlideTransition(
@@ -225,101 +267,69 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 1.5.h),
-                      InputText(
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.all(0.w),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                'assets/icons/sng.png',
-                                width: 5.w,
-                              ),
-                              SizedBox(width: 1.5.h),
-                              Text(
-                                widget.phoneNumber,
-                                style: TextStyle(
-                                  color: const Color(0xFF1A1A1A),
-                                  fontFamily: 'Cabin',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12.sp,
-                                ),
-                              ),
-                            ],
+                      Row(
+                        children: [
+                          Image.asset(
+                            widget.flag,
+                            width: 50.0,
+                            height: 50.0,
                           ),
-                        ),
-                        controller: phoneController,
-                        enabled: false,
+                          const SizedBox(width: 16.0),
+                          Text(
+                            widget.phoneNumber,
+                            style: const TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 2.h),
-                      InputText(
-                        hintText: "Nom(s)",
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.all(0.w),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                'assets/icons/crt.png',
-                                width: 5.w,
-                              ),
-                              SizedBox(width: 1.5.h),
-                            ],
-                          ),
-                        ),
+                      const SizedBox(height: 24.0),
+                      _buildTextField(
                         controller: nameController,
-                        onChanged: (value) {
-                          setState(() {
-                            name = value!;
-                          });
-                          print("Nom onChanged: $value");
-                        },
+                        labelText: 'Nom',
+                        errorText: nameError,
+                      ),
+                      const SizedBox(height: 16.0),
+                      _buildTextField(
+                        controller: surnameController,
+                        labelText: 'Prénom',
+                        errorText: surnameError,
+                      ),
+                      const SizedBox(height: 16.0),
+                      _buildTextField(
+                        controller: emailController,
+                        labelText: 'Email',
+                        errorText: emailError,
+                      ),
+                      const SizedBox(height: 30.0),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: registerUser,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1A1A1A),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 1.5.h, horizontal: 10.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(1.5.w),
+                            ),
+                          ),
+                          child: isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  "Suivant",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12.sp,
+                                      fontFamily: "Cabin",
+                                      fontWeight: FontWeight.w600),
+                                ),
+                        ),
                       ),
                       SizedBox(height: 2.h),
-                      InputText(
-                        hintText: "Prénom(s)",
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.all(0.w),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                'assets/icons/crt.png',
-                                width: 5.w,
-                              ),
-                              SizedBox(width: 1.5.h),
-                            ],
-                          ),
-                        ),
-                        controller: surnameController,
-                        onChanged: (value) {
-                          setState(() {
-                            surname = value!;
-                          });
-                          print("Prénom onChanged: $value");
-                        },
-                      ),
-                      SizedBox(height: 3.h),
-                      ElevatedButton(
-                        onPressed: registerUser,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1A1A1A),
-                          padding: EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 10.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(1.5.w),
-                          ),
-                        ),
-                        child: Text(
-                          "Suivant",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12.sp,
-                            fontFamily: "Cabin",
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 5.h),
                     ],
                   ),
                 ),
@@ -327,6 +337,24 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    String? errorText,
+  }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        errorText: errorText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        contentPadding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
       ),
     );
   }

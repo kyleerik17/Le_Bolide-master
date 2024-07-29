@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Importez ceci pour accéder à SystemChrome
-
 import 'package:sizer/sizer.dart';
-
 import '../../loading modal/pages/pages.dart';
 import '../widgets/appbar.dart';
 import '../widgets/bottom.dart';
@@ -13,7 +11,13 @@ import '../widgets/slider.dart';
 import 'Categories/pages/categorie_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  const HomePage({
+    Key? key,
+    required this.partId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -32,8 +36,8 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-      
-          const AppBarWidget(),
+          SizedBox(height: 2.h),
+          AppBarWidget(partId: widget.partId, userId: widget.userId),
           Expanded(
             child: Container(
               color: const Color(0xFFF7F8F9),
@@ -65,8 +69,9 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CategoriesPage(),
+                                      builder: (context) => CategoriesPage(
+                                          partId: widget.partId,
+                                          userId: widget.userId),
                                     ),
                                   );
                                 },
@@ -86,7 +91,8 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     SizedBox(height: 1.h),
-                    const SearchBarWidget(),
+                    SearchBarWidget(
+                        partId: widget.partId, userId: widget.userId),
                     SizedBox(height: 2.h),
                     const SliderPage(),
                     SizedBox(height: 1.h),
@@ -112,8 +118,9 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CategoriesPage(),
+                                      builder: (context) => CategoriesPage(
+                                          partId: widget.partId,
+                                          userId: widget.userId),
                                     ),
                                   );
                                 },
@@ -133,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     SizedBox(height: 1.h),
-                    const Categorie(),
+                    Categorie(partId: widget.partId, userId: widget.userId),
                     SizedBox(height: 2.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -179,8 +186,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: BottomNavBar(
-        onTap: (int) {},
-      ),
+          onTap: (int) {}, partId: widget.partId, userId: widget.userId),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
         child: Container(
@@ -192,18 +198,9 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 300),
-                  pageBuilder: (_, __, ___) => const SearchLoadPage(),
-                  transitionsBuilder: (_, animation, __, child) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0.0, 1.0),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    );
-                  },
+                MaterialPageRoute(
+                  builder: (context) => SearchLoadPage(
+                      partId: widget.partId, userId: widget.userId),
                 ),
               );
             },

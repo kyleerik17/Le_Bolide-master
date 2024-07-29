@@ -26,5 +26,5 @@ class Piece {
   }
 }
 
-// const String baseUrl = 'https://bolide.armasoft.ci/bolide_services/index.php/';
-const String baseUrl = 'http://192.168.1.4/rest-api/';
+const String baseUrl = 'https://bolide.armasoft.ci/bolide_services/index.php/';
+// const String baseUrl = 'http://192.168.1.4/rest-api/';

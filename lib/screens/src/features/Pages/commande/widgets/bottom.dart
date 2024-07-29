@@ -6,11 +6,15 @@ import '../../Favoris/Pages/favoris.dart';
 import '../../Home/pages/home_page.dart';
 
 class ReservBottomNavBar extends StatefulWidget {
+  final int partId;
+  final int userId;
   final Function(int) onTap;
 
   const ReservBottomNavBar({
     Key? key,
     required this.onTap,
+    required this.partId,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -51,7 +55,9 @@ class _ReservBottomNavBarState extends State<ReservBottomNavBar> {
                   widget.onTap(0);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            HomePage(partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(
@@ -124,7 +130,8 @@ class _ReservBottomNavBarState extends State<ReservBottomNavBar> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const AssistancePage()),
+                        builder: (context) => AssistancePage(
+                            partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(
@@ -160,7 +167,8 @@ class _ReservBottomNavBarState extends State<ReservBottomNavBar> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const FavorisPage()),
+                        builder: (context) =>
+                            FavorisPage(partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(

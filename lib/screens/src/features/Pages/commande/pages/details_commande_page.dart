@@ -6,8 +6,14 @@ import '../../Home/Pay/Widgets/buildStep.dart';
 import 'commande_page.dart';
 
 class DetailsCommandePage extends StatelessWidget {
+  final int partId;
+  final int userId;
   const DetailsCommandePage(
-      {super.key, required String price, required String description});
+      {super.key,
+      required String price,
+      required String description,
+      required this.partId,
+      required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +23,9 @@ class DetailsCommandePage extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const CommandePage()),
+              MaterialPageRoute(
+                  builder: (context) =>
+                      CommandePage(partId: partId, userId: userId)),
             );
           },
           child: Container(

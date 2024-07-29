@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -8,7 +11,11 @@ import '../../Onboarding/pages/pages.dart';
 import 'pages.dart';
 
 class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({Key? key}) : super(key: key);
+  final int userId;
+  final int partId;
+
+  const RegistrationPage({Key? key, required this.userId, required this.partId})
+      : super(key: key);
 
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
@@ -16,6 +23,14 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _phoneController = TextEditingController();
+  String _selectedCountry = 'Senegal';
+  bool _isLoading = false;
+  bool _isPhoneValid =
+      false; // Ajout d'une variable pour la validité du téléphone
+  final Map<String, String> _countryCodes = {
+    'Senegal': '+221',
+    'Côte d\'Ivoire': '+225',
+  };
 
   @override
   void dispose() {
@@ -23,35 +38,73 @@ class _RegistrationPageState extends State<RegistrationPage> {
     super.dispose();
   }
 
+  bool _isPhoneNumberValid(String phoneNumber) {
+    print('Validation du numéro: $phoneNumber pour le pays: $_selectedCountry');
+    if (_selectedCountry == 'Senegal') {
+      bool valid = phoneNumber.length == 9 && phoneNumber.startsWith('7');
+      print('Validation pour Sénégal: $valid');
+      return valid;
+    } else if (_selectedCountry == 'Côte d\'Ivoire') {
+      bool valid = phoneNumber.length == 10 &&
+          (phoneNumber.startsWith('05') ||
+              phoneNumber.startsWith('01') ||
+              phoneNumber.startsWith('07'));
+      print('Validation pour Côte d\'Ivoire: $valid');
+      return valid;
+    }
+    print('Validation échouée pour le pays sélectionné.');
+    return false;
+  }
+
   Future<void> _generateOTP() async {
-    final url = Uri.parse('${baseUrl}api/otp/generate');
     final phoneNumber = _phoneController.text.trim();
+
+    if (!_isPhoneNumberValid(phoneNumber)) {
+      _showErrorDialog('Numéro de téléphone invalide pour $_selectedCountry.');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final url = Uri.parse('${baseUrl}api/otp/generate');
+    final fullPhoneNumber = '${_countryCodes[_selectedCountry]}$phoneNumber';
+
+    print('Numéro complet envoyé à l\'API: $fullPhoneNumber');
 
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'phone': phoneNumber}),
+        body: jsonEncode({'phone': fullPhoneNumber}),
       );
 
-      // Afficher la réponse dans la console
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      print('Code de statut de la réponse: ${response.statusCode}');
+      print('Réponse brute de l\'API: ${response.body}');
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        
+        print('Réponse décodée: $responseData');
+
+        await Future.delayed(const Duration(seconds: 1));
+
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
             transitionDuration: const Duration(milliseconds: 300),
             pageBuilder: (_, __, ___) => RegistrationAuthPage(
-              phoneNumber: phoneNumber, // Passez le numéro de téléphone ici
+              phoneNumber: fullPhoneNumber,
+              flag: _selectedCountry == 'Senegal'
+                  ? 'sng'
+                  : 'civ', // Pass the correct flag here
+              userId: widget.userId,
+              partId: widget.partId,
             ),
             transitionsBuilder: (_, animation, __, child) {
               return SlideTransition(
                 position: Tween<Offset>(
-                  begin: const Offset(-1.0, 0.0),
+                  begin: const Offset(1.0, 0.0),
                   end: Offset.zero,
                 ).animate(animation),
                 child: child,
@@ -60,10 +113,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
           ),
         );
       } else {
-        _showErrorDialog('Une erreur est survenue lors de la génération du code OTP.');
+        print('Erreur lors de la requête: ${response.statusCode}');
+        _showErrorDialog('Erreur de la demande OTP.');
       }
     } catch (e) {
-      _showErrorDialog('Erreur de connexion. Veuillez réessayer.');
+      print('Erreur lors de la connexion: $e');
+      _showErrorDialog('Erreur: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -105,7 +164,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         context,
                         PageRouteBuilder(
                           transitionDuration: const Duration(milliseconds: 300),
-                          pageBuilder: (_, __, ___) => const OnboardingPage(),
+                          pageBuilder: (_, __, ___) =>
+                              OnboardingPage(partId: 0, userId: widget.userId),
                           transitionsBuilder: (_, animation, __, child) {
                             return SlideTransition(
                               position: Tween<Offset>(
@@ -184,25 +244,30 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   SizedBox(width: 1.5.h),
-                                  Image.asset(
-                                    'assets/icons/sng.png',
-                                    width: 5.w,
-                                    height: 5.w,
+                                  DropdownButton<String>(
+                                    value: _selectedCountry,
+                                    items: _countryCodes.keys
+                                        .map((String country) {
+                                      return DropdownMenuItem<String>(
+                                        value: country,
+                                        child: Image.asset(
+                                          'assets/icons/${country == 'Senegal' ? 'sng' : 'civ'}.png',
+                                          width: 5.w,
+                                          height: 5.w,
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? newValue) {
+                                      print('Pays sélectionné: $newValue');
+                                      setState(() {
+                                        _selectedCountry = newValue!;
+                                        _isPhoneValid = _isPhoneNumberValid(
+                                            _phoneController.text.trim());
+                                        _updatePhoneFormatter();
+                                      });
+                                    },
                                   ),
-                                  SizedBox(width: 2.w),
                                 ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 3.w),
-                              child: Text(
-                                '+221 ',
-                                style: TextStyle(
-                                  color: const Color(0xFF1A1A1A),
-                                  fontFamily: 'Cabin',
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12.sp,
-                                ),
                               ),
                             ),
                             Expanded(
@@ -210,28 +275,35 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 controller: _phoneController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: "78 444 56 78",
+                                  hintText: "Numéro de téléphone",
                                   contentPadding: EdgeInsets.symmetric(
                                     vertical: 3.w,
                                   ),
                                 ),
-                                keyboardType: TextInputType.phone,
-                                textCapitalization: TextCapitalization.none,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(5),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.asset(
-                                    'assets/icons/check.png',
-                                    width: 5.w,
-                                    height: 5.w,
-                                  ),
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(
+                                      _getMaxLength()),
                                 ],
+                                textCapitalization: TextCapitalization.none,
+                                onChanged: (text) {
+                                  setState(() {
+                                    _isPhoneValid =
+                                        _isPhoneNumberValid(text.trim());
+                                  });
+                                },
                               ),
                             ),
+                            if (_isPhoneValid)
+                              Padding(
+                                padding: const EdgeInsets.all(5),
+                                child: Image.asset(
+                                  'assets/icons/check.png',
+                                  width: 5.w,
+                                  height: 5.w,
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -260,23 +332,38 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       SizedBox(height: 20.h),
                       Center(
                         child: ElevatedButton(
-                          onPressed: _generateOTP,
+                          onPressed: _isLoading || !_isPhoneValid
+                              ? null
+                              : () async {
+                                  if (_isPhoneValid) {
+                                    await _generateOTP();
+                                  } else {
+                                    print('Numéro de téléphone invalide.');
+                                    _showErrorDialog(
+                                        'Numéro de téléphone invalide.');
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1A1A1A),
                             padding: EdgeInsets.symmetric(
                                 vertical: 1.5.h, horizontal: 10.h),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(1.h),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: Text(
-                            "Suivant",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12.sp,
-                                fontFamily: "Cabin",
-                                fontWeight: FontWeight.w600),
-                          ),
+                          child: _isLoading
+                              ? SizedBox(
+                                  height: 2.h,
+                                  width: 2.h,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.0,
+                                  ),
+                                )
+                              : Text(
+                                  'Suivant',
+                                  style: TextStyle(fontSize: 14.sp),
+                                ),
                         ),
                       ),
                     ],
@@ -289,5 +376,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ),
     );
   }
-}
 
+  int _getMaxLength() {
+    return _selectedCountry == 'Senegal' ? 9 : 10;
+  }
+
+  void _updatePhoneFormatter() {
+    final maxLength = _getMaxLength();
+    final formatter = LengthLimitingTextInputFormatter(maxLength);
+
+    // Apply the new formatter to the TextField
+    _phoneController.text = _phoneController.text.substring(
+      0,
+      min(_phoneController.text.length, maxLength),
+    );
+    _phoneController.selection = TextSelection.fromPosition(
+      TextPosition(offset: _phoneController.text.length),
+    );
+  }
+}

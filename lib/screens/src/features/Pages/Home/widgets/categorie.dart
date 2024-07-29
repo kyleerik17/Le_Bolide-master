@@ -9,7 +9,10 @@ import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
 
 class Categorie extends StatefulWidget {
-  const Categorie({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  const Categorie({Key? key, required this.partId, required this.userId})
+      : super(key: key);
 
   @override
   _CategorieState createState() => _CategorieState();
@@ -25,8 +28,7 @@ class _CategorieState extends State<Categorie> {
   }
 
   Future<List<Map<String, dynamic>>> fetchCategories() async {
-    final response = await http
-        .get(Uri.parse('${baseUrl}api/categorie/parts'));
+    final response = await http.get(Uri.parse('${baseUrl}api/categorie/parts'));
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
       return data
@@ -45,7 +47,11 @@ class _CategorieState extends State<Categorie> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CategoryDetailPage(categoryId: categoryId),
+        builder: (context) => CategoryDetailPage(
+          categoryId: categoryId,
+          partId: widget.partId,
+          userId:widget.userId
+        ),
       ),
     );
   }
@@ -66,10 +72,14 @@ class _CategorieState extends State<Categorie> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: snapshot.data!.map((category) {
-                return _buildCategorie(
-                  icon: category['icon'],
-                  label: category['label'],
-                  onTap: () => navigateToCategory(category['id']),
+                return Padding(
+                  padding: EdgeInsets.only(
+                      right: 2.w), // Espacement entre les catégories
+                  child: _buildCategorie(
+                    icon: category['icon'],
+                    label: category['label'],
+                    onTap: () => navigateToCategory(category['id']),
+                  ),
                 );
               }).toList(),
             ),
@@ -121,10 +131,16 @@ class _CategorieState extends State<Categorie> {
 }
 
 class CategoryDetailPage extends StatefulWidget {
+  final int partId;
+  final int userId;
   final String categoryId;
 
-  const CategoryDetailPage({Key? key, required this.categoryId})
-      : super(key: key);
+  const CategoryDetailPage({
+    Key? key,
+    required this.categoryId,
+    required this.partId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   _CategoryDetailPageState createState() => _CategoryDetailPageState();
@@ -141,8 +157,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
   }
 
   Future<Map<String, dynamic>> fetchCategoryDetail(String categoryId) async {
-    final response = await http.get(Uri.parse(
-        '${baseUrl}/api/pieces/category/$categoryId'));
+    final response =
+        await http.get(Uri.parse('${baseUrl}api/pieces/category/$categoryId'));
     if (response.statusCode == 200) {
       return jsonDecode(response.body)[0];
     } else {
@@ -168,7 +184,10 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const HomePage(),
+                        HomePage(
+                      partId: widget.partId,
+                      userId: widget.userId
+                    ),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(-1.0, 0.0);
@@ -305,12 +324,10 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                         ],
                       ),
                       SizedBox(height: 2.h),
-
-                      SizedBox(height: 2.h),
-                      // You can add logic here to fetch and display articles based on the categoryId
-                      const Article3Page(categoryId: 1),
-
-                      SizedBox(height: 2.h),
+                      Article3Page(
+                        categoryId: int.parse(widget.categoryId),
+                        userId: widget.userId
+                      ),
                     ],
                   ),
                 );

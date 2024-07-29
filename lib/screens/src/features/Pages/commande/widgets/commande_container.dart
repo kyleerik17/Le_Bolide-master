@@ -1,32 +1,35 @@
 import 'package:flutter/material.dart';
-
 import 'package:sizer/sizer.dart';
-
 import '../pages/pages.dart';
 
 class CommandeContainer extends StatelessWidget {
+  final int partId;
   final String price;
   final String description;
   final String assetIcon;
+  final int userId;
 
   const CommandeContainer({
     Key? key,
     required this.price,
     required this.description,
     required this.assetIcon,
+    required this.partId,
+    required this.userId,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => DetailsCommandePage(
-              price: price,
-              description: description,
-            ),
+                price: price,
+                description: description,
+                partId: partId,
+                userId: userId),
           ),
         );
       },
@@ -45,6 +48,7 @@ class CommandeContainer extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: 2.w),
                     Text(
                       price,
                       style: TextStyle(
@@ -63,13 +67,16 @@ class CommandeContainer extends StatelessWidget {
                           color: Colors.black,
                         ),
                         SizedBox(width: 2.w),
-                        Text(
-                          description,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontFamily: "Cabin",
-                            fontWeight: FontWeight.w400,
+                        Expanded(
+                          child: Text(
+                            description,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontFamily: "Cabin",
+                              fontWeight: FontWeight.w400,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],

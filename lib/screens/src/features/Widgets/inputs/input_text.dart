@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:sizer/sizer.dart';
 
 class InputText extends StatelessWidget {
@@ -15,8 +16,7 @@ class InputText extends StatelessWidget {
   final Function(String?)? onChanged;
   final bool readOnly;
   final Function()? onTap;
-  
-  
+  final FormFieldValidator<String>? validator;
 
   const InputText({
     Key? key,
@@ -32,7 +32,10 @@ class InputText extends StatelessWidget {
     this.capitalization,
     this.onChanged,
     this.readOnly = false,
-    this.onTap, required TextEditingController controller,
+    this.onTap,
+    required TextEditingController controller,
+    String? errorText,
+    this.validator,
   }) : super(key: key);
 
   @override

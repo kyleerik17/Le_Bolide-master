@@ -6,24 +6,25 @@ import 'dart:convert';
 import 'package:sizer/sizer.dart';
 
 // ignore: must_be_immutable
-class QuantityWidget extends StatefulWidget {
+class QuantityWidgetFav extends StatefulWidget {
   final int userId;
   final int partId;
 
-  const QuantityWidget({Key? key, required this.userId, required this.partId})
+  const QuantityWidgetFav(
+      {Key? key, required this.userId, required this.partId})
       : super(key: key);
 
   @override
-  _QuantityWidgetState createState() => _QuantityWidgetState();
+  _QuantityWidgetFavState createState() => _QuantityWidgetFavState();
 }
 
-class _QuantityWidgetState extends State<QuantityWidget> {
+class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
   bool _showQuantityControls = false;
   int _quantity = 1;
 
   // Function to send quantity update to the API
   Future<void> _sendQuantityUpdate() async {
-    final url = '${baseUrl}api/cart/add';
+    const url = '${baseUrl}api/cart/add';
 
     final data = {
       'user_id': widget.userId.toString(),
@@ -53,7 +54,6 @@ class _QuantityWidgetState extends State<QuantityWidget> {
       } else {
         print(
             'Échec de la mise à jour de la quantité, code de statut: ${response.statusCode}');
-        // Ajouter plus de détails si possible à partir du corps de la réponse
       }
     } catch (e) {
       print('Erreur lors de l\'envoi de la requête: $e');
@@ -106,9 +106,8 @@ class _QuantityWidgetState extends State<QuantityWidget> {
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             Details1ProduitsPage(
-          partId: widget.partId,
-          userId: widget.userId
-        ), // Utiliser widget.partId ici
+                partId: widget.partId,
+                userId: widget.userId), // Utiliser widget.partId ici
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
           const end = Offset.zero;
@@ -185,7 +184,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
                       },
                       icon: const Icon(Icons.remove),
                       padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
+                      constraints: const BoxConstraints(),
                     ),
                     VerticalDivider(
                       color: Colors.grey,
@@ -215,7 +214,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
                       },
                       icon: const Icon(Icons.add),
                       padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),

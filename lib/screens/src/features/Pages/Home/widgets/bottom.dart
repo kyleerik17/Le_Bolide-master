@@ -6,14 +6,17 @@ import '../../Assistance/pages/assistance_page.dart';
 import '../../Favoris/Pages/favoris.dart';
 import '../../commande/pages/pages.dart';
 
-
 class BottomNavBar extends StatefulWidget {
+  final int partId;
+  final int userId;
   final Function(int) onTap;
 
-  const BottomNavBar({
-    Key? key,
-    required this.onTap,
-  }) : super(key: key);
+  const BottomNavBar(
+      {Key? key,
+      required this.onTap,
+      required this.partId,
+      required this.userId})
+      : super(key: key);
 
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
@@ -89,7 +92,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const CommandePage()),
+                        builder: (context) => CommandePage(
+                            partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(
@@ -131,7 +135,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const AssistancePage()),
+                        builder: (context) => AssistancePage(
+                              partId: widget.partId,
+                              userId: widget.userId
+                            )),
                   );
                 },
                 child: Padding(
@@ -167,7 +174,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const FavorisPage()),
+                        builder: (context) =>
+                            FavorisPage(partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(

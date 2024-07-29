@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
 import 'package:sizer/sizer.dart';
 
-Widget buildTotalWidget() {
+Widget buildTotalWidget(Order order, ) {
   return Container(
     height: 40.w,
     width: double.infinity,
@@ -22,7 +23,7 @@ Widget buildTotalWidget() {
             ),
             Padding(
               padding: EdgeInsets.only(right: 4.w),
-              child: Text('76 000 F',
+              child: Text(' ${order.totalPrice} FCFA',
                   style: TextStyle(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
@@ -100,7 +101,7 @@ Widget buildTotalWidget() {
             ),
             Padding(
               padding: EdgeInsets.only(right: 4.w),
-              child: Text('68 400 F',
+              child: Text(' ${order.totalPrice} FCFA',
                   style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,

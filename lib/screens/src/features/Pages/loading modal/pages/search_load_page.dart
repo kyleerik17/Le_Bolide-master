@@ -7,7 +7,13 @@ import 'package:sizer/sizer.dart';
 import '../../Home/pages/pages.dart';
 
 class SearchLoadPage extends StatefulWidget {
-  const SearchLoadPage({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  const SearchLoadPage({
+    Key? key,
+    required this.partId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   _SearchLoadPageState createState() => _SearchLoadPageState();
@@ -46,7 +52,10 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const HomePage(),
+                        builder: (context) => HomePage(
+                          partId: widget.partId,
+                          userId:widget.userId
+                        ),
                       ),
                     );
                   },

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:le_bolide/data/models/api_services.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
 import 'dart:convert';
 import 'package:sizer/sizer.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
-
-import '../../../../../../../data/models/api_services.dart';
 
 class Article3Page extends StatefulWidget {
-  final int categoryId; 
-
-  const Article3Page({Key? key, required this.categoryId}) : super(key: key);
+  final int categoryId;
+  final int userId;
+  const Article3Page({
+    Key? key,
+    required this.categoryId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   _Article3PageState createState() => _Article3PageState();
@@ -26,11 +29,11 @@ class _Article3PageState extends State<Article3Page> {
   }
 
   Future<void> _fetchPieces() async {
-    final url =
-        '${baseUrl}rest-api/api/pieces/category/${widget.categoryId}';
+    final url = '${baseUrl}api/pieces/category/${widget.categoryId}';
 
     try {
-      final response = await http.get(Uri.parse(url));
+      final response =
+          await http.get(Uri.parse(url)).timeout(Duration(seconds: 10));
       if (response.statusCode == 200) {
         setState(() {
           _pieces = jsonDecode(response.body);
@@ -43,27 +46,36 @@ class _Article3PageState extends State<Article3Page> {
       print('Error fetching pieces: $e');
       setState(() {
         _isLoading = false;
+        // Ajoutez un état d'erreur ici si nécessaire
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? Center(child: CircularProgressIndicator())
-        : Column(
-            children: _pieces.map((piece) {
-              return _buildArticle(
-                imageUrl: '${baseUrl}rest-api/uploads/pneu.png',
-                libelle: piece['libelle'],
-                iconUrl: 'assets/icons/sun.png',
-                description: piece['description'],
-                price: piece['price'],
-                categoryName: piece['category_name'],
-                partId: piece['id'] as int, // Convertir l'ID en int
-              );
-            }).toList(),
-          );
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator());
+    } else if (_pieces.isEmpty) {
+      return Center(child: Text('Aucune pièce trouvée'));
+    } else {
+      return SingleChildScrollView(
+        child: Column(
+          children: _pieces.map((piece) {
+            return _buildArticle(
+              imageUrl: '${baseUrl}uploads/${piece['img']}',
+              libelle: piece['libelle'] ?? '',
+              iconUrl: 'assets/icons/sun.png',
+              description: piece['description'] ?? '',
+              price: piece['price']?.toString() ?? '0',
+              categoryName: piece['category_name'] ?? '',
+              partId: piece['id'] != null
+                  ? int.tryParse(piece['id'].toString()) ?? 0
+                  : 0,
+            );
+          }).toList(),
+        ),
+      );
+    }
   }
 
   Widget _buildArticle({
@@ -73,18 +85,16 @@ class _Article3PageState extends State<Article3Page> {
     required String description,
     required String price,
     required String categoryName,
-    required int partId, // Changer l'ID de la pièce en int
+    required dynamic partId,
   }) {
-    // Vérification des valeurs
-    print('ID de la pièce: $partId');
-
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 1.h),
-      padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 2.w),
+      width: 92.w,
+      margin: EdgeInsets.only(bottom: 2.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(0.5.h),
       ),
+      padding: EdgeInsets.symmetric(vertical: 2.w, horizontal: 2.w),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -115,7 +125,7 @@ class _Article3PageState extends State<Article3Page> {
                 Row(
                   children: [
                     Image.asset(
-                      iconUrl,
+                      'assets/icons/sun.png',
                       color: const Color(0xFF1A1A1A),
                       width: 4.w,
                     ),
@@ -143,7 +153,10 @@ class _Article3PageState extends State<Article3Page> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    QuantityWidget(userId: 2, partId: ''), // Passer l'ID ici en tant qu'int
+                    QuantityWidget(
+                      userId: widget.userId,
+                      partId: int.parse(partId.toString()),
+                    ),
                   ],
                 ),
               ],

@@ -6,17 +6,23 @@ import '../../Home/widgets/bouton_ajouter.dart';
 import '../widgets/widgets.dart';
 
 class DetailsProduitsPage extends StatefulWidget {
+  final int partId;
   final String imageUrl;
   final String title;
   final String description;
   final String price;
+  final int quantity;
+  final int userId;
 
   const DetailsProduitsPage({
     Key? key,
     required this.imageUrl,
     required this.title,
     required this.description,
-    required this.price, required String partId,
+    required this.price,
+    required this.partId,
+    required this.quantity,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -45,7 +51,10 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const FindSearchPage(),
+                builder: (context) => FindSearchPage(
+                  partId: widget.partId,
+                  userId: widget.userId
+                ),
               ),
             );
           },
@@ -167,7 +176,7 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
                   fontFamily: "Cabin",
                 ),
               ),
-           // Ensure this is defined elsewhere
+              // Ensure this is defined elsewhere
             ],
           ),
           SizedBox(height: 1.h),

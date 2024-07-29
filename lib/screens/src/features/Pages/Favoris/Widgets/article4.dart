@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
+import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/quantity_widget_fav.dart';
 import 'package:sizer/sizer.dart';
 
 class Article4Page extends StatelessWidget {
-  const Article4Page({Key? key}) : super(key: key);
+  final int userId;
+  final int partId;
+  const Article4Page({Key? key, required this.userId, required this.partId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,7 @@ class Article4Page extends StatelessWidget {
         _buildArticle(
           imageUrl: 'assets/images/btl.jpeg',
           title: 'O1491E K2 TEXAR XN1',
-          iconUrl: 'assets/icons/hmm.png',
+          iconUrl: 'assets/icons/hle.png',
           description: 'Huile moteur',
           price: '12 000 F',
         ),
@@ -77,6 +81,8 @@ class Article4Page extends StatelessWidget {
                   iconUrl: iconUrl,
                   description: description,
                   price: price,
+                  partId: partId,
+                  userId: userId,
                 ),
               ),
             ],
@@ -92,6 +98,8 @@ class ArticleContent extends StatefulWidget {
   final String iconUrl;
   final String description;
   final String price;
+  final int partId;
+  final int userId;
 
   const ArticleContent({
     Key? key,
@@ -99,6 +107,8 @@ class ArticleContent extends StatefulWidget {
     required this.iconUrl,
     required this.description,
     required this.price,
+    required this.partId,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -163,7 +173,10 @@ class _ArticleContentState extends State<ArticleContent> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const Add3Page(),
+                QuantityWidgetFav(
+                  userId:widget.userId,
+                  partId: widget.partId,
+                ),
               ],
             ),
           ],

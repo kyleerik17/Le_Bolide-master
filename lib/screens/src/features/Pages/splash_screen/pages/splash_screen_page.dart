@@ -5,7 +5,10 @@ import 'package:sizer/sizer.dart';
 import '../../Onboarding/onboarding.dart';
 
 class SplashScreenPage extends StatefulWidget {
-  const SplashScreenPage({super.key});
+  final int partId;
+  final int userId;
+  const SplashScreenPage(
+      {super.key, required this.partId, required this.userId});
 
   @override
   _SplashScreenPageState createState() => _SplashScreenPageState();
@@ -66,13 +69,15 @@ class _SplashScreenPageState extends State<SplashScreenPage>
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 800),
-        pageBuilder: (context, animation, secondaryAnimation) => const OnboardingPage(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            OnboardingPage(partId: widget.partId, userId: widget.userId),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
           const end = Offset(0.0, 0.0);
           const curve = Curves.easeInOut;
 
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
           return SlideTransition(
             position: animation.drive(tween),

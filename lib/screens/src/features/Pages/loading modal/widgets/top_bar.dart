@@ -4,7 +4,15 @@ import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
 
 class TopBar extends StatelessWidget {
-  const TopBar({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  final int quantity;
+  const TopBar(
+      {Key? key,
+      required this.partId,
+      required this.quantity,
+      required this.userId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +24,10 @@ class TopBar extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const HomePage(),
+                builder: (context) => HomePage(
+                  partId: partId,
+                  userId: userId,
+                ),
               ),
             );
           },

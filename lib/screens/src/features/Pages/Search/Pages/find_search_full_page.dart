@@ -10,7 +10,14 @@ import '../widgets/search1.dart';
 import 'find_search_page.dart';
 
 class FindSearchPlusPage extends StatefulWidget {
-  const FindSearchPlusPage({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+
+  const FindSearchPlusPage({
+    Key? key,
+    required this.partId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   _FindSearchPlusState createState() => _FindSearchPlusState();
@@ -60,7 +67,10 @@ class _FindSearchPlusState extends State<FindSearchPlusPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const FindSearchPage()),
+                            builder: (context) => FindSearchPage(
+                                  partId: widget.partId,
+                                  userId:widget.userId
+                                )),
                       );
                     },
                     child: Container(
@@ -169,10 +179,22 @@ class _FindSearchPlusState extends State<FindSearchPlusPage> {
                 ],
               ),
               SizedBox(height: 2.w),
-             const Article3Page(categoryId: 1),
-              const Article3Page(categoryId: 1),
-               const Article3Page(categoryId: 1),
-                const Article3Page(categoryId: 1),
+              Article3Page(
+                categoryId: 1,
+                userId: widget.userId
+              ),
+              Article3Page(
+                categoryId: 1,
+                userId: widget.userId
+              ),
+              Article3Page(
+                categoryId: 1,
+                userId: widget.userId
+              ),
+              Article3Page(
+                categoryId: 1,
+                userId: widget.userId
+              ),
               SizedBox(height: 9.w),
               Center(
                 child: TextButton(

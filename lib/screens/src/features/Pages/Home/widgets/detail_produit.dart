@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add2.dart';
 import 'package:le_bolide/screens/src/features/Pages/commande/widgets/slider1.dart';
 
 import 'package:sizer/sizer.dart';
@@ -8,7 +9,13 @@ import 'package:sizer/sizer.dart';
 import '../../Home/widgets/bouton_ajouter.dart';
 
 class Details1ProduitsPage extends StatelessWidget {
-  const Details1ProduitsPage({Key? key, required String partId}) : super(key: key);
+  final int partId;
+  final int userId;
+  const Details1ProduitsPage({
+    Key? key,
+    required this.partId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +26,11 @@ class Details1ProduitsPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const PayPage(partId: '',),
+                builder: (context) => PayPage(
+                  partId: partId,
+                  userId: userId,
+                  cartItems: [],
+                ),
               ),
             );
           },
@@ -139,9 +150,7 @@ class Details1ProduitsPage extends StatelessWidget {
                   ),
                 ],
               ),
-              Add3Page(
-                
-              )
+              Add2Page()
             ],
           ),
           SizedBox(height: 1.h),

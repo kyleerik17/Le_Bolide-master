@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
 
 import 'package:gap/gap.dart';
@@ -6,7 +7,9 @@ import 'package:gap/gap.dart';
 import '../../../profile/pages/pages.dart';
 
 class MenuPage extends StatelessWidget {
-  const MenuPage({Key? key}) : super(key: key);
+  final int partId;
+  final int userId;
+  const MenuPage({Key? key, required this.partId, required this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +51,8 @@ class MenuPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const ProfilePage()),
+                                builder: (context) =>
+                                    ProfilePage(partId ,userId)),
                           );
                         },
                         child: Row(
