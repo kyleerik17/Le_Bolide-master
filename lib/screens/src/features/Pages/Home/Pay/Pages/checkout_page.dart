@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
+import 'package:le_bolide/data/services/user.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/TotalWidget.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
@@ -14,11 +16,12 @@ import '../Widgets/promo_code_widget.dart';
 import 'checkout1_page.dart';
 
 class PayPage extends StatefulWidget {
-  final int partId;
+  late int partId;
   final int userId;
+  
   final List cartItems;
 
-  const PayPage({
+  PayPage({
     Key? key,
     required this.partId,
     required this.userId,
@@ -34,15 +37,24 @@ class _PayPageState extends State<PayPage> {
   List<dynamic> _cartItems = [];
   bool _isLoading = true;
   String _errorMessage = '';
+  late User user;
 
   @override
   void initState() {
+    try {
+      user = GetIt.instance.get<User>();
+
+      print(user.name);
+      print('user info');
+    } catch (e) {
+      print(e);
+    }
     super.initState();
     _fetchCartItems();
   }
 
   Future<void> _fetchCartItems() async {
-    final url = '${baseUrl}api/cart/user/${widget.userId}';
+    final url = '${baseUrl}api/cart/user/${user.id}';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -70,7 +82,7 @@ class _PayPageState extends State<PayPage> {
 
   void _incrementQuantity() {
     setState(() {
-      if (_quantity < 2) {
+      if (_quantity < 5) {
         _quantity++;
       }
     });
@@ -85,13 +97,20 @@ class _PayPageState extends State<PayPage> {
   }
 
   void _navigateToPay1Page() {
+    // Affichez les articles dans la console
+    print('Articles du panier:');
+    for (var item in _cartItems) {
+      print(
+          'Libellé: ${item['libelle']}, Prix: ${item['prix']}, Quantité: ${item['quantite']}');
+    }
+
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => Pay1Page(
           partId: widget.partId,
           userId: widget.userId,
-          cartItems: _cartItems,
+          cartItems: _cartItems, deliveryAddress: '', // Passez les articles ici
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
@@ -182,10 +201,22 @@ class _PayPageState extends State<PayPage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('${_cartItems.length} Produits',
-                                        style: TextStyle(fontSize: 12.sp)),
-                                    Text('Sous-total ${_calculateTotal()} F',
-                                        style: TextStyle(fontSize: 12.sp)),
+                                    Text(
+                                      '${_cartItems.length} Produits',
+                                      style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontFamily: 'Cabin',
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xFF1A1A1A)),
+                                    ),
+                                    Text(
+                                      'Sous-total ${_calculateTotal()} F',
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Cabin',
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF1A1A1A)),
+                                    )
                                   ],
                                 ),
                               ),
@@ -201,9 +232,12 @@ class _PayPageState extends State<PayPage> {
                                     quantite: int.tryParse(
                                             item['quantite'].toString()) ??
                                         0,
-                                    partId: widget.partId,
+                                    partId: int.parse(item['id_produit']),
                                     userId: widget.userId,
-                                    onRemove: (int partId) {},
+                                    onRemove: (int userId, partId) {
+                                      print(userId);
+                                      print(partId);
+                                    },
                                   )),
                               SizedBox(height: 1.h),
                               Padding(
@@ -293,16 +327,127 @@ class _PayPageState extends State<PayPage> {
                                       ),
                                     ),
                                   ],
-                                  
                                 ),
                               ),
-                              SizedBox(height: 1.h),
-                              SizedBox(height: 5.w),
+                              Container(
+                                height: 40.w,
+                                width: double.infinity,
+                                color: Colors.white,
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 5.w),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 4.w),
+                                          child: Text('Sous-total',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontFamily: 'Poppins')),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(right: 4.w),
+                                          child: Text('${_calculateTotal()} F',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontFamily: 'Cabin')),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 1.h),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 4.w),
+                                          child: Text('Frais de livraison',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontFamily: 'Poppins')),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(right: 4.w),
+                                          child: Text('Gratuit',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontFamily: 'Cabin')),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 1.h),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 4.w),
+                                          child: Text('Code promo',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontFamily: 'Poppins')),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(right: 4.w),
+                                          child: Text('BOL10 (-10%)',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontFamily: 'Cabin')),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 1.h),
+                                    Container(
+                                      child: Center(
+                                        child: SizedBox(
+                                          width: 88.w,
+                                          child: Divider(
+                                            height: 2.h,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 1.h),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 4.w),
+                                          child: Text('TOTAL',
+                                              style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontFamily: 'Poppins')),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(right: 4.w),
+                                          child: Text('${_calculateTotal()} F',
+                                              style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontFamily: 'Poppins')),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 3.w),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   elevation: 10,
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15)),
+                                      borderRadius: BorderRadius.circular(1.w)),
                                   backgroundColor: const Color(0xFF1A1A1A),
                                   padding: EdgeInsets.symmetric(
                                       vertical: 1.5.h, horizontal: 10.h),
@@ -320,6 +465,7 @@ class _PayPageState extends State<PayPage> {
                               ),
                             ],
                           ),
+                SizedBox(height: 3.w),
               ]),
             ))
           ],
@@ -337,16 +483,15 @@ class _PayPageState extends State<PayPage> {
   }
 }
 
-class CartItemWidget extends StatelessWidget {
+class CartItemWidget extends StatefulWidget {
   final String img;
   final String libelle;
   final double prix;
   final int quantite;
   final int partId;
   final int userId;
-  final Function(int partId) onRemove; // Callback for removal
-
-  const CartItemWidget({
+  final Function(int userId, int partId) onRemove;
+  CartItemWidget({
     Key? key,
     required this.img,
     required this.libelle,
@@ -358,9 +503,31 @@ class CartItemWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<CartItemWidget> createState() => _CartItemWidgetState();
+}
+
+class _CartItemWidgetState extends State<CartItemWidget> {
+  // Callback for removal
+  int userIdConnect = 0;
+
+  late User user;
+
+  @override
+  void initState() {
+    try {
+      user = GetIt.instance.get<User>();
+      userIdConnect = int.parse(user.id);
+      print(user.name);
+      print('user info');
+    } catch (e) {
+      print(e);
+    }
+    super.initState();
+  }
+
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(4.w),
+      padding: EdgeInsets.all(2.w),
       margin: EdgeInsets.symmetric(vertical: 0.5.w),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -369,12 +536,17 @@ class CartItemWidget extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Image.asset(
+          //   img,
+          //   width: 25.w,
+          //   height: 25.w,
+          // ),
           Image.asset(
-            img,
+            'assets/images/pn2.png',
             width: 25.w,
             height: 25.w,
           ),
-          SizedBox(width: 4.w),
+          SizedBox(width: 2.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,7 +555,7 @@ class CartItemWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      libelle,
+                      widget.libelle,
                       style: TextStyle(
                         fontFamily: "Poppins",
                         fontWeight: FontWeight.w600,
@@ -391,6 +563,7 @@ class CartItemWidget extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
+                      // onTap: () => onRemove(5, partId){},
                       onTap: () => _showConfirmationDialog(context),
                       child: Image.asset(
                         'assets/icons/trash.png',
@@ -424,7 +597,7 @@ class CartItemWidget extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '${prix.toString()} F',
+                      '${widget.prix.toString()} F',
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontFamily: 'Cabin',
@@ -435,10 +608,10 @@ class CartItemWidget extends StatelessWidget {
                     SizedBox(width: 8.w),
                     // Assume AddPage is a widget to adjust the quantity
                     AddPage(
-                      userId: userId,
-                      partId: partId,
-                      initialQuantity: quantite,
-                      quantity: quantite,
+                      userId: widget.userId,
+                      partId: widget.partId,
+                      initialQuantity: widget.quantite,
+                      quantity: widget.quantite,
                     ),
                   ],
                 ),
@@ -455,22 +628,22 @@ class CartItemWidget extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmer la suppression'),
-          content: Text(
+          title: const Text('Confirmer la suppression'),
+          content: const Text(
               'Êtes-vous sûr de vouloir supprimer cet article du panier ?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Annuler'),
+              child: const Text('Annuler'),
             ),
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop(); // Close the dialog
-                await _removeItemFromCart();
+                await _removeItemFromCart(userIdConnect, widget.partId);
               },
-              child: Text('Supprimer'),
+              child: const Text('Supprimer'),
             ),
           ],
         );
@@ -478,9 +651,11 @@ class CartItemWidget extends StatelessWidget {
     );
   }
 
-  Future<void> _removeItemFromCart() async {
+  Future<void> _removeItemFromCart(int userId, int partId) async {
+    print(userId);
+    print(partId);
     final url =
-        'https://bolide.armasoft.ci/bolide_services/index.php/api/cart/remove/$userId/4';
+        'https://bolide.armasoft.ci/bolide_services/index.php/api/cart/remove/${userId}/${partId}';
 
     final response = await http.delete(Uri.parse(url));
 
@@ -489,7 +664,7 @@ class CartItemWidget extends StatelessWidget {
       if (responseBody['status'] == 'success') {
         // Handle successful removal, e.g., show a snackbar or update the UI
         print('Item removed successfully');
-        onRemove(partId); // Notify parent to remove item from UI
+        // Notify parent to remove item from UI
       } else {
         // Handle failure, e.g., show an error message
         print('Failed to remove item: ${responseBody['message']}');

@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
+import 'package:le_bolide/data/services/user.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bar_search1.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/find_search_full_page.dart';
+import 'package:le_bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
+import 'package:le_bolide/screens/src/features/Pages/commande/pages/details_commande_page.dart';
 import 'package:sizer/sizer.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal2_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal_page.dart';
@@ -25,9 +29,16 @@ class FindSearchPage extends StatefulWidget {
 class _FindSearchPageState extends State<FindSearchPage> {
   String _selectedButton = 'Tout';
   late Future<List<Piece>> _piecesFuture;
-
+  late User user;
   @override
   void initState() {
+    try {
+      user = GetIt.instance.get<User>();
+      print(user.name);
+      print('Informations de l\'utilisateur');
+    } catch (e) {
+      print(e);
+    }
     super.initState();
     _piecesFuture = _fetchPieces();
   }
@@ -95,9 +106,7 @@ class _FindSearchPageState extends State<FindSearchPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => HomePage(
-                                partId: widget.partId,
-                                userId: widget.userId
-                              )),
+                              partId: widget.partId, userId: widget.userId)),
                     ),
                     child: Container(
                       decoration: const BoxDecoration(
@@ -139,13 +148,13 @@ class _FindSearchPageState extends State<FindSearchPage> {
                     return Column(
                       children: snapshot.data!.map((piece) {
                         return ArticleCard(
-                          imageUrl: piece.img,
-                          title: piece.libelle,
-                          description: piece.description,
-                          price: piece.price,
-                          partId: piece.id,
-                          userId: widget.userId // Passer l'ID en tant qu'int
-                        );
+                            imageUrl: piece.img,
+                            title: piece.libelle,
+                            description: piece.description,
+                            price: piece.price,
+                            partId: piece.id,
+                            userId: widget.userId, libelle: piece.libelle, // Passer l'ID en tant qu'int
+                            );
                       }).toList(),
                     );
                   } else {
@@ -161,9 +170,7 @@ class _FindSearchPageState extends State<FindSearchPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => FindSearchPlusPage(
-                                partId: widget.partId,
-                                userId: widget.userId
-                              )),
+                              partId: widget.partId, userId: widget.userId)),
                     );
                   },
                   style: TextButton.styleFrom(
@@ -230,6 +237,7 @@ class ArticleCard extends StatelessWidget {
   final String title;
   final String description;
   final String price;
+  final String libelle;
   final int partId; // ID de l'article en tant qu'int
   final int userId;
 
@@ -240,7 +248,7 @@ class ArticleCard extends StatelessWidget {
     required this.description,
     required this.price,
     required this.partId,
-    required this.userId, // Ajout de l'ID de l'article
+    required this.userId, required this.libelle, // Ajout de l'ID de l'article
   }) : super(key: key);
 
   @override
@@ -263,9 +271,12 @@ class ArticleCard extends StatelessWidget {
 
               return SlideTransition(
                 position: offsetAnimation,
-                child: Details1ProduitsPage(
+                child: DetailsProduitsPage(
                   partId: partId,
                   userId: userId,
+                  price: price,
+                  libelle: libelle,
+                  description: description,
                 ), // Convertir l'ID en String ici
               );
             },

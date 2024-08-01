@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:get_it/get_it.dart';
+import 'package:le_bolide/data/services/user.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Home/pages/home_page.dart';
@@ -21,8 +23,18 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
+  late User user;
   @override
   void initState() {
+    try {
+      user = GetIt.instance.get<User>();
+      print(user.name);
+      print('user info');
+    } catch (e) {
+      print(e);
+      // Navigator.pushReplacement(
+      //     context, MaterialPageRoute(builder: (builder) => const RegistrationPage()));
+    }
     super.initState();
     // Configure la barre d'état pour Android
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -54,10 +66,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   context,
                   PageRouteBuilder(
                     transitionDuration: const Duration(milliseconds: 300),
-                    pageBuilder: (_, __, ___) => HomePage(
-                      partId: widget.partId,
-                      userId: widget.userId
-                    ),
+                    pageBuilder: (_, __, ___) =>
+                        HomePage(partId: widget.partId, userId: widget.userId),
                     transitionsBuilder: (_, animation, __, child) {
                       return SlideTransition(
                         position: Tween<Offset>(
@@ -116,9 +126,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Text(
-                            "Alex SAROI",
+                            user.name,
                             style: TextStyle(
-                              fontSize: 11.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w400,
                               fontFamily: 'Cabin',
                               color: const Color(0xFF1A1A1A),
@@ -129,7 +139,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Text(
-                            "78 463 40 40",
+                            user.phone,
                             style: TextStyle(
                               fontSize: 11.sp,
                               fontWeight: FontWeight.w400,

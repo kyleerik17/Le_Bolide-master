@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:le_bolide/screens/src/features/Pages/commande/pages/details_commande_page.dart';
 import 'package:sizer/sizer.dart';
-import '../pages/pages.dart';
 
-class CommandeContainer extends StatelessWidget {
-  final int partId;
+class CommandeContainer extends StatefulWidget {
   final String price;
   final String description;
   final String assetIcon;
+  final int partId;
   final int userId;
-
   const CommandeContainer({
     Key? key,
     required this.price,
@@ -19,6 +18,11 @@ class CommandeContainer extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _CommandeContainerState createState() => _CommandeContainerState();
+}
+
+class _CommandeContainerState extends State<CommandeContainer> {
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -26,10 +30,10 @@ class CommandeContainer extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => DetailsCommandePage(
-                price: price,
-                description: description,
-                partId: partId,
-                userId: userId),
+              partId: widget.partId,
+              userId: widget.userId,
+              price: widget.price,
+            ),
           ),
         );
       },
@@ -50,7 +54,7 @@ class CommandeContainer extends StatelessWidget {
                   children: [
                     SizedBox(height: 2.w),
                     Text(
-                      price,
+                      widget.price,
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: Colors.black,
@@ -62,15 +66,15 @@ class CommandeContainer extends StatelessWidget {
                     Row(
                       children: [
                         ImageIcon(
-                          AssetImage(assetIcon),
+                          AssetImage(widget.assetIcon),
                           size: 5.w,
                           color: Colors.black,
                         ),
                         SizedBox(width: 2.w),
                         Expanded(
                           child: Text(
-                            description,
-                            style: TextStyle(
+                            widget.description,
+                            style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
                               fontFamily: "Cabin",

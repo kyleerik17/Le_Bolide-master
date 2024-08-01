@@ -1,3 +1,10 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import '../services/user.dart';
+
+late User user;
+
 class Piece {
   final int id;
   final String img;
@@ -28,3 +35,5 @@ class Piece {
 
 const String baseUrl = 'https://bolide.armasoft.ci/bolide_services/index.php/';
 // const String baseUrl = 'http://192.168.1.4/rest-api/';
+
+

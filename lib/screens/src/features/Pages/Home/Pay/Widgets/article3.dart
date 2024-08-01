@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:le_bolide/data/models/api_services.dart';
+import 'package:le_bolide/data/services/user.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
 import 'dart:convert';
 import 'package:sizer/sizer.dart';
@@ -10,8 +12,7 @@ class Article3Page extends StatefulWidget {
   final int userId;
   const Article3Page({
     Key? key,
-    required this.categoryId,
-    required this.userId,
+    required this.categoryId, required this.userId,
   }) : super(key: key);
 
   @override
@@ -21,10 +22,18 @@ class Article3Page extends StatefulWidget {
 class _Article3PageState extends State<Article3Page> {
   List<dynamic> _pieces = [];
   bool _isLoading = true;
+  late User user;
 
   @override
   void initState() {
     super.initState();
+    try {
+      user = GetIt.instance.get<User>();
+      print('User ID from GetIt: ${user.id}');
+      print('User name from GetIt: ${user.name}');
+    } catch (e) {
+      print(e);
+    }
     _fetchPieces();
   }
 
@@ -154,7 +163,7 @@ class _Article3PageState extends State<Article3Page> {
                       ),
                     ),
                     QuantityWidget(
-                      userId: widget.userId,
+                      userId: widget.userId, // Utiliser user.id ici
                       partId: int.parse(partId.toString()),
                     ),
                   ],

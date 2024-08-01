@@ -1,12 +1,12 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:le_bolide/data/services/getit.dart';
+import 'package:le_bolide/data/services/user.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration-auth_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration_congratulation_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
-
-import '../../../Widgets/inputs/inputs.dart';
 
 class RegistrationLastPage extends StatefulWidget {
   final int partId;
@@ -29,12 +29,10 @@ class RegistrationLastPage extends StatefulWidget {
 class _RegistrationLastPageState extends State<RegistrationLastPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
 
   String? nameError;
   String? surnameError;
-  String? emailError;
   bool isLoading = false;
 
   @override
@@ -47,7 +45,6 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
   void dispose() {
     nameController.dispose();
     surnameController.dispose();
-    emailController.dispose();
     phoneNumberController.dispose();
     super.dispose();
   }
@@ -63,100 +60,71 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
     return null;
   }
 
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Ce champ est requis';
-    }
-    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    if (!regex.hasMatch(value)) {
-      return 'Veuillez entrer un email valide';
-    }
-    return null;
-  }
-
   Future<void> registerUser() async {
-    print('Bouton "Enregistrer" pressé');
-
-    if (!_validateForm()) {
-      print('Erreur de validation des données');
-      return;
-    }
+    if (!_validateForm()) return;
 
     setState(() {
       isLoading = true;
     });
 
-    final url = Uri.parse(
-        'https://bolide.armasoft.ci/bolide_services/index.php/api/auth/register');
+    final url = Uri.parse('https://bolide.armasoft.ci/bolide_services/index.php/api/auth/register');
 
     try {
       final String name = nameController.text.trim();
       final String surname = surnameController.text.trim();
-      final String email = emailController.text.trim();
-      final String phone =
-          phoneNumberController.text.replaceAll(RegExp(r'[^\d]'), '');
+      final String phone = phoneNumberController.text.replaceAll(RegExp(r'[^\d]'), '');
 
       final requestBody = {
         'phone': phone,
         'name': name,
         'surname': surname,
-        'email': email,
       };
-
-      print('Payload envoyé à l\'API: $requestBody');
 
       final response = await http.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestBody),
       );
 
-      print('Réponse de l\'API: ${response.body}');
-      print('Code de statut: ${response.statusCode}');
-
       if (response.statusCode == 200) {
-        final responseBody = jsonDecode(response.body);
-        print('Réponse décodée: $responseBody');
+        Map<String, dynamic> dataUser = json.decode(response.body);
+               Map<String, dynamic> userData = dataUser['user_info'];
 
-        if (responseBody['message'] == 'Inscription reussie') {
-          final data = responseBody['data'];
-          final userId = data['id'];
-          final userName = data['name'];
-          final userSurname = data['surname'];
-          final userPhone = data['phone'];
+  print("UserModel Data: ${userData}");
 
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              transitionDuration: const Duration(milliseconds: 300),
-              pageBuilder: (_, __, ___) => RegistrationCongratulationPage(
-                partId: widget.partId,
-                userId: userId, // Pass the userId from the API response
-              ),
-              transitionsBuilder: (_, animation, __, child) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: child,
-                );
-              },
-            ),
-          );
-        } else {
-          _showErrorSnackBar(
-              'Erreur lors de l\'inscription. Veuillez réessayer.');
-        }
+        // final responseBody = jsonDecode(response.body);
+        // if (responseBody['message'] == 'Inscription reussie') {
+        //   final data = responseBody['data'];
+        //   final userId = data['id'];
+
+        //   // Créer un objet User avec les informations récupérées
+        //   final user = User(
+        //     id: userId,
+        //     name: name,
+        //     surname: surname,
+        //     phone: phone,
+        //   );
+          
+        //   // Stocker l'utilisateur dans UserProvider
+        //   getIt<UserProvider>().setUser(user);
+
+        //   Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (context) => HomePage(
+        //         partId: widget.partId,
+        //         userId: userId,
+        //       ),
+        //     ),
+        //   );
+        // } else {
+        //   _showErrorSnackBar('Erreur lors de l\'inscription. Veuillez réessayer.');
+        // }
       } else {
         _showErrorSnackBar('Erreur serveur. Veuillez réessayer plus tard.');
       }
     } catch (e) {
-      print('Erreur de connexion: $e');
-      _showErrorSnackBar(
-          'Erreur de connexion. Vérifiez votre connexion internet.');
+      _showErrorSnackBar('Erreur de connexion. Vérifiez votre connexion internet.');
     } finally {
       setState(() {
         isLoading = false;
@@ -165,19 +133,15 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   bool _validateForm() {
     setState(() {
       nameError = validateName(nameController.text);
       surnameError = validateName(surnameController.text);
-      emailError = validateEmail(emailController.text);
     });
-
-    return nameError == null && surnameError == null && emailError == null;
+    return nameError == null && surnameError == null;
   }
 
   @override
@@ -196,22 +160,13 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
                     onTap: () {
                       Navigator.pushReplacement(
                         context,
-                        PageRouteBuilder(
-                          transitionDuration: const Duration(milliseconds: 300),
-                          pageBuilder: (_, __, ___) => RegistrationAuthPage(
+                        MaterialPageRoute(
+                          builder: (context) => RegistrationAuthPage(
                             phoneNumber: widget.phoneNumber,
                             partId: widget.partId,
-                            userId: widget.userId, flag: widget.flag,
+                            userId: widget.userId,
+                            flag: widget.flag,
                           ),
-                          transitionsBuilder: (_, animation, __, child) {
-                            return SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(-1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          },
                         ),
                       );
                     },
@@ -259,79 +214,56 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
                       ),
                       SizedBox(height: 3.h),
                       Text(
-                        'Veuillez entrer vos nom(s) et prénom(s) ainsi que votre date de naissance',
+                        'Veuillez entrer vos nom(s) et prénom(s) ainsi\nque votre date de naissance',
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontFamily: "Cabin",
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 1.5.h),
-                      Row(
-                        children: [
-                          Image.asset(
-                            widget.flag,
-                            width: 50.0,
-                            height: 50.0,
-                          ),
-                          const SizedBox(width: 16.0),
-                          Text(
-                            widget.phoneNumber,
-                            style: const TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
+                      SizedBox(height: 3.h),
+                      _buildTextField(
+                        controller: phoneNumberController,
+                        hintText: 'Téléphone',
+                        readOnly: true,
                       ),
-                      const SizedBox(height: 24.0),
+                      SizedBox(height: 3.h),
                       _buildTextField(
                         controller: nameController,
-                        labelText: 'Nom',
+                        hintText: 'Nom',
                         errorText: nameError,
                       ),
-                      const SizedBox(height: 16.0),
+                      SizedBox(height: 3.h),
                       _buildTextField(
                         controller: surnameController,
-                        labelText: 'Prénom',
+                        hintText: 'Prénom',
                         errorText: surnameError,
                       ),
-                      const SizedBox(height: 16.0),
-                      _buildTextField(
-                        controller: emailController,
-                        labelText: 'Email',
-                        errorText: emailError,
-                      ),
-                      const SizedBox(height: 30.0),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: registerUser,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1A1A1A),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 1.5.h, horizontal: 10.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(1.5.w),
-                            ),
-                          ),
-                          child: isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : Text(
-                                  "Suivant",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12.sp,
-                                      fontFamily: "Cabin",
-                                      fontWeight: FontWeight.w600),
-                                ),
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
                     ],
                   ),
+                ),
+              ),
+              SizedBox(height: 10.w),
+              Center(
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : registerUser,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1A1A1A),
+                    padding: EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 10.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(1.5.w),
+                    ),
+                  ),
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          "Suivant",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.sp,
+                              fontFamily: "Cabin",
+                              fontWeight: FontWeight.w600),
+                        ),
                 ),
               ),
             ],
@@ -343,18 +275,21 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
 
   Widget _buildTextField({
     required TextEditingController controller,
-    required String labelText,
+    required String hintText,
+    bool readOnly = false,
     String? errorText,
   }) {
     return TextField(
       controller: controller,
+      readOnly: readOnly,
       decoration: InputDecoration(
-        labelText: labelText,
+        hintText: hintText,
         errorText: errorText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset('assets/icons/crt.png'),
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+        border: OutlineInputBorder(),
       ),
     );
   }

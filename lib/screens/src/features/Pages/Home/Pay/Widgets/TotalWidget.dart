@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
 import 'package:sizer/sizer.dart';
 
-Widget buildTotalWidget(Order order, ) {
+Widget buildTotalWidget(
+  Order order,
+) {
   return Container(
     height: 40.w,
     width: double.infinity,
@@ -113,3 +115,5 @@ Widget buildTotalWidget(Order order, ) {
     ),
   );
 }
+
+

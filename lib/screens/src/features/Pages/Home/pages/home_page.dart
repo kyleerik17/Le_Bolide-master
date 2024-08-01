@@ -191,7 +191,7 @@ class _HomePageState extends State<HomePage> {
         alignment: Alignment.bottomCenter,
         child: Container(
           margin: EdgeInsets.only(
-              bottom: 7.h), // Ajustez cette valeur selon vos besoins
+              bottom: 5.h), // Ajustez cette valeur selon vos besoins
           width: 20.w,
           height: 20.w,
           child: FloatingActionButton(

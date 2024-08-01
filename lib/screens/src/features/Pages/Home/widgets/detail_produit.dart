@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:le_bolide/data/services/user.dart';
 import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add2.dart';
@@ -7,7 +9,7 @@ import 'package:le_bolide/screens/src/features/Pages/commande/widgets/slider1.da
 import 'package:sizer/sizer.dart';
 
 import '../../Home/widgets/bouton_ajouter.dart';
-
+late User user;
 class Details1ProduitsPage extends StatelessWidget {
   final int partId;
   final int userId;
@@ -16,7 +18,18 @@ class Details1ProduitsPage extends StatelessWidget {
     required this.partId,
     required this.userId,
   }) : super(key: key);
+ void initState() {
+    
+    try {
+      user = GetIt.instance.get<User>();
 
+      print('User ID from GetIt: ${user.id}');
+      print('User name from GetIt: ${user.name}');
+    } catch (e) {
+      print(e);
+    }
+   
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

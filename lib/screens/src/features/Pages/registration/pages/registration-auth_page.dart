@@ -1,30 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:le_bolide/data/services/data_services.dart';
+import 'package:le_bolide/data/services/user.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
+import 'package:le_bolide/screens/src/features/Pages/registration/pages/pages.dart';
 import 'package:sizer/sizer.dart';
 import 'package:pinput/pinput.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'pages.dart';
+import 'registration_last_page.dart';
 
 class RegistrationAuthPage extends StatefulWidget {
   final String phoneNumber;
   final int partId;
   final int userId;
 
-  const RegistrationAuthPage(
-      {Key? key,
-      required this.phoneNumber,
-      required this.partId,
-      required this.userId,
-      required String flag})
-      : super(key: key);
+  const RegistrationAuthPage({
+    Key? key,
+    required this.phoneNumber,
+    required this.partId,
+    required this.userId,
+    required String flag,
+  }) : super(key: key);
 
   @override
   _RegistrationAuthPageState createState() => _RegistrationAuthPageState();
 }
 
 class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
+  String fullPhoneNumber = ''; // Ensure this variable is defined
+  String _selectedCountry = ''; // Ensure this variable is defined
   final TextEditingController _pinController = TextEditingController();
   String _errorMessage = '';
   bool _isLoading = false;
@@ -35,8 +41,12 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
       _errorMessage = '';
     });
 
+    print('Début de la vérification OTP avec le code: $otp');
+    print('Numéro de téléphone: ${widget.phoneNumber}');
+
     final url = Uri.parse(
-        'https://bolide.armasoft.ci/bolide_services/index.php/api/otp/validate');
+      'https://bolide.armasoft.ci/bolide_services/index.php/api/otp/validate',
+    );
 
     try {
       final response = await http.post(
@@ -52,39 +62,81 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
       print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        print('Response data: $responseData');
+        Map<String, dynamic> responseData = jsonDecode(response.body);
 
-        if (responseData['statut'] == true) {
-          print('OTP validation successful. Navigating to HomePage.');
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => HomePage(
-                userId: widget.userId,
+        bool isRegistered = responseData['is_registered'];
+        print('Response data registered:');
+        print(isRegistered);
+
+        String message = responseData['message'] ?? '';
+        if (message.contains('Utilisateur inscrit')) {
+          isRegistered = true;
+          print('L\'utilisateur semble être inscrit selon le message.');
+        }
+
+        if (!isRegistered) {
+          print(
+              'Utilisateur non enregistré. Navigation vers RegistrationLastPage.');
+          // print(isRegistered);
+          print(responseData['is_registered']);
+
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              transitionDuration: const Duration(milliseconds: 300),
+              pageBuilder: (_, __, ___) => RegistrationLastPage(
+                phoneNumber: widget.phoneNumber,
                 partId: widget.partId,
+                userId: widget.userId, // Make sure userId is correctly passed
+                flag: _selectedCountry == 'Senegal' ? 'sng' : 'civ',
               ),
+              transitionsBuilder: (_, animation, __, child) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: child,
+                );
+              },
             ),
           );
         } else {
-          print('OTP validation failed. Navigating to RegistrationLastPage.');
+          Map<String, dynamic> dataUser = json.decode(response.body);
+          // print(dataUser);
+          Map<String, dynamic> userData = dataUser['user_info'];
+          // print(userData);
+
+          // print("UserModel Data: ${userData}");
+
+          User user = User.fromJson(userData);
+            print(user);
+          await DataService.save("user", user.toJson().toString());
+
+          GetIt.instance.registerFactory<User>(() => user);
+
+          print('Utilisateur déjà enregistré. Navigation vers HomePage() .');
+          // print(isRegistered);
+          print(responseData['is_registered']);
+
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => RegistrationLastPage(
-                phoneNumber: widget.phoneNumber,
+              builder: (context) => HomePage(
                 partId: widget.partId,
                 userId: widget.userId,
-                flag: '',
               ),
             ),
           );
         }
       } else {
+        print('Erreur de serveur lors de la vérification OTP.');
         setState(() {
           _errorMessage = 'Erreur de serveur. Veuillez réessayer.';
         });
       }
     } catch (e) {
-      print('Error during OTP verification: $e');
+      print('Erreur lors de la vérification OTP: $e');
+      print(otp);
       setState(() {
         _errorMessage = 'Erreur de connexion. Veuillez réessayer.';
       });
@@ -105,85 +157,18 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4.w),
-        child: SafeArea(
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 6.h),
-              Row(
-                children: [
-                  SizedBox(width: 4.w),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        PageRouteBuilder(
-                          transitionDuration: const Duration(milliseconds: 300),
-                          pageBuilder: (_, __, ___) => RegistrationPage(
-                              partId: widget.partId, userId: widget.userId),
-                          transitionsBuilder: (_, animation, __, child) {
-                            return SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(-1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFEBEBEB),
-                        shape: BoxShape.circle,
-                      ),
-                      padding: EdgeInsets.all(2.w),
-                      child: Icon(Icons.arrow_back_ios_new, size: 3.w),
-                    ),
-                  ),
-                  SizedBox(width: 35.w),
-                  Image.asset(
-                    'assets/icons/lgo.png',
-                    height: 4.h,
-                    fit: BoxFit.contain,
-                  ),
-                  const Spacer(flex: 3),
-                ],
-              ),
+              _buildHeader(),
               SizedBox(height: 5.h),
-              Text(
-                "Authentification",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18.sp,
-                  fontFamily: "Poppins",
-                  letterSpacing: 0.05,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              _buildTitle(),
               SizedBox(height: 2.h),
-              Text.rich(
-                TextSpan(
-                  text: "Un SMS sera envoyé au ",
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontFamily: "Cabin",
-                  ),
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: widget.phoneNumber,
-                      style: const TextStyle(
-                        color: Color(0xFF1A1A1A),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
-              ),
+              _buildPhoneNumberText(),
               SizedBox(height: 4.h),
               Expanded(
                 child: SingleChildScrollView(
@@ -191,59 +176,12 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(height: 2.h),
-                      Pinput(
-                        controller: _pinController,
-                        length: 4,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        onChanged: (value) {
-                          setState(() {
-                            _errorMessage = '';
-                          });
-                          if (value.length == 4) {
-                            _verifyOTP(value);
-                          }
-                        },
-                      ),
+                      _buildPinInput(),
                       SizedBox(height: 2.h),
                       if (_isLoading) const ImageRotation(),
-                      if (_errorMessage.isNotEmpty)
-                        Text(
-                          _errorMessage,
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 12.sp,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                      if (_errorMessage.isNotEmpty) _buildErrorMessage(),
                       SizedBox(height: 4.h),
-                      Text.rich(
-                        TextSpan(
-                          text: "Vous n'avez pas reçu de code ? ",
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            fontFamily: "Cabin",
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: "Renvoyer \n",
-                              style: TextStyle(
-                                color: const Color(0xFF1A1A1A),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 11.sp,
-                              ),
-                            ),
-                            TextSpan(
-                              text: "Recevoir un appel",
-                              style: TextStyle(
-                                color: const Color(0xFF1A1A1A),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 11.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                      _buildResendOptions(),
                       SizedBox(height: 3.h),
                     ],
                   ),
@@ -253,6 +191,148 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      children: [
+        SizedBox(width: 4.w),
+        _buildBackButton(),
+        SizedBox(width: 35.w),
+        Image.asset(
+          'assets/icons/lgo.png',
+          height: 4.h,
+          fit: BoxFit.contain,
+        ),
+        const Spacer(flex: 3),
+      ],
+    );
+  }
+
+  Widget _buildBackButton() {
+    return InkWell(
+      onTap: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RegistrationPage(
+              partId: widget.partId,
+              userId: widget.userId,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFFEBEBEB),
+          shape: BoxShape.circle,
+        ),
+        padding: EdgeInsets.all(2.w),
+        child: Icon(Icons.arrow_back_ios_new, size: 3.w),
+      ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return Text(
+      "Authentification",
+      style: TextStyle(
+        color: Colors.black,
+        fontSize: 19.sp,
+        fontFamily: "Poppins",
+        letterSpacing: 0.05,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildPhoneNumberText() {
+    return Text.rich(
+      TextSpan(
+        text: "Un SMS sera envoyé au ",
+        style: TextStyle(
+          fontSize: 12.sp,
+          fontFamily: "Cabin",
+        ),
+        children: <TextSpan>[
+          TextSpan(
+            text: widget.phoneNumber,
+            style: const TextStyle(
+              color: Color(0xFF1A1A1A),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildPinInput() {
+    return Pinput(
+      controller: _pinController,
+      length: 4,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      onCompleted: (pin) {
+        print('PIN complet: $pin');
+        _verifyOTP(pin);
+      },
+      defaultPinTheme: PinTheme(
+        width: 60, // Ajustez la largeur du champ PIN ici
+        height: 60, // Ajustez la hauteur du champ PIN ici
+        textStyle: TextStyle(
+          fontSize: 28.sp, // Ajustez la taille du texte ici
+          fontWeight: FontWeight.bold,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.grey[300], // Fond gris clair
+          border: Border.all(color: Colors.transparent), // Retire les bordures
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorMessage() {
+    return Text(
+      _errorMessage,
+      style: TextStyle(
+        color: Colors.red,
+        fontSize: 12.sp,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildResendOptions() {
+    return Text.rich(
+      TextSpan(
+        text: "Vous n'avez pas reçu de code ? ",
+        style: TextStyle(
+          fontSize: 11.sp,
+          fontFamily: "Cabin",
+        ),
+        children: <TextSpan>[
+          TextSpan(
+            text: "Renvoyer \n",
+            style: TextStyle(
+              color: const Color(0xFF1A1A1A),
+              fontWeight: FontWeight.bold,
+              fontSize: 11.sp,
+            ),
+          ),
+          TextSpan(
+            text: "Recevoir un appel",
+            style: TextStyle(
+              color: const Color(0xFF1A1A1A),
+              fontWeight: FontWeight.bold,
+              fontSize: 11.sp,
+            ),
+          ),
+        ],
+      ),
+      textAlign: TextAlign.center,
     );
   }
 }

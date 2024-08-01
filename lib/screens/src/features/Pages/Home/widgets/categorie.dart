@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:le_bolide/data/models/api_services.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/article3.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/pages/Categories/widgets/search_pneu.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../../../../../data/services/user.dart';
 
 class Categorie extends StatefulWidget {
   final int partId;
@@ -20,9 +23,16 @@ class Categorie extends StatefulWidget {
 
 class _CategorieState extends State<Categorie> {
   late Future<List<Map<String, dynamic>>> categories;
-
+  late User user;
   @override
   void initState() {
+    try {
+      user = GetIt.instance.get<User>();
+      print(user.id);
+      print('user info');
+    } catch (e) {
+      print(e);
+    }
     super.initState();
     categories = fetchCategories();
   }
@@ -48,10 +58,9 @@ class _CategorieState extends State<Categorie> {
       context,
       MaterialPageRoute(
         builder: (context) => CategoryDetailPage(
-          categoryId: categoryId,
-          partId: widget.partId,
-          userId:widget.userId
-        ),
+            categoryId: categoryId,
+            partId: widget.partId,
+            userId: widget.userId),
       ),
     );
   }
@@ -149,9 +158,16 @@ class CategoryDetailPage extends StatefulWidget {
 class _CategoryDetailPageState extends State<CategoryDetailPage> {
   late Future<Map<String, dynamic>> categoryDetail;
   String _selectedButton = '';
-
+  late User user;
   @override
   void initState() {
+    try {
+      user = GetIt.instance.get<User>();
+      print(user.name);
+      print('user info');
+    } catch (e) {
+      print(e);
+    }
     super.initState();
     categoryDetail = fetchCategoryDetail(widget.categoryId);
   }
@@ -184,10 +200,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        HomePage(
-                      partId: widget.partId,
-                      userId: widget.userId
-                    ),
+                        HomePage(partId: widget.partId, userId: widget.userId),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(-1.0, 0.0);
@@ -325,9 +338,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                       ),
                       SizedBox(height: 2.h),
                       Article3Page(
-                        categoryId: int.parse(widget.categoryId),
-                        userId: widget.userId
-                      ),
+                          categoryId: int.parse(widget.categoryId),
+                          userId: widget.userId),
                     ],
                   ),
                 );

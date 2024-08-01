@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:le_bolide/data/models/api_services.dart';
+import 'package:le_bolide/data/services/user.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
 import 'dart:convert';
 import 'package:sizer/sizer.dart';
@@ -14,7 +16,8 @@ class AddPage extends StatefulWidget {
     Key? key,
     required this.userId,
     required this.partId,
-    required this.quantity, required int initialQuantity,
+    required this.quantity,
+    required int initialQuantity,
   }) : super(key: key);
 
   @override
@@ -24,26 +27,34 @@ class AddPage extends StatefulWidget {
 class _AddPageState extends State<AddPage> {
   bool _showQuantityControls = false;
   late int _quantity; // Utiliser late pour l'initialiser dans initState
+  late User user;
 
   @override
   void initState() {
     super.initState();
+    try {
+      user = GetIt.instance.get<User>();
+
+      print('ID utilisateur de GetIt: ${user.id}');
+      print('Nom utilisateur de GetIt: ${user.name}');
+    } catch (e) {
+      print(e);
+    }
     _quantity = widget.quantity; // Initialiser _quantity avec la valeur reçue
   }
 
   Future<void> _sendQuantityUpdate() async {
-    final url = '${baseUrl}api/cart/add';
+    final url = '${baseUrl}api/cart/add/${user.id}';
 
     final data = {
-      'user_id': widget.userId.toString(),
+      'user_id': user.id.toString(), // Utiliser user.id ici
       'part_id': widget.partId.toString(),
       'quantity': _quantity.toString(),
     };
 
-    try {
-      print('Envoi de la requête à $url');
-      print('Données envoyées: ${jsonEncode(data)}');
+    print('Données envoyées: ${jsonEncode(data)}');
 
+    try {
       final response = await http.post(
         Uri.parse(url),
         headers: {
@@ -53,7 +64,7 @@ class _AddPageState extends State<AddPage> {
         body: jsonEncode(data),
       );
 
-      print('Code de statut reçu: ${response.statusCode}');
+      print('Code de statut: ${response.statusCode}');
       print('Corps de la réponse: ${response.body}');
 
       if (response.statusCode == 200) {
@@ -68,16 +79,38 @@ class _AddPageState extends State<AddPage> {
     }
   }
 
+  Future<void> _removeItemFromCart() async {
+    final url = '${baseUrl}api/cart/remove/${user.id}/${widget.partId}';
+
+    try {
+      final response = await http.delete(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        if (responseBody['status'] == 'success') {
+          print('Article supprimé avec succès');
+        } else {
+          print(
+              'Échec de la suppression de l\'article: ${responseBody['message']}');
+        }
+      } else {
+        print('Erreur HTTP: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erreur lors de la suppression de l\'article: $e');
+    }
+  }
+
   void _incrementQuantity() {
     setState(() {
-      if (_quantity < 2) {
+      if (_quantity < 8) {
         _quantity++;
       }
     });
     _sendQuantityUpdate().then((_) {
       print(
-          'user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
-      if (_quantity >= 2) {
+          'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
+      if (_quantity >= 8) {
         _navigateToPay1Page();
       }
     });
@@ -87,14 +120,16 @@ class _AddPageState extends State<AddPage> {
     setState(() {
       if (_quantity > 1) {
         _quantity--;
+        _sendQuantityUpdate().then((_) {
+          print(
+              'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
+        });
       } else {
-        _quantity = 1; // Assurer que la quantité ne tombe pas en dessous de 1
-        _showQuantityControls = false; // Cacher les contrôles et montrer le bouton "Ajouter"
+        _removeItemFromCart().then((_) {
+          print(
+              'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
+        });
       }
-    });
-    _sendQuantityUpdate().then((_) {
-      print(
-          'user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
     });
   }
 
@@ -105,7 +140,7 @@ class _AddPageState extends State<AddPage> {
         pageBuilder: (context, animation, secondaryAnimation) =>
             Details1ProduitsPage(
           partId: widget.partId,
-          userId: widget.userId, // Utiliser widget.userId ici
+          userId: widget.userId,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);

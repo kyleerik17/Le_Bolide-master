@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
+import 'package:le_bolide/data/services/user.dart';
 import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/quantity_widget_fav.dart';
+import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/search2.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/widgets/search.dart';
 import 'package:sizer/sizer.dart';
 import '../../Home/widgets/appbar.dart';
 import '../../loading modal/pages/pages.dart';
@@ -24,9 +28,16 @@ class FavorisPage extends StatefulWidget {
 
 class _FavorisPageState extends State<FavorisPage> {
   late Future<List<Item>> _futureFavorites;
-
+  late User user;
   @override
   void initState() {
+    try {
+      user = GetIt.instance.get<User>();
+      print(user.id);
+      print('user info');
+    } catch (e) {
+      print(e);
+    }
     super.initState();
     _futureFavorites = fetchFavorites();
   }
@@ -34,7 +45,7 @@ class _FavorisPageState extends State<FavorisPage> {
   Future<List<Item>> fetchFavorites() async {
     final response = await http.get(
       Uri.parse(
-          'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/user/${widget.userId}'),
+          'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/user/${user.id}'),
     );
 
     if (response.statusCode == 200) {
@@ -65,30 +76,7 @@ class _FavorisPageState extends State<FavorisPage> {
               padding: EdgeInsets.all(2.w),
               child: Column(
                 children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(vertical: 1.h),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(1.h),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Rechercher',
-                      hintStyle: TextStyle(
-                        color: const Color(0xFF737373),
-                        fontFamily: 'Poppins',
-                        fontSize: 12.sp,
-                      ),
-                      prefixIcon: ImageIcon(
-                        const AssetImage('assets/icons/search.png'),
-                        size: 6.w,
-                        color: Colors.black,
-                      ),
-                    ),
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
+                  Search2(partId: widget.partId, userId: widget.userId),
                   FutureBuilder<List<Item>>(
                     future: _futureFavorites,
                     builder: (context, snapshot) {
@@ -134,7 +122,7 @@ class _FavorisPageState extends State<FavorisPage> {
         alignment: Alignment.bottomCenter,
         child: Container(
           margin: EdgeInsets.only(
-              bottom: 7.h), // Ajustez cette valeur selon vos besoins
+              bottom: 5.h), // Ajustez cette valeur selon vos besoins
           width: 20.w,
           height: 20.w,
           child: FloatingActionButton(

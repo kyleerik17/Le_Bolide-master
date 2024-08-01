@@ -1,19 +1,40 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:http/http.dart' as http;
+import 'package:le_bolide/data/services/user.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout2_page.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
 import 'package:sizer/sizer.dart';
 import '../Widgets/formulaire_livraison.dart';
-import 'pages.dart';
 
-class Pay1Page extends StatelessWidget {
+class Pay1Page extends StatefulWidget {
   final int partId;
   final int userId;
-  final List<dynamic> cartItems; // Liste des éléments du panier
+  final String deliveryAddress;
+  final List<dynamic> cartItems;
 
-  const Pay1Page({
+  Pay1Page({
     Key? key,
     required this.partId,
     required this.userId,
-    required this.cartItems, // Recevoir les éléments du panier
+    required this.cartItems,
+    required this.deliveryAddress,
   }) : super(key: key);
+
+  @override
+  _Pay1PageState createState() => _Pay1PageState();
+}
+
+class _Pay1PageState extends State<Pay1Page> {
+  bool _isLoading = false;
+
+  String _name = '';
+  String _surname = '';
+  String _email = '';
+  String _country = '';
+  String _address = '';
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +46,10 @@ class Pay1Page extends StatelessWidget {
               context,
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
-                    Pay2Page(
-                  partId: partId,
-                  userId: userId,
-                  cartItems:
-                      cartItems, // Passer les éléments du panier à Pay2Page
+                    PayPage(
+                  partId: widget.partId,
+                  userId: widget.userId,
+                  cartItems: widget.cartItems,
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
@@ -56,7 +76,7 @@ class Pay1Page extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFFF7F8F9),
         elevation: 0,
         title: Text(
           'Paiement',
@@ -86,14 +106,14 @@ class Pay1Page extends StatelessWidget {
                       'assets/icons/lgo.png',
                       width: 8.w,
                     ),
-                    SizedBox(width: 30.w),
+                    SizedBox(width: 40.w),
                     Row(
                       children: [
                         Image.asset(
                           'assets/icons/lock.png',
                           width: 8.w,
                         ),
-                        SizedBox(width: 4.w),
+                        SizedBox(width: 2.w),
                         Text(
                           'Paiement sécurisé',
                           style: TextStyle(
@@ -170,42 +190,74 @@ class Pay1Page extends StatelessWidget {
                 ),
               ),
               FormulaireLivraison(
-                userId: userId,
-                onInformationChanged: (String name, String surname,
-                    String email, String country, String address) {},
+                userId: widget.userId,
+                onInformationChanged: (name, surname, email, country, address) {
+                  setState(() {
+                    _name = name;
+                    _surname = surname;
+                    _email = email;
+                    _country = country;
+                    _address = address;
+                  });
+                },
+                partId: widget.partId,
               ),
               SizedBox(height: 1.h),
               Center(
                 child: TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            Pay2Page(
-                          partId: partId,
-                          userId: userId,
-                          cartItems:
-                              cartItems, // Passer les éléments du panier à Pay2Page
-                        ),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin = Offset(1.0, 0.0);
-                          const end = Offset.zero;
-                          const curve = Curves.ease;
+                  onPressed: _isLoading
+                      ? null
+                      : () {
+                          if (_validateFields()) {
+                            setState(() {
+                              _isLoading = true;
+                            });
 
-                          final tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-                          final offsetAnimation = animation.drive(tween);
+                            Future.delayed(const Duration(seconds: 2), () {
+                              Navigator.pushReplacement(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      Pay2Page(
+                                          userId: widget.userId,
+                                          partId: widget.partId,
+                                          cartItems: widget.cartItems,
+                                          orderDetails: [
+                                            {
+                                              'name': _name,
+                                              'surname': _surname,
+                                              'email': _email,
+                                              'country': _country,
+                                              'address': _address,
+                                            }
+                                          ],
+                                          deliveryAddress: ''),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    const begin = Offset(1.0, 0.0);
+                                    const end = Offset.zero;
+                                    const curve = Curves.ease;
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
+                                    final tween = Tween(begin: begin, end: end)
+                                        .chain(CurveTween(curve: curve));
+                                    final offsetAnimation =
+                                        animation.drive(tween);
+
+                                    return SlideTransition(
+                                      position: offsetAnimation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              ).then((_) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              });
+                            });
+                          }
                         },
-                      ),
-                    );
-                  },
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),
                     padding:
@@ -217,15 +269,25 @@ class Pay1Page extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        "Continuer",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14.sp,
-                          fontFamily: 'Cabin',
-                          fontWeight: FontWeight.w500,
+                      if (_isLoading)
+                        SizedBox(
+                          height: 2.h,
+                          width: 2.h,
+                          child: const CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.0,
+                          ),
                         ),
-                      ),
+                      if (!_isLoading)
+                        Text(
+                          "Continuer",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.sp,
+                            fontFamily: 'Cabin',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -234,6 +296,46 @@ class Pay1Page extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  bool _validateFields() {
+    if (_name.isEmpty ||
+        _surname.isEmpty ||
+        _email.isEmpty ||
+        _country.isEmpty ||
+        _address.isEmpty) {
+      _showErrorDialog('Tous les champs doivent être remplis.');
+      return false;
+    }
+
+    final emailRegExp =
+        RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+    if (!emailRegExp.hasMatch(_email)) {
+      _showErrorDialog('Veuillez entrer une adresse email valide.');
+      return false;
+    }
+
+    return true;
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Erreur'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-
 import 'package:sizer/sizer.dart';
-
 import '../../../../../../gen/assets.gen.dart';
 import '../../registration/pages/pages.dart';
 
@@ -43,9 +41,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Widget build(BuildContext context) {
     double currentProgress = ((currentPage + 1) / images.length);
     return Scaffold(
-        backgroundColor: const Color(0xFFFFFFFF),
-        body: SafeArea(
-            child: Padding(
+      backgroundColor: const Color(0xFFFFFFFF),
+      body: SafeArea(
+        child: Padding(
           padding: EdgeInsets.all(4.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -147,90 +145,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               if (currentPage == 2)
                 TextButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Dialog(
-                          backgroundColor:
-                              const Color(0x545458).withOpacity(0.95),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(1.5.h),
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.all(4.w),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "Voulez-vous activer les notifications ?",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.sp,
-                                    fontFamily: "Cabin",
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(height: 2.h),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            transitionDuration: const Duration(
-                                                milliseconds: 300),
-                                            pageBuilder: (_, __, ___) =>
-                                                RegistrationPage(
-                                              partId: widget.partId,
-                                              userId: widget.userId
-                                            ),
-                                            transitionsBuilder:
-                                                (_, animation, __, child) {
-                                              return SlideTransition(
-                                                position: Tween<Offset>(
-                                                  begin: const Offset(1.0, 0.0),
-                                                  end: Offset.zero,
-                                                ).animate(animation),
-                                                child: child,
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      },
-                                      child: Text(
-                                        "Continuer",
-                                        style: TextStyle(
-                                          color: Colors.blue,
-                                          fontSize: 14.sp,
-                                          fontFamily: "Cabin",
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 1.h),
-                                    TextButton(
-                                      onPressed: () {},
-                                      child: Text(
-                                        "Annuler",
-                                        style: TextStyle(
-                                          color: Colors.red,
-                                          fontSize: 14.sp,
-                                          fontFamily: "Cabin",
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
+                    _showCenteredDialog();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),
@@ -253,6 +168,95 @@ class _OnboardingPageState extends State<OnboardingPage> {
               const Spacer(),
             ],
           ),
-        )));
+        ),
+      ),
+    );
+  }
+
+  void _showCenteredDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: const Color(0x545458).withOpacity(0.95),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(1.5.h),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(4.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Voulez-vous activer les notifications ?",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.sp,
+                    fontFamily: "Cabin",
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 2.h),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            transitionDuration:
+                                const Duration(milliseconds: 300),
+                            pageBuilder: (_, __, ___) => RegistrationPage(
+                              partId: widget.partId,
+                              userId: widget.userId,
+                            ),
+                            transitionsBuilder: (_, animation, __, child) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Continuer",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 14.sp,
+                          fontFamily: "Cabin",
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 1.h),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close the dialog
+                      },
+                      child: Text(
+                        "Annuler",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 14.sp,
+                          fontFamily: "Cabin",
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

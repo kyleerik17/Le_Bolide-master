@@ -176,13 +176,13 @@ class AssistancePage extends StatelessWidget {
       bottomNavigationBar: AssisBottom(
         onTap: (int) {},
         partId: partId,
-        userId:userId,
+        userId: userId,
       ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
         child: Container(
           margin: EdgeInsets.only(
-              bottom: 7.h), // Ajustez cette valeur selon vos besoins
+              bottom: 5.h), // Ajustez cette valeur selon vos besoins
           width: 20.w,
           height: 20.w,
           child: FloatingActionButton(
@@ -193,7 +193,7 @@ class AssistancePage extends StatelessWidget {
                   transitionDuration: const Duration(milliseconds: 300),
                   pageBuilder: (_, __, ___) => SearchLoadPage(
                     partId: partId,
-                    userId:userId,
+                    userId: userId,
                   ),
                   transitionsBuilder: (_, animation, __, child) {
                     return SlideTransition(

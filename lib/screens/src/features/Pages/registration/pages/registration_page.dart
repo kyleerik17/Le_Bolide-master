@@ -28,8 +28,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool _isPhoneValid =
       false; // Ajout d'une variable pour la validité du téléphone
   final Map<String, String> _countryCodes = {
-    'Senegal': '+221',
-    'Côte d\'Ivoire': '+225',
+    'Senegal': '221',
+    'Côte d\'Ivoire': '225',
   };
 
   @override
@@ -271,28 +271,33 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               ),
                             ),
                             Expanded(
-                              child: TextField(
-                                controller: _phoneController,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "Numéro de téléphone",
-                                  contentPadding: EdgeInsets.symmetric(
-                                    vertical: 3.w,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextField(
+                                    controller: _phoneController,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: "Numéro de téléphone",
+                                      contentPadding: EdgeInsets.symmetric(
+                                        vertical: 3.w,
+                                      ),
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      LengthLimitingTextInputFormatter(
+                                          _getMaxLength()),
+                                    ],
+                                    textCapitalization: TextCapitalization.none,
+                                    onChanged: (text) {
+                                      setState(() {
+                                        _isPhoneValid =
+                                            _isPhoneNumberValid(text.trim());
+                                      });
+                                    },
                                   ),
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(
-                                      _getMaxLength()),
                                 ],
-                                textCapitalization: TextCapitalization.none,
-                                onChanged: (text) {
-                                  setState(() {
-                                    _isPhoneValid =
-                                        _isPhoneNumberValid(text.trim());
-                                  });
-                                },
                               ),
                             ),
                             if (_isPhoneValid)
@@ -307,6 +312,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           ],
                         ),
                       ),
+                      if (!_isPhoneValid && _phoneController.text.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            _selectedCountry == 'Côte d\'Ivoire'
+                                ? 'Les numéros doivent commencer par 05, 01 ou 07 et avoir 10 chiffres.'
+                                : 'Le numéro doit commencer par 7 et avoir 9 chiffres.',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 10.sp,
+                            ),
+                          ),
+                        ),
                       SizedBox(height: 2.h),
                       Text.rich(
                         TextSpan(
