@@ -5,8 +5,12 @@ import '../../Home/pages/pages.dart';
 class RegistrationCongratulationPage extends StatelessWidget {
   final int partId;
   final int userId;
+  final String phoneNumber;
   const RegistrationCongratulationPage(
-      {super.key, required this.partId, required this.userId});
+      {super.key,
+      required this.partId,
+      required this.userId,
+      required this.phoneNumber});
 
   @override
   Widget build(BuildContext context) {

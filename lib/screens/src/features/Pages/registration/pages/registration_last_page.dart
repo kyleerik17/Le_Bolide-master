@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:le_bolide/data/services/getit.dart';
+import 'package:get_it/get_it.dart';
+import 'package:le_bolide/data/models/api_services.dart';
 import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration-auth_page.dart';
+
 import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration_congratulation_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
@@ -37,8 +38,17 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
 
   @override
   void initState() {
+    try {
+      user = GetIt.instance.get<User>();
+
+      print(user.name);
+      print('user info');
+    } catch (e) {
+      print(e);
+    }
     super.initState();
     phoneNumberController.text = widget.phoneNumber;
+    print("InitState: Phone number set to ${widget.phoneNumber}");
   }
 
   @override
@@ -50,6 +60,7 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
   }
 
   String? validateName(String? value) {
+    print("Validating name: $value");
     if (value == null || value.isEmpty) {
       return 'Ce champ est requis';
     }
@@ -61,18 +72,23 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
   }
 
   Future<void> registerUser() async {
-    if (!_validateForm()) return;
+    if (!_validateForm()) {
+      print("Form validation failed");
+      return;
+    }
 
     setState(() {
       isLoading = true;
     });
 
-    final url = Uri.parse('https://bolide.armasoft.ci/bolide_services/index.php/api/auth/register');
+    final url = Uri.parse(
+        'https://bolide.armasoft.ci/bolide_services/index.php/api/auth/register');
 
     try {
       final String name = nameController.text.trim();
       final String surname = surnameController.text.trim();
-      final String phone = phoneNumberController.text.replaceAll(RegExp(r'[^\d]'), '');
+      final String phone =
+          phoneNumberController.text.replaceAll(RegExp(r'[^\d]'), '');
 
       final requestBody = {
         'phone': phone,
@@ -80,51 +96,57 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
         'surname': surname,
       };
 
+      print("Request body: ${jsonEncode(requestBody)}");
+
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestBody),
       );
 
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
       if (response.statusCode == 200) {
-        Map<String, dynamic> dataUser = json.decode(response.body);
-               Map<String, dynamic> userData = dataUser['user_info'];
+        final responseBody = jsonDecode(response.body);
+        print("Response decoded: ${responseBody}");
 
-  print("UserModel Data: ${userData}");
+        if (responseBody['message'] == 'Inscription reussie') {
+          final data = responseBody['data'];
+          final userId = data['id'];
 
-        // final responseBody = jsonDecode(response.body);
-        // if (responseBody['message'] == 'Inscription reussie') {
-        //   final data = responseBody['data'];
-        //   final userId = data['id'];
+          print("User ID: $userId");
 
-        //   // Créer un objet User avec les informations récupérées
-        //   final user = User(
-        //     id: userId,
-        //     name: name,
-        //     surname: surname,
-        //     phone: phone,
-        //   );
-          
-        //   // Stocker l'utilisateur dans UserProvider
-        //   getIt<UserProvider>().setUser(user);
+          final user = User(
+            id: userId,
+            name: name,
+            surname: surname,
+            phone: phone,
+          );
 
-        //   Navigator.pushReplacement(
-        //     context,
-        //     MaterialPageRoute(
-        //       builder: (context) => HomePage(
-        //         partId: widget.partId,
-        //         userId: userId,
-        //       ),
-        //     ),
-        //   );
-        // } else {
-        //   _showErrorSnackBar('Erreur lors de l\'inscription. Veuillez réessayer.');
-        // }
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RegistrationCongratulationPage(
+                phoneNumber: phone,
+                partId: widget.partId,
+                userId: user.id,
+              ),
+            ),
+          );
+        } else {
+          print("Error message: ${responseBody['message']}");
+          _showErrorSnackBar(
+              'Erreur lors de l\'inscription. Veuillez réessayer.');
+        }
       } else {
+        print("Server error: ${response.statusCode}");
         _showErrorSnackBar('Erreur serveur. Veuillez réessayer plus tard.');
       }
     } catch (e) {
-      _showErrorSnackBar('Erreur de connexion. Vérifiez votre connexion internet.');
+      print("Exception: $e");
+      _showErrorSnackBar(
+          'Erreur de connexion. Vérifiez votre connexion internet.');
     } finally {
       setState(() {
         isLoading = false;
@@ -133,7 +155,9 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    print("Showing error snackbar: $message");
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   bool _validateForm() {
@@ -141,6 +165,8 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
       nameError = validateName(nameController.text);
       surnameError = validateName(surnameController.text);
     });
+    print("Name error: $nameError");
+    print("Surname error: $surnameError");
     return nameError == null && surnameError == null;
   }
 
@@ -186,7 +212,7 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
                     width: 40.w,
                     fit: BoxFit.contain,
                   ),
-                  Spacer(flex: 3),
+                  const Spacer(flex: 3),
                 ],
               ),
               SizedBox(height: 3.h),
@@ -243,13 +269,14 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 10.w),
+              SizedBox(height: 5.w),
               Center(
                 child: ElevatedButton(
                   onPressed: isLoading ? null : registerUser,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),
-                    padding: EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 10.h),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 10.h),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(1.5.w),
                     ),
@@ -266,6 +293,7 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
                         ),
                 ),
               ),
+              SizedBox(height: 2.h),
             ],
           ),
         ),
@@ -279,17 +307,29 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
     bool readOnly = false,
     String? errorText,
   }) {
-    return TextField(
-      controller: controller,
-      readOnly: readOnly,
-      decoration: InputDecoration(
-        hintText: hintText,
-        errorText: errorText,
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset('assets/icons/crt.png'),
+    return Container(
+      width: 358,
+      height: 40,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: const Color(0xFFC9CDD2),
+          width: 1.0,
         ),
-        border: OutlineInputBorder(),
+        borderRadius: BorderRadius.circular(4.0),
+      ),
+      child: TextField(
+        controller: controller,
+        readOnly: readOnly,
+        decoration: InputDecoration(
+          hintText: hintText,
+          errorText: errorText,
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset('assets/icons/crt.png'),
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 3.0),
+        ),
       ),
     );
   }

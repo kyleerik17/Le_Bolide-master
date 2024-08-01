@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 class User {
-  final String id;
+  final int id;
   final String name;
   final String surname;
   final String phone;
