@@ -18,7 +18,7 @@ class _Modal2PageState extends State<Modal2Page> {
       child: FractionallySizedBox(
         heightFactor: 0.8,
         child: Padding(
-          padding: EdgeInsets.all(4.w),
+          padding: EdgeInsets.all(5.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

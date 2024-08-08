@@ -119,7 +119,7 @@ class SearchResultPage extends StatelessWidget {
                     // Navigator.push(
                     //   context,
                     //   MaterialPageRoute(
-                    //       builder: (context) => const FindSearchPlusPage()),
+                    //       builder: (context) => const FindSearchPage()),
                     // );
                   },
                   style: TextButton.styleFrom(

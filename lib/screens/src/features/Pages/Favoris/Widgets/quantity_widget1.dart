@@ -5,20 +5,21 @@ import 'package:http/http.dart' as http;
 import 'package:le_bolide/data/models/api_services.dart';
 import 'package:le_bolide/data/services/user.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
+import 'package:le_bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
 import 'package:sizer/sizer.dart';
 
 // ignore: must_be_immutable
-class QuantityWidget extends StatefulWidget {
+class Quantity1Widget extends StatefulWidget {
   final int partId;
   final int userId;
-  const QuantityWidget({Key? key, required this.partId, required this.userId})
+  const Quantity1Widget({Key? key, required this.partId, required this.userId})
       : super(key: key);
 
   @override
-  _QuantityWidgetState createState() => _QuantityWidgetState();
+  _Quantity1WidgetState createState() => _Quantity1WidgetState();
 }
 
-class _QuantityWidgetState extends State<QuantityWidget> {
+class _Quantity1WidgetState extends State<Quantity1Widget> {
   bool _showQuantityControls = false;
   int _quantity = 0;
   late User user;
@@ -82,10 +83,11 @@ class _QuantityWidgetState extends State<QuantityWidget> {
       _sendQuantityUpdate().then((_) {
         print(
             'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
-        if (_quantity >= 3) {
-          _navigateToPay1Page();
-        }
       });
+    }
+    // Naviguer vers la page si la quantité est maintenant supérieure à 2
+    if (_quantity > 2) {
+      _navigateToPay1Page();
     }
   }
 
@@ -118,9 +120,10 @@ class _QuantityWidgetState extends State<QuantityWidget> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            Details1ProduitsPage(
+            DetailsProduitsPage(
           partId: widget.partId,
-          userId: widget.userId, // Utiliser user.id ici
+          userId: widget.userId, description: '', price: '',
+          libelle: '', // Utiliser user.id ici
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
@@ -164,7 +167,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),
                     padding:
-                        EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 6.w),
+                        EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 8.w),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(1.5.w),
                     ),
@@ -203,7 +206,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
                     VerticalDivider(
                       color: Colors.grey,
                       thickness: 1,
-                      width: 0.w,
+                      width: 1.w,
                     ),
                     SizedBox(
                       width: 3.w,

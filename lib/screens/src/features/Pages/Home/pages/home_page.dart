@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Importez ceci pour accéder à SystemChrome
+import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration_page.dart';
 import 'package:sizer/sizer.dart';
 import '../../loading modal/pages/pages.dart';
 import '../widgets/appbar.dart';
@@ -13,6 +14,7 @@ import 'Categories/pages/categorie_page.dart';
 class HomePage extends StatefulWidget {
   final int partId;
   final int userId;
+
   const HomePage({
     Key? key,
     required this.partId,
@@ -25,6 +27,40 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
+  void initState() {
+    super.initState();
+
+    // Vérifiez si l'ID utilisateur est valide, sinon redirigez vers RegistrationPage
+    if (widget.userId <= 0) {
+      Future.delayed(Duration.zero, () {
+        Navigator.pushReplacement(
+          context,
+          _createSlideTransition(
+            RegistrationPage(userId: widget.userId, partId: widget.partId),
+          ),
+        );
+      });
+    }
+  }
+
+  PageRouteBuilder _createSlideTransition(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOut;
+
+        var tween = Tween(begin: begin, end: end);
+        var offsetAnimation =
+            animation.drive(tween.chain(CurveTween(curve: curve)));
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.white,
@@ -33,153 +69,154 @@ class _HomePageState extends State<HomePage> {
     ));
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 2.h),
           AppBarWidget(partId: widget.partId, userId: widget.userId),
           Expanded(
-            child: Container(
-              color: const Color(0xFFF7F8F9),
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 2.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Nouveau chez Bolide 🔥",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13.sp,
-                                  fontFamily: "Poppins",
-                                ),
-                                textAlign: TextAlign.center,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 4.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 2.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Nouveau chez Bolide 🔥",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13.sp,
+                                fontFamily: "Poppins",
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CategoriesPage(
-                                          partId: widget.partId,
-                                          userId: widget.userId),
+                              textAlign: TextAlign.center,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  _createSlideTransition(
+                                    CategoriesPage(
+                                      partId: widget.partId,
+                                      userId: widget.userId,
+                                      categoryName: '',
                                     ),
-                                  );
-                                },
-                                child: Text(
-                                  "Voir tout",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 11.sp,
-                                    fontFamily: "Cabin",
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 1.h),
-                    SearchBarWidget(
-                        partId: widget.partId, userId: widget.userId),
-                    SizedBox(height: 2.h),
-                    const SliderPage(),
-                    SizedBox(height: 1.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Categories",
+                                );
+                              },
+                              child: Text(
+                                "Voir tout",
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13.sp,
-                                  fontFamily: "Poppins",
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 11.sp,
+                                  fontFamily: "Cabin",
                                 ),
-                                textAlign: TextAlign.center,
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CategoriesPage(
-                                          partId: widget.partId,
-                                          userId: widget.userId),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 1.h),
+                  SearchBarWidget(partId: widget.partId, userId: widget.userId),
+                  SizedBox(height: 2.h),
+                  const SliderPage(),
+                  SizedBox(height: 1.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Catégories",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13.sp,
+                                fontFamily: "Poppins",
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  _createSlideTransition(
+                                    CategoriesPage(
+                                      partId: widget.partId,
+                                      userId: widget.userId,
+                                      categoryName: '',
                                     ),
-                                  );
-                                },
-                                child: Text(
-                                  "Voir tout",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 11.sp,
-                                    fontFamily: "Cabin",
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 1.h),
-                    Categorie(partId: widget.partId, userId: widget.userId),
-                    SizedBox(height: 2.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Les marques populaires",
+                                );
+                              },
+                              child: Text(
+                                "Voir tout",
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13.sp,
-                                  fontFamily: "Poppins",
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Text(
-                                  "Voir tout",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 11.sp,
-                                    fontFamily: "Cabin",
-                                  ),
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 11.sp,
+                                  fontFamily: "Cabin",
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 1.h),
-                    const MarquePopu(),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 1.h),
+                  Categorie(partId: widget.partId, userId: widget.userId),
+                  SizedBox(height: 2.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Les marques populaires",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13.sp,
+                                fontFamily: "Poppins",
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            GestureDetector(
+                              onTap: () {},
+                              child: Text(
+                                "Voir tout",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 11.sp,
+                                  fontFamily: "Cabin",
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 1.h),
+                  const MarquePopu(),
+                ],
               ),
             ),
           ),
@@ -198,9 +235,8 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => SearchLoadPage(
-                      partId: widget.partId, userId: widget.userId),
+                _createSlideTransition(
+                  SearchLoadPage(partId: widget.partId, userId: widget.userId),
                 ),
               );
             },

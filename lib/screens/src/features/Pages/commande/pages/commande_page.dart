@@ -67,13 +67,13 @@ class _CommandePageState extends State<CommandePage> {
           setState(() {
             _commandes = [];
             _isLoading = false;
-            _errorMessage = 'Aucune commande trouvée.';
+            _errorMessage = 'Pas de commande';
           });
         }
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Erreur: ${response.statusCode}\n${response.body}';
+          _errorMessage = 'Pas de commande';
         });
       }
     } catch (e) {
@@ -99,149 +99,133 @@ class _CommandePageState extends State<CommandePage> {
     ));
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8F9),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-              ? Center(child: Text(_errorMessage!))
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 3.h),
+            AppBarWidget(partId: widget.partId, userId: widget.userId),
+            Padding(
+              padding: EdgeInsets.all(4.w),
+              child: Column(
+                children: [
+                  Search1(partId: widget.partId, userId: widget.userId),
+                  SizedBox(height: 1.h),
+                  Row(
                     children: [
-                      SizedBox(height: 3.h),
-                      AppBarWidget(
-                          partId: widget.partId, userId: widget.userId),
-                      SizedBox(height: 1.h),
-                      Padding(
-                        padding: EdgeInsets.all(4.w),
-                        child: Column(
-                          children: [
-                            Search1(
-                                partId: widget.partId, userId: widget.userId),
-                            SizedBox(height: 1.h),
-                            Row(
-                              children: [
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: _selectedButton == 'Tout'
-                                        ? Colors.black
-                                        : Colors.white,
-                                    side: const BorderSide(color: Colors.grey),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(0.5.h),
-                                    ),
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 4.w),
-                                    minimumSize: Size(0, 3.8.h),
-                                  ),
-                                  onPressed: () => _onButtonPressed('Tout'),
-                                  child: Text(
-                                    'Tout',
-                                    style: TextStyle(
-                                      color: _selectedButton == 'Tout'
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                Gap(2.w),
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    backgroundColor:
-                                        _selectedButton == 'En cours'
-                                            ? Colors.black
-                                            : Colors.white,
-                                    side: const BorderSide(color: Colors.grey),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(0.5.h),
-                                    ),
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 4.w),
-                                    minimumSize: Size(0, 3.8.h),
-                                  ),
-                                  onPressed: () => _onButtonPressed('En cours'),
-                                  child: Text(
-                                    'En cours',
-                                    style: TextStyle(
-                                      color: _selectedButton == 'En cours'
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                Gap(2.w),
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    backgroundColor:
-                                        _selectedButton == 'Terminées'
-                                            ? Colors.black
-                                            : Colors.white,
-                                    side: const BorderSide(color: Colors.grey),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(0.5.h),
-                                    ),
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 4.w),
-                                    minimumSize: Size(0, 3.8.h),
-                                  ),
-                                  onPressed: () =>
-                                      _onButtonPressed('Terminées'),
-                                  child: Text(
-                                    'Terminées',
-                                    style: TextStyle(
-                                      color: _selectedButton == 'Terminées'
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 1.5.h),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Commandes en cours',
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontFamily: "Poppins",
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Text(
-                                  'Voir tout',
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontFamily: "Cabin",
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 2.h),
-                            for (var commande in _commandes) ...[
-                              CommandeContainer(
-                                price: '${commande['total_price']} F',
-                                description: 'Commande ${commande['id']}',
-                                assetIcon: 'assets/icons/rec.png',
-                                partId: int.parse(commande['id']),
-                                userId: widget.userId,
-                              ),
-                              SizedBox(
-                                  height: 2
-                                      .h), // Ajoute un espace vertical entre les commandes
-                            ],
-                          ],
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: _selectedButton == 'Tout'
+                              ? Colors.black
+                              : Colors.white,
+                          side: const BorderSide(color: Colors.grey),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(0.5.h),
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          minimumSize: Size(0, 3.8.h),
+                        ),
+                        onPressed: () => _onButtonPressed('Tout'),
+                        child: Text(
+                          'Tout',
+                          style: TextStyle(
+                            color: _selectedButton == 'Tout'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                      ),
+                      Gap(2.w),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: _selectedButton == 'En cours'
+                              ? Colors.black
+                              : Colors.white,
+                          side: const BorderSide(color: Colors.grey),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(0.5.h),
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          minimumSize: Size(0, 3.8.h),
+                        ),
+                        onPressed: () => _onButtonPressed('En cours'),
+                        child: Text(
+                          'En cours',
+                          style: TextStyle(
+                            color: _selectedButton == 'En cours'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                      ),
+                      Gap(2.w),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: _selectedButton == 'Terminées'
+                              ? Colors.black
+                              : Colors.white,
+                          side: const BorderSide(color: Colors.grey),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(0.5.h),
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          minimumSize: Size(0, 3.8.h),
+                        ),
+                        onPressed: () => _onButtonPressed('Terminées'),
+                        child: Text(
+                          'Terminées',
+                          style: TextStyle(
+                            color: _selectedButton == 'Terminées'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
+                  SizedBox(height: 1.5.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Commandes en cours',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        'Voir tout',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontFamily: "Cabin",
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 2.h),
+                  for (var commande in _commandes) ...[
+                    CommandeContainer(
+                      price: '${commande['total_price']} F',
+                      description: 'Commande ${commande['order_code']}',
+                      assetIcon: 'assets/icons/rec.png',
+                      partId: int.parse(commande['id']),
+                      userId: widget.userId,
+                    ),
+                    SizedBox(
+                        height: 2
+                            .h), // Ajoute un espace vertical entre les commandes
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
       bottomNavigationBar: ReservBottomNavBar(
           onTap: (int) {}, partId: widget.partId, userId: widget.userId),
       floatingActionButton: Align(

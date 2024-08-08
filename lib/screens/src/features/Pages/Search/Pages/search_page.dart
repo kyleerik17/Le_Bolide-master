@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
 
 import 'find_search_page.dart';
@@ -26,11 +27,11 @@ class SearchPage extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => const VoirReplaysPage()),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>  HomePage(userId: userId, partId: partId,)),
+                    );
                   },
                   child: Container(
                     decoration: const BoxDecoration(

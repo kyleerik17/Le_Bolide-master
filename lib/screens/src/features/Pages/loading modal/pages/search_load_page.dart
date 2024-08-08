@@ -51,11 +51,27 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePage(
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            HomePage(
                           partId: widget.partId,
-                          userId:widget.userId
+                          userId: widget.userId,
                         ),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          const offsetBegin =
+                              Offset(-1.0, 0.0); // Start from right
+                          const offsetEnd =
+                              Offset.zero; // End at the current position
+                          const curve = Curves.easeInOut;
+
+                          var tween = Tween(begin: offsetBegin, end: offsetEnd)
+                              .chain(CurveTween(curve: curve));
+                          var offsetAnimation = animation.drive(tween);
+
+                          return SlideTransition(
+                              position: offsetAnimation, child: child);
+                        },
                       ),
                     );
                   },

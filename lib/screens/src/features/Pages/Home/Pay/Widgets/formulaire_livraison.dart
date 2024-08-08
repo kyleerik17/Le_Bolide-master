@@ -33,6 +33,7 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
   final _formKey = GlobalKey<FormState>();
   late User user;
   bool _isEmailValid = false;
+  bool _isAddressValid = false;
 
   @override
   void initState() {
@@ -54,7 +55,7 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
     _nomController.addListener(_notifyParent);
     _prenomController.addListener(_notifyParent);
     _emailController.addListener(_validateEmail);
-    _adresseController.addListener(_notifyParent);
+    _adresseController.addListener(_validateAddress);
   }
 
   void _notifyParent() {
@@ -72,6 +73,14 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
     final emailPattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
     setState(() {
       _isEmailValid = RegExp(emailPattern).hasMatch(email);
+    });
+    _notifyParent();
+  }
+
+  void _validateAddress() {
+    final address = _adresseController.text;
+    setState(() {
+      _isAddressValid = address.isNotEmpty;
     });
     _notifyParent();
   }
@@ -138,7 +147,7 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 2.h),
+        SizedBox(height: 1.h),
         Text(
           '$label *',
           style: TextStyle(
@@ -166,14 +175,8 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
           ),
           decoration: InputDecoration(
             hintText: hintText,
-            contentPadding: EdgeInsets.symmetric(vertical: 1.5.h),
-            prefixIcon: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 2.w),
-              child: Image.asset(
-                'assets/icons/crt.png', // Icon à gauche
-                width: 5.w,
-              ),
-            ),
+            contentPadding: EdgeInsets.symmetric(
+                vertical: 0.8.h, horizontal: 4.w), // Réduit la hauteur
             suffixIcon: hasCheckIcon && _isFieldValid(controller.text)
                 ? Padding(
                     padding: EdgeInsets.all(0.w),
@@ -200,7 +203,7 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 2.h),
+        SizedBox(height: 1.h),
         Text(
           'Pays *',
           style: TextStyle(
@@ -213,8 +216,8 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
         DropdownButtonFormField<String>(
           value: _selectedCountry,
           decoration: InputDecoration(
-            contentPadding:
-                EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 2.w),
+            contentPadding: EdgeInsets.symmetric(
+                vertical: 0.8.h, horizontal: 2.w), // Réduit la hauteur
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
@@ -228,10 +231,6 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
               value: 'Côte d\'Ivoire',
               child: Row(
                 children: [
-                  Image.asset(
-                    'assets/icons/civ.png',
-                    width: 5.w,
-                  ),
                   SizedBox(width: 2.w),
                   Text(
                     'Côte d\'Ivoire',
@@ -249,10 +248,6 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
               value: 'Sénégal',
               child: Row(
                 children: [
-                  Image.asset(
-                    'assets/icons/sng.png',
-                    width: 5.w,
-                  ),
                   SizedBox(width: 2.w),
                   Text(
                     'Sénégal',
@@ -288,12 +283,6 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
         _selectedCountry,
         _adresseController.text,
       );
-
-      // Here you could navigate to another page if needed
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => NextPage(...)),
-      // );
     }
   }
 
@@ -337,8 +326,9 @@ class _FormulaireLivraisonState extends State<FormulaireLivraison> {
             label: 'Adresse de livraison',
             controller: _adresseController,
             hintText: 'Adresse de livraison',
+            hasCheckIcon: _isAddressValid,
           ),
-          SizedBox(height: 2.h),
+          SizedBox(height: 1.h),
         ],
       ),
     );

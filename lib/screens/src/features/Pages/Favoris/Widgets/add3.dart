@@ -4,7 +4,7 @@ import 'package:sizer/sizer.dart';
 class Add3Page extends StatefulWidget {
   final int initialQuantity;
 
-  const Add3Page({Key? key, required this.initialQuantity}) : super(key: key);
+  const Add3Page({Key? key, required this.initialQuantity, required int partId, required int userId}) : super(key: key);
 
   @override
   _Add3PageState createState() => _Add3PageState();

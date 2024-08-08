@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:le_bolide/data/services/user.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout2_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/TotalWidget.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
@@ -18,7 +19,7 @@ import 'checkout1_page.dart';
 class PayPage extends StatefulWidget {
   late int partId;
   final int userId;
-  final List cartItems;
+  final List<Map<String, dynamic>> cartItems;
 
   PayPage({
     Key? key,
@@ -32,8 +33,8 @@ class PayPage extends StatefulWidget {
 }
 
 class _PayPageState extends State<PayPage> {
-  int _quantity = 1;
-  List<dynamic> _cartItems = [];
+  int _quantity = 0;
+  List<Map<String, dynamic>> _cartItems = []; // Corrected type
   bool _isLoading = true;
   String _errorMessage = '';
   late User user;
@@ -58,15 +59,18 @@ class _PayPageState extends State<PayPage> {
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(response.body) as List;
         setState(() {
-          _cartItems = data;
+          _cartItems =
+              data.map((item) => item as Map<String, dynamic>).toList();
+          print('Cart Items: $_cartItems'); // Imprimer les éléments du panier
           _isLoading = false;
         });
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Erreur lors de la récupération des articles du panier';
+          _errorMessage =
+              'Erreur lors de la récupération des articles du panier';
         });
       }
     } catch (e) {
@@ -78,15 +82,17 @@ class _PayPageState extends State<PayPage> {
   }
 
   void _removeItemAndRefresh(int userId, int partId) async {
-    final removed = await _removeItemFromCart(userId, partId);
+    final removed = await _removeItemFromCart(user.id, partId);
     if (removed) {
       await _fetchCartItems(); // Recharge les articles du panier
+      print(
+          'Cart Items after removal: $_cartItems'); // Imprimer les éléments après suppression
       setState(() {}); // Force le widget à se reconstruire
     }
   }
 
   Future<bool> _removeItemFromCart(int userId, int partId) async {
-    final url = '${baseUrl}api/cart/remove/$userId/$partId';
+    final url = '${baseUrl}api/cart/remove/${user.id}/$partId';
 
     try {
       final response = await http.delete(Uri.parse(url));
@@ -111,26 +117,22 @@ class _PayPageState extends State<PayPage> {
   }
 
   void _navigateToPay1Page() {
-    print('Articles du panier:');
-    for (var item in _cartItems) {
-      print('Libellé: ${item['libelle']}, Prix: ${item['prix']}, Quantité: ${item['quantite']}');
-    }
-
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => Pay1Page(
           partId: widget.partId,
           userId: widget.userId,
-          cartItems: _cartItems,
-          deliveryAddress: '',
+          cartItems: _cartItems, deliveryAddress: '',
+          // Vous pouvez également passer d'autres paramètres nécessaires
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
           const end = Offset.zero;
           const curve = Curves.ease;
 
-          final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          final tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
           final offsetAnimation = animation.drive(tween);
 
           return SlideTransition(
@@ -139,11 +141,28 @@ class _PayPageState extends State<PayPage> {
           );
         },
       ),
-    );
+    ).then((_) {
+      // Après la navigation vers Pay1Page, envoyez les articles à Pay2Page
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Pay2Page(
+            cartItems: _cartItems,
+            partId: widget.partId,
+            userId: user.id,
+            orderDetails: const [],
+            deliveryAddress: '',
+          ),
+        ),
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    print(
+        'Building PayPage with Cart Items: $_cartItems'); // Imprimer les éléments pendant la construction
+
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -151,16 +170,19 @@ class _PayPageState extends State<PayPage> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => HomePage(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    HomePage(
                   userId: widget.userId,
                   partId: widget.partId,
                 ),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
                   const begin = Offset(-1.0, 0.0);
                   const end = Offset.zero;
                   const curve = Curves.ease;
 
-                  final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  final tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
                   final offsetAnimation = animation.drive(tween);
 
                   return SlideTransition(
@@ -208,7 +230,8 @@ class _PayPageState extends State<PayPage> {
                                   Padding(
                                     padding: EdgeInsets.all(2.w),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           '${_cartItems.length} Produits',
@@ -234,31 +257,40 @@ class _PayPageState extends State<PayPage> {
                                   SizedBox(height: 1.h),
                                   const PromoCodeWidget(),
                                   SizedBox(height: 1.h),
-                                  ..._cartItems.map((item) => CartItemWidget(
-                                    img: item['img'],
-                                    libelle: item['libelle'],
-                                    prix: double.tryParse(item['prix'].toString()) ?? 0.0,
-                                    quantite: int.tryParse(item['quantite'].toString()) ?? 0,
-                                    partId: int.parse(item['id_produit']),
-                                    userId: widget.userId,
-                                    onRemove: _removeItemAndRefresh,
-                                  )),
+                                  if (_cartItems.isNotEmpty)
+                                    ..._cartItems.map((item) => CartItemWidget(
+                                          img: item['img'],
+                                          libelle: item['libelle'],
+                                          prix: double.tryParse(
+                                                  item['prix'].toString()) ??
+                                              0.0,
+                                          quantite: int.tryParse(
+                                                  item['quantite']
+                                                      .toString()) ??
+                                              0,
+                                          partId: int.parse(item['id_produit']),
+                                          userId: widget.userId,
+                                          onRemove: _removeItemAndRefresh,
+                                        )),
+                                  if (_cartItems.isEmpty)
+                                    const Row(
+                                      children: [
+                                        Text(
+                                          '   *Vous serez notifié quand le produit sera en stock',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.red,
+                                            fontFamily: "Cabin",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   SizedBox(height: 1.h),
                                   Padding(
-                                    padding: EdgeInsets.all(0.w),
-                                    child: const Text(
-                                      '* Vous serez notifié quand le produit sera en stock',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0xFF1A1A1A),
-                                        fontFamily: "Cabin",
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(2.w),
+                                    padding: EdgeInsets.all(3.w),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           'Souvent acheté ensemble...',
@@ -280,55 +312,67 @@ class _PayPageState extends State<PayPage> {
                                     ),
                                   ),
                                   const ContaiRizon(),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: const Color(0xFFC9CDD2)),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Image.asset(
-                                          'assets/icons/pct.png',
-                                          width: 6.w,
-                                          height: 6.w,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        const Expanded(
-                                          child: TextField(
-                                            decoration: InputDecoration(
-                                              hintText: 'Entrez un code promo',
-                                              hintStyle: TextStyle(
-                                                fontFamily: 'Cabin',
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 14,
-                                                color: Color(0xFF94979E),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 3.w),
+                                    child: Container(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 4.w),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: const Color(0xFFC9CDD2)),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Image.asset(
+                                            'assets/icons/pct.png',
+                                            width: 6.w,
+                                            height: 6.w,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          const Expanded(
+                                            child: TextField(
+                                              decoration: InputDecoration(
+                                                hintText:
+                                                    'Entrez un code promo',
+                                                hintStyle: TextStyle(
+                                                  fontFamily: 'Cabin',
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF94979E),
+                                                ),
+                                                border: InputBorder.none,
                                               ),
-                                              border: InputBorder.none,
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        TextButton(
-                                          onPressed: () {},
-                                          style: TextButton.styleFrom(
-                                            backgroundColor: Colors.black,
-                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(8),
+                                          const SizedBox(width: 8),
+                                          TextButton(
+                                            onPressed: () {},
+                                            style: TextButton.styleFrom(
+                                              backgroundColor: Colors.black,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16,
+                                                      vertical: 8),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              'Appliquer',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                              ),
                                             ),
                                           ),
-                                          child: const Text(
-                                            'Appliquer',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
+                                  SizedBox(height: 2.h),
                                   Container(
                                     height: 40.w,
                                     width: double.infinity,
@@ -337,10 +381,12 @@ class _PayPageState extends State<PayPage> {
                                       children: [
                                         SizedBox(height: 5.w),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Padding(
-                                              padding: EdgeInsets.only(left: 4.w),
+                                              padding:
+                                                  EdgeInsets.only(left: 4.w),
                                               child: Text(
                                                 'Sous-total',
                                                 style: TextStyle(
@@ -351,7 +397,8 @@ class _PayPageState extends State<PayPage> {
                                               ),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(right: 4.w),
+                                              padding:
+                                                  EdgeInsets.only(right: 4.w),
                                               child: Text(
                                                 '${_calculateTotal()} F',
                                                 style: TextStyle(
@@ -365,10 +412,12 @@ class _PayPageState extends State<PayPage> {
                                         ),
                                         SizedBox(height: 1.h),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Padding(
-                                              padding: EdgeInsets.only(left: 4.w),
+                                              padding:
+                                                  EdgeInsets.only(left: 4.w),
                                               child: Text(
                                                 'Frais de livraison',
                                                 style: TextStyle(
@@ -379,7 +428,8 @@ class _PayPageState extends State<PayPage> {
                                               ),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(right: 4.w),
+                                              padding:
+                                                  EdgeInsets.only(right: 4.w),
                                               child: Text(
                                                 'Gratuit',
                                                 style: TextStyle(
@@ -393,10 +443,12 @@ class _PayPageState extends State<PayPage> {
                                         ),
                                         SizedBox(height: 1.h),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Padding(
-                                              padding: EdgeInsets.only(left: 4.w),
+                                              padding:
+                                                  EdgeInsets.only(left: 4.w),
                                               child: Text(
                                                 'Code promo',
                                                 style: TextStyle(
@@ -407,7 +459,8 @@ class _PayPageState extends State<PayPage> {
                                               ),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(right: 4.w),
+                                              padding:
+                                                  EdgeInsets.only(right: 4.w),
                                               child: Text(
                                                 'BOL10 (-10%)',
                                                 style: TextStyle(
@@ -433,10 +486,12 @@ class _PayPageState extends State<PayPage> {
                                         ),
                                         SizedBox(height: 1.h),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Padding(
-                                              padding: EdgeInsets.only(left: 4.w),
+                                              padding:
+                                                  EdgeInsets.only(left: 4.w),
                                               child: Text(
                                                 'TOTAL',
                                                 style: TextStyle(
@@ -447,7 +502,8 @@ class _PayPageState extends State<PayPage> {
                                               ),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.only(right: 4.w),
+                                              padding:
+                                                  EdgeInsets.only(right: 4.w),
                                               child: Text(
                                                 '${_calculateTotal()} F',
                                                 style: TextStyle(
@@ -462,15 +518,22 @@ class _PayPageState extends State<PayPage> {
                                       ],
                                     ),
                                   ),
-                                  SizedBox(height: 3.w),
+                                  SizedBox(height: 7.w),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       elevation: 10,
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1.w)),
-                                      backgroundColor: const Color(0xFF1A1A1A),
-                                      padding: EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 10.h),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(1.w)),
+                                      backgroundColor: _cartItems.isNotEmpty
+                                          ? const Color(0xFF1A1A1A)
+                                          : Colors.grey, // Color when disabled
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 1.5.h, horizontal: 10.h),
                                     ),
-                                    onPressed: _navigateToPay1Page,
+                                    onPressed: _cartItems.isNotEmpty
+                                        ? _navigateToPay1Page
+                                        : null, // Disable the button if cart is empty
                                     child: Text(
                                       'Passer la commande',
                                       style: TextStyle(
@@ -553,86 +616,83 @@ class _CartItemWidgetState extends State<CartItemWidget> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset(
-            'assets/images/pn2.png',
-            width: 25.w,
-            height: 25.w,
-          ),
-          SizedBox(width: 2.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.libelle,
-                      style: TextStyle(
-                        fontFamily: "Poppins",
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12.sp,
-                      ),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Image.network(
+          widget.img,
+          width: 25.w,
+          height: 25.w,
+        ),
+        SizedBox(width: 2.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.libelle,
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12.sp,
                     ),
-                    GestureDetector(
-                      onTap: () => _showConfirmationDialog(context),
-                      child: Image.asset(
-                        'assets/icons/trash.png',
-                        width: 6.w,
-                        height: 6.w,
-                      ),
+                  ),
+                  GestureDetector(
+                    onTap: () => _showConfirmationDialog(context),
+                    child: Image.asset(
+                      'assets/icons/trash.png',
+                      width: 6.w,
+                      height: 6.w,
                     ),
-                  ],
-                ),
-                SizedBox(height: 0.5.h),
-                Row(
-                  children: [
-                    Image.asset(
-                      'assets/icons/ea.png',
+                  ),
+                ],
+              ),
+              SizedBox(height: 0.5.h),
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/icons/ea.png',
+                    color: const Color(0xFF1A1A1A),
+                    width: 5.w,
+                  ),
+                  SizedBox(width: 1.w),
+                  Text(
+                    'Pneu été',
+                    style: TextStyle(
+                      fontFamily: "Cabin",
                       color: const Color(0xFF1A1A1A),
-                      width: 5.w,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w400,
                     ),
-                    SizedBox(width: 1.w),
-                    Text(
-                      'Pneu été',
-                      style: TextStyle(
-                        fontFamily: "Cabin",
-                        color: const Color(0xFF1A1A1A),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w400,
-                      ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 1.h),
+              Row(
+                children: [
+                  Text(
+                    '${widget.prix.toString()} F',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontFamily: 'Cabin',
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF1A1A1A),
                     ),
-                  ],
-                ),
-                SizedBox(height: 1.h),
-                Row(
-                  children: [
-                    Text(
-                      '${widget.prix.toString()} F',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontFamily: 'Cabin',
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF1A1A1A),
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    AddPage(
-                      userId: widget.userId,
-                      partId: widget.partId,
-                      initialQuantity: widget.quantite,
-                      quantity: widget.quantite,
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                  SizedBox(width: 8.w),
+                  AddPage(
+                    userId: widget.userId,
+                    partId: widget.partId,
+                    initialQuantity: widget.quantite,
+                    quantity: widget.quantite,
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 
@@ -642,7 +702,8 @@ class _CartItemWidgetState extends State<CartItemWidget> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirmer la suppression'),
-          content: const Text('Êtes-vous sûr de vouloir supprimer cet article du panier ?'),
+          content: const Text(
+              'Êtes-vous sûr de vouloir supprimer cet article du panier ?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -653,7 +714,8 @@ class _CartItemWidgetState extends State<CartItemWidget> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Ferme le dialogue
-                widget.onRemove(userIdConnect, widget.partId); // Appelle la fonction de suppression
+                widget.onRemove(userIdConnect,
+                    widget.partId); // Appelle la fonction de suppression
               },
               child: const Text('Supprimer'),
             ),

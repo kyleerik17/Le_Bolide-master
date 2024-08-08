@@ -6,8 +6,11 @@ class PromoCodeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: EdgeInsets.all(2.w),
+    return Padding(
+      padding:
+          EdgeInsets.all(4.w), // Ajout du padding autour du Container blanc
+      child: Container(
+        padding: EdgeInsets.all(2.w), // Padding interne du Container blanc
         color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -27,6 +30,8 @@ class PromoCodeWidget extends StatelessWidget {
               ),
             ),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

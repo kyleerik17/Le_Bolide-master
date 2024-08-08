@@ -10,7 +10,7 @@ class QuantityWidget extends StatefulWidget {
 
 class _QuantityWidgetState extends State<QuantityWidget> {
   bool _showQuantityControls = false;
-  int _quantity = 1;
+  int _quantity = 0;
 
   void _incrementQuantity() {
     setState(() {

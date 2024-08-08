@@ -197,7 +197,7 @@ class _SearchResult2PageState extends State<SearchResult2Page> {
                     // Navigator.push(
                     //   context,
                     //   MaterialPageRoute(
-                    //       builder: (context) => const FindSearchPlusPage()),
+                    //       builder: (context) => const FindSearchPage()),
                     // );
                   },
                   style: TextButton.styleFrom(

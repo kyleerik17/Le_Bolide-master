@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -10,7 +11,6 @@ import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/find_search_full_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/commande/pages/details_commande_page.dart';
 import 'package:sizer/sizer.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal2_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal_page.dart';
@@ -30,6 +30,9 @@ class _FindSearchPageState extends State<FindSearchPage> {
   String _selectedButton = 'Tout';
   late Future<List<Piece>> _piecesFuture;
   late User user;
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+
   @override
   void initState() {
     try {
@@ -43,16 +46,26 @@ class _FindSearchPageState extends State<FindSearchPage> {
     _piecesFuture = _fetchPieces();
   }
 
-  Future<List<Piece>> _fetchPieces() async {
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  Future<List<Piece>> _fetchPieces({String? searchTerm}) async {
     try {
-      final response = await http.get(Uri.parse('${baseUrl}api/pieces'));
+      final response = await http.get(
+        Uri.parse(
+            '${baseUrl}api/pieces/search?part_name=${searchTerm ?? ""}&category_id='),
+      );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        if (jsonResponse.containsKey('Liste des pieces')) {
-          final List<dynamic> piecesList = jsonResponse['Liste des pieces'];
+        if (jsonResponse.containsKey('pieces')) {
+          final List<dynamic> piecesList = jsonResponse['pieces'];
           return piecesList.map((piece) => Piece.fromJson(piece)).toList();
         } else {
-          throw Exception('Key "Liste des pieces" not found in response');
+          throw Exception('Key "pieces" not found in response');
         }
       } else {
         throw Exception(
@@ -61,6 +74,15 @@ class _FindSearchPageState extends State<FindSearchPage> {
     } catch (error) {
       throw Exception('Error fetching pieces: $error');
     }
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        _piecesFuture = _fetchPieces(searchTerm: query);
+      });
+    });
   }
 
   void _onButtonPressed(String buttonName) {
@@ -125,7 +147,10 @@ class _FindSearchPageState extends State<FindSearchPage> {
                 ],
               ),
               SizedBox(height: 5.w),
-              const SearchBar1Widget(),
+              SearchBar1Widget(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+              ),
               SizedBox(height: 2.w),
               Row(
                 children: [
@@ -148,13 +173,14 @@ class _FindSearchPageState extends State<FindSearchPage> {
                     return Column(
                       children: snapshot.data!.map((piece) {
                         return ArticleCard(
-                            imageUrl: piece.img,
-                            title: piece.libelle,
-                            description: piece.description,
-                            price: piece.price,
-                            partId: piece.id,
-                            userId: widget.userId, libelle: piece.libelle, // Passer l'ID en tant qu'int
-                            );
+                          imageUrl: piece.img,
+                          title: piece.libelle,
+                          description: piece.description,
+                          price: piece.price,
+                          partId: int.parse(piece.id), // Convert String to int
+                          userId: widget.userId,
+                          libelle: piece.libelle,
+                        );
                       }).toList(),
                     );
                   } else {
@@ -232,13 +258,91 @@ class _FindSearchPageState extends State<FindSearchPage> {
   }
 }
 
+class SearchBar1Widget extends StatelessWidget {
+  final TextEditingController controller;
+  final Function(String) onChanged;
+
+  const SearchBar1Widget({
+    Key? key,
+    required this.controller,
+    required this.onChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 4.w),
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black),
+          borderRadius: BorderRadius.circular(1.h),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        hintText: 'Rechercher...',
+        hintStyle: TextStyle(
+          color: const Color(0xFF737373),
+          fontFamily: 'Poppins',
+          fontSize: 10.sp,
+        ),
+        prefixIcon: ImageIcon(
+          const AssetImage('assets/icons/search.png'),
+          size: 5.w,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+}
+
+class Piece {
+  final String id;
+  final String img;
+  final String libelle;
+  final String description;
+  final String price;
+  final String categoryId;
+  final String vehicleId;
+  final String createdAt;
+  final String updatedAt;
+
+  Piece({
+    required this.id,
+    required this.img,
+    required this.libelle,
+    required this.description,
+    required this.price,
+    required this.categoryId,
+    required this.vehicleId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Piece.fromJson(Map<String, dynamic> json) {
+    return Piece(
+      id: json['id'],
+      img: json['img'],
+      libelle: json['libelle'],
+      description: json['description'],
+      price: json['price'],
+      categoryId: json['category_id'],
+      vehicleId: json['vehicle_id'],
+      createdAt: json['created_at'],
+      updatedAt: json['update_at'] ?? '',
+    );
+  }
+}
+
 class ArticleCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String description;
   final String price;
   final String libelle;
-  final int partId; // ID de l'article en tant qu'int
+
+  final int partId;
   final int userId;
 
   const ArticleCard({
@@ -248,7 +352,8 @@ class ArticleCard extends StatelessWidget {
     required this.description,
     required this.price,
     required this.partId,
-    required this.userId, required this.libelle, // Ajout de l'ID de l'article
+    required this.userId,
+    required this.libelle,
   }) : super(key: key);
 
   @override
@@ -277,7 +382,7 @@ class ArticleCard extends StatelessWidget {
                   price: price,
                   libelle: libelle,
                   description: description,
-                ), // Convertir l'ID en String ici
+                ),
               );
             },
           ),
@@ -356,8 +461,9 @@ class ArticleCard extends StatelessWidget {
                         ),
                       ),
                       QuantityWidget(
-                          userId: userId,
-                          partId: partId) // Passer l'ID ici en tant qu'int
+                        userId: userId,
+                        partId: partId,
+                      )
                     ],
                   ),
                 ],

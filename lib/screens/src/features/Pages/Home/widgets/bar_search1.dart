@@ -66,10 +66,8 @@ class _SequencedImageDialogState extends State<SequencedImageDialog> {
     'assets/icons/3.png',
     'assets/icons/4.png',
   ];
-  double _animationDurationInSeconds =
-      4.0;
-  double _imageDisplayDurationInSeconds =
-      0.5; 
+  double _animationDurationInSeconds = 4.0;
+  double _imageDisplayDurationInSeconds = 0.5;
 
   @override
   void initState() {
@@ -86,9 +84,7 @@ class _SequencedImageDialogState extends State<SequencedImageDialog> {
   void _startTimer() {
     int totalFrames =
         (_animationDurationInSeconds / _imageDisplayDurationInSeconds).ceil();
-    const Duration imageDisplayDuration = Duration(
-        milliseconds:
-            300); 
+    const Duration imageDisplayDuration = Duration(milliseconds: 300);
     int frame = 0;
 
     _timer = Timer.periodic(imageDisplayDuration, (timer) {

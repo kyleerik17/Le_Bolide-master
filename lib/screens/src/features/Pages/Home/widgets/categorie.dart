@@ -24,6 +24,7 @@ class Categorie extends StatefulWidget {
 class _CategorieState extends State<Categorie> {
   late Future<List<Map<String, dynamic>>> categories;
   late User user;
+
   @override
   void initState() {
     try {
@@ -53,14 +54,15 @@ class _CategorieState extends State<Categorie> {
     }
   }
 
-  void navigateToCategory(String categoryId) {
+  void navigateToCategory(String categoryId, String categoryName) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CategoryDetailPage(
             categoryId: categoryId,
             partId: widget.partId,
-            userId: widget.userId),
+            userId: widget.userId,
+            categoryName: categoryName),
       ),
     );
   }
@@ -82,12 +84,12 @@ class _CategorieState extends State<Categorie> {
             child: Row(
               children: snapshot.data!.map((category) {
                 return Padding(
-                  padding: EdgeInsets.only(
-                      right: 2.w), // Espacement entre les catégories
+                  padding: EdgeInsets.only(right: 2.w),
                   child: _buildCategorie(
                     icon: category['icon'],
                     label: category['label'],
-                    onTap: () => navigateToCategory(category['id']),
+                    categoryName: category['label'],
+                    onTap: () => navigateToCategory(category['id'], category['label']),
                   ),
                 );
               }).toList(),
@@ -102,6 +104,7 @@ class _CategorieState extends State<Categorie> {
     required String icon,
     required String label,
     required VoidCallback onTap,
+    required String categoryName,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -143,12 +146,14 @@ class CategoryDetailPage extends StatefulWidget {
   final int partId;
   final int userId;
   final String categoryId;
+  final String categoryName;
 
   const CategoryDetailPage({
     Key? key,
     required this.categoryId,
     required this.partId,
     required this.userId,
+    required this.categoryName,
   }) : super(key: key);
 
   @override
@@ -159,6 +164,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
   late Future<Map<String, dynamic>> categoryDetail;
   String _selectedButton = '';
   late User user;
+
   @override
   void initState() {
     try {
@@ -229,7 +235,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
             backgroundColor: Colors.white,
             elevation: 0,
             title: Text(
-              'Détails de la catégorie',
+              widget.categoryName,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16.sp,
@@ -337,9 +343,12 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                         ],
                       ),
                       SizedBox(height: 2.h),
-                      Article3Page(
+                      Expanded(
+                        child: Article3Page(
                           categoryId: int.parse(widget.categoryId),
-                          userId: widget.userId),
+                          userId: widget.userId,
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -351,3 +360,5 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     );
   }
 }
+
+

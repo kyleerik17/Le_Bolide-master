@@ -14,7 +14,7 @@ class _ModalPageState extends State<ModalPage> {
   bool _isLoading = false;
   List<dynamic> _items = [];
   String _selectedFilter = '';
-  String? _selectedItemId; // Variable pour l'élément sélectionné
+  String? _selectedItemId;
 
   Future<void> _fetchItems() async {
     final url =
@@ -33,7 +33,6 @@ class _ModalPageState extends State<ModalPage> {
           _items = data;
         });
       } else {
-        // Handle errors
         print('Failed to load items. Status code: ${response.statusCode}');
       }
     } catch (e) {
@@ -58,7 +57,7 @@ class _ModalPageState extends State<ModalPage> {
           return SingleChildScrollView(
             controller: scrollController,
             child: Padding(
-              padding: EdgeInsets.all(4.w),
+              padding: EdgeInsets.all(5.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -109,18 +108,13 @@ class _ModalPageState extends State<ModalPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  FilterSection(
-                    title: 'Marques',
-                    options: [
-                      'Michelin',
-                      'Hankook',
-                      'Continental',
-                      'Goodyear',
-                      'Bridgestone',
-                      'Maxxis'
-                    ],
+                  const CategoriesDisplay(
+                    label: 'Catégories',
+                    apiUrl:
+                        'https://bolide.armasoft.ci/bolide_services/index.php/api/categorie',
                   ),
-                  FilterSection(
+                  SizedBox(height: 2.h),
+                  const FilterSection(
                     title: 'Types de véhicules',
                     options: [
                       'Auto',
@@ -130,6 +124,7 @@ class _ModalPageState extends State<ModalPage> {
                       'Moto/Scooter'
                     ],
                   ),
+                  SizedBox(height: 2.h),
                   FilterSection(
                     title: 'Types de pneus',
                     options: ['Toutes saisons', 'Pneus été', 'Pneus hiver'],
@@ -144,7 +139,7 @@ class _ModalPageState extends State<ModalPage> {
                   ),
                   const SizedBox(height: 16),
                   if (_isLoading)
-                    Center(child: CircularProgressIndicator())
+                    const Center(child: CircularProgressIndicator())
                   else if (_selectedFilter == 'Toutes saisons' &&
                       _items.isNotEmpty)
                     Column(
@@ -170,7 +165,6 @@ class _ModalPageState extends State<ModalPage> {
                     child: TextButton(
                       onPressed: () {
                         if (_selectedItemId != null) {
-                          // Handle validation or submission with the selected item
                           print('Selected item ID: $_selectedItemId');
                         }
                       },
@@ -206,8 +200,7 @@ class _ModalPageState extends State<ModalPage> {
 class FilterSection extends StatefulWidget {
   final String title;
   final List<String> options;
-  final void Function(String)?
-      onOptionSelected; // Callback pour la sélection des options
+  final void Function(String)? onOptionSelected;
 
   const FilterSection({
     super.key,
@@ -221,20 +214,11 @@ class FilterSection extends StatefulWidget {
 }
 
 class _FilterSectionState extends State<FilterSection> {
-  Map<String, bool> selectedOptions = {};
-
-  @override
-  void initState() {
-    super.initState();
-    for (var option in widget.options) {
-      selectedOptions[option] = false;
-    }
-  }
+  String? _selectedOption;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 2.w),
       decoration: const BoxDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,24 +237,21 @@ class _FilterSectionState extends State<FilterSection> {
             spacing: 8,
             runSpacing: 8,
             children: widget.options.map((option) {
+              final isSelected = _selectedOption == option;
               return FilterChip(
                 label: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: Text(
                     option,
                     style: TextStyle(
                       fontSize: 10.sp,
-                      color: selectedOptions[option]!
-                          ? Colors.white
-                          : Colors.black,
+                      color: isSelected ? Colors.white : Colors.black,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-                backgroundColor:
-                    selectedOptions[option]! ? Colors.black : Colors.white,
+                backgroundColor: isSelected ? Colors.black : Colors.white,
                 selectedColor: Colors.black,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
@@ -280,9 +261,9 @@ class _FilterSectionState extends State<FilterSection> {
                 ),
                 onSelected: (bool value) {
                   setState(() {
-                    selectedOptions[option] = value;
+                    _selectedOption = isSelected ? null : option;
                     if (widget.onOptionSelected != null) {
-                      widget.onOptionSelected!(option);
+                      widget.onOptionSelected!(_selectedOption ?? '');
                     }
                   });
                 },
@@ -295,11 +276,48 @@ class _FilterSectionState extends State<FilterSection> {
   }
 }
 
-class DimensionInput extends StatelessWidget {
+class CategoriesDisplay extends StatefulWidget {
   final String label;
-  final List<String> options;
+  final String apiUrl;
 
-  const DimensionInput({super.key, required this.label, required this.options});
+  const CategoriesDisplay(
+      {super.key, required this.label, required this.apiUrl});
+
+  @override
+  _CategoriesDisplayState createState() => _CategoriesDisplayState();
+}
+
+class _CategoriesDisplayState extends State<CategoriesDisplay> {
+  List<String> _categories = [];
+  bool _isLoading = true;
+  String? _selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    try {
+      final response = await http.get(Uri.parse(widget.apiUrl));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          _categories =
+              data.map((item) => item['libelle'] as String).toSet().toList();
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load categories. Status code: ${response.statusCode}');
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -307,34 +325,47 @@ class DimensionInput extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          widget.label,
           style: TextStyle(
-            fontSize: 12.sp,
-            color: Colors.black,
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
           ),
         ),
         SizedBox(height: 2.w),
-        Container(
-          width: 25.w,
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 9),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFC9CDD2), width: 1),
-          ),
-          child: DropdownButton<String>(
-            value: options[0],
-            onChanged: (String? newValue) {},
-            items: options.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-            isExpanded: true,
-          ),
-        ),
+        _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _categories.map((category) {
+                  final isSelected = _selectedCategory == category;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = isSelected ? null : category;
+                      });
+                    },
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.w),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFC9CDD2)),
+                        borderRadius: BorderRadius.circular(4),
+                        color: isSelected ? Colors.black : Colors.white,
+                      ),
+                      child: Text(
+                        category,
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: isSelected ? Colors.white : Colors.black,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
       ],
     );
   }

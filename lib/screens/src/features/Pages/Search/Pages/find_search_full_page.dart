@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/article3.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal2_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal_page.dart';
 
@@ -67,10 +68,8 @@ class _FindSearchPlusState extends State<FindSearchPlusPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => FindSearchPage(
-                                  partId: widget.partId,
-                                  userId:widget.userId
-                                )),
+                            builder: (context) => HomePage(
+                                partId: widget.partId, userId: widget.userId)),
                       );
                     },
                     child: Container(
@@ -179,22 +178,10 @@ class _FindSearchPlusState extends State<FindSearchPlusPage> {
                 ],
               ),
               SizedBox(height: 2.w),
-              Article3Page(
-                categoryId: 1,
-                userId: widget.userId
-              ),
-              Article3Page(
-                categoryId: 1,
-                userId: widget.userId
-              ),
-              Article3Page(
-                categoryId: 1,
-                userId: widget.userId
-              ),
-              Article3Page(
-                categoryId: 1,
-                userId: widget.userId
-              ),
+              Article3Page(categoryId:1, userId: widget.userId),
+              Article3Page(categoryId: 1, userId: widget.userId),
+              Article3Page(categoryId: 1, userId: widget.userId),
+              Article3Page(categoryId: 1, userId: widget.userId),
               SizedBox(height: 9.w),
               Center(
                 child: TextButton(

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/services/user.dart';
+import 'package:le_bolide/data/services/user.dart'; // Assurez-vous que ce chemin est correct
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout2_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
@@ -11,16 +11,15 @@ import '../Widgets/formulaire_livraison.dart';
 
 class Pay1Page extends StatefulWidget {
   final int partId;
-  final int userId;
   final String deliveryAddress;
-  final List<dynamic> cartItems;
+  final List<Map<String, dynamic>> cartItems;
 
   Pay1Page({
     Key? key,
     required this.partId,
-    required this.userId,
     required this.cartItems,
     required this.deliveryAddress,
+    required int userId,
   }) : super(key: key);
 
   @override
@@ -29,6 +28,7 @@ class Pay1Page extends StatefulWidget {
 
 class _Pay1PageState extends State<Pay1Page> {
   bool _isLoading = false;
+  late User user; // Déclaration de la variable user
 
   String _name = '';
   String _surname = '';
@@ -37,18 +37,30 @@ class _Pay1PageState extends State<Pay1Page> {
   String _address = '';
 
   @override
+  void initState() {
+    super.initState();
+    user = GetIt.instance.get<User>(); // Récupération de l'utilisateur
+    print('Pay1Page - Initial user id: ${user.id}'); // Affichage du user.id
+    print('Pay1Page - Initial partId: ${widget.partId}');
+    print('Pay1Page - Initial deliveryAddress: ${widget.deliveryAddress}');
+    print('Pay1Page - Initial cartItems: ${widget.cartItems}');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-            Navigator.pushReplacement(
+            print(
+                'Navigating to PayPage with partId: ${widget.partId}, userId: ${user.id}, cartItems: ${widget.cartItems}');
+            Navigator.push(
               context,
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     PayPage(
                   partId: widget.partId,
-                  userId: widget.userId,
+                  userId: user.id, // Utilisation de user.id
                   cartItems: widget.cartItems,
                 ),
                 transitionsBuilder:
@@ -56,15 +68,11 @@ class _Pay1PageState extends State<Pay1Page> {
                   const begin = Offset(-1.0, 0.0);
                   const end = Offset.zero;
                   const curve = Curves.ease;
-
                   final tween = Tween(begin: begin, end: end)
                       .chain(CurveTween(curve: curve));
                   final offsetAnimation = animation.drive(tween);
-
                   return SlideTransition(
-                    position: offsetAnimation,
-                    child: child,
-                  );
+                      position: offsetAnimation, child: child);
                 },
               ),
             );
@@ -124,7 +132,7 @@ class _Pay1PageState extends State<Pay1Page> {
                   ],
                 ),
               ),
-              SizedBox(height: 3.h),
+              SizedBox(height: 2.h),
               Row(
                 children: [
                   SizedBox(width: 2.h),
@@ -162,7 +170,7 @@ class _Pay1PageState extends State<Pay1Page> {
                   ),
                 ],
               ),
-              SizedBox(height: 1.h),
+              SizedBox(height: 2.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -171,7 +179,7 @@ class _Pay1PageState extends State<Pay1Page> {
                   _buildStep('Confirmation'),
                 ],
               ),
-              SizedBox(height: 3.h),
+              SizedBox(height: 2.h),
               Text(
                 "Ajoutez votre adresse de livraison",
                 style: TextStyle(
@@ -180,7 +188,7 @@ class _Pay1PageState extends State<Pay1Page> {
                   fontFamily: "Poppins",
                 ),
               ),
-              SizedBox(height: 2.h),
+              SizedBox(height: 1.h),
               Text(
                 "* Champs obligatoires",
                 style: TextStyle(
@@ -189,8 +197,10 @@ class _Pay1PageState extends State<Pay1Page> {
                   fontFamily: "Cabin",
                 ),
               ),
+              // Formulaire de livraison
               FormulaireLivraison(
-                userId: widget.userId,
+                userId: user.id, // Utilisation de user.id
+                partId: widget.partId,
                 onInformationChanged: (name, surname, email, country, address) {
                   setState(() {
                     _name = name;
@@ -198,11 +208,11 @@ class _Pay1PageState extends State<Pay1Page> {
                     _email = email;
                     _country = country;
                     _address = address;
+                    print(
+                        'Information changed: name: $_name, surname: $_surname, email: $_email, country: $_country, address: $_address');
                   });
                 },
-                partId: widget.partId,
               ),
-              SizedBox(height: 1.h),
               Center(
                 child: TextButton(
                   onPressed: _isLoading
@@ -213,41 +223,45 @@ class _Pay1PageState extends State<Pay1Page> {
                               _isLoading = true;
                             });
 
+                            // Créer une liste de détails de commande
+                            List<Map<String, String>> orderDetails = [
+                              {
+                                'name': _name,
+                                'surname': _surname,
+                                'email': _email,
+                                'country': _country,
+                                'address': _address,
+                              }
+                            ];
+
+                            print('Order details: $orderDetails');
+
+                            // Attendre avant de naviguer vers la page suivante
                             Future.delayed(const Duration(seconds: 2), () {
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                 context,
                                 PageRouteBuilder(
                                   pageBuilder: (context, animation,
                                           secondaryAnimation) =>
                                       Pay2Page(
-                                          userId: widget.userId,
-                                          partId: widget.partId,
-                                          cartItems: widget.cartItems,
-                                          orderDetails: [
-                                            {
-                                              'name': _name,
-                                              'surname': _surname,
-                                              'email': _email,
-                                              'country': _country,
-                                              'address': _address,
-                                            }
-                                          ],
-                                          deliveryAddress: ''),
+                                    partId: widget.partId,
+                                    deliveryAddress: widget.deliveryAddress,
+                                    cartItems: widget.cartItems,
+                                    userId: user.id, // Passer user.id
+                                    orderDetails: orderDetails,
+                                  ),
                                   transitionsBuilder: (context, animation,
                                       secondaryAnimation, child) {
                                     const begin = Offset(1.0, 0.0);
                                     const end = Offset.zero;
                                     const curve = Curves.ease;
-
                                     final tween = Tween(begin: begin, end: end)
                                         .chain(CurveTween(curve: curve));
                                     final offsetAnimation =
                                         animation.drive(tween);
-
                                     return SlideTransition(
-                                      position: offsetAnimation,
-                                      child: child,
-                                    );
+                                        position: offsetAnimation,
+                                        child: child);
                                   },
                                 ),
                               ).then((_) {
@@ -261,7 +275,7 @@ class _Pay1PageState extends State<Pay1Page> {
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),
                     padding:
-                        EdgeInsets.symmetric(vertical: 1.h, horizontal: 20.w),
+                        EdgeInsets.symmetric(vertical: 0.h, horizontal: 20.w),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(1.w),
                     ),
@@ -271,7 +285,7 @@ class _Pay1PageState extends State<Pay1Page> {
                     children: [
                       if (_isLoading)
                         SizedBox(
-                          height: 2.h,
+                          height: 1.h,
                           width: 2.h,
                           child: const CircularProgressIndicator(
                             color: Colors.white,
@@ -316,6 +330,13 @@ class _Pay1PageState extends State<Pay1Page> {
       return false;
     }
 
+    final addressRegExp = RegExp(r'^(?=.*[0-9])(?=.*[a-zA-Z]).{5,}$');
+    if (!addressRegExp.hasMatch(_address)) {
+      _showErrorDialog(
+          'Veuillez entrer une adresse valide. Elle doit contenir des lettres, des chiffres, et avoir au moins 5 caractères.');
+      return false;
+    }
+
     return true;
   }
 
@@ -338,15 +359,15 @@ class _Pay1PageState extends State<Pay1Page> {
       },
     );
   }
+}
 
-  Widget _buildStep(String title) {
-    return Row(
-      children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: 11.sp),
-        ),
-      ],
-    );
-  }
+Widget _buildStep(String title) {
+  return Row(
+    children: [
+      Text(
+        title,
+        style: TextStyle(fontSize: 11.sp),
+      ),
+    ],
+  );
 }

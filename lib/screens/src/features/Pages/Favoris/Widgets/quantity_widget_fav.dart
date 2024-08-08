@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:le_bolide/data/models/api_services.dart';
+import 'package:le_bolide/data/services/user.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
 import 'dart:convert';
 import 'package:sizer/sizer.dart';
 
 // ignore: must_be_immutable
 class QuantityWidgetFav extends StatefulWidget {
-  final int userId;
   final int partId;
-
+  final int userId;
   const QuantityWidgetFav(
-      {Key? key, required this.userId, required this.partId})
+      {Key? key, required this.partId, required this.userId})
       : super(key: key);
 
   @override
@@ -20,21 +21,34 @@ class QuantityWidgetFav extends StatefulWidget {
 
 class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
   bool _showQuantityControls = false;
-  int _quantity = 1;
+  int _quantity = 0;
+  late User user;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      user = GetIt.instance.get<User>();
+      print('User name: ${user.name}');
+      print('User ID: ${user.id}');
+    } catch (e) {
+      print('Error retrieving user: $e');
+    }
+  }
 
   // Function to send quantity update to the API
   Future<void> _sendQuantityUpdate() async {
-    const url = '${baseUrl}api/cart/add';
+    const url = '${baseUrl}api/cart/add/';
 
     final data = {
-      'user_id': widget.userId.toString(),
+      'user_id': user.id.toString(), // Utiliser user.id ici
       'part_id': widget.partId.toString(),
       'quantity': _quantity.toString(),
     };
 
     try {
-      print('Envoi de la requête à $url');
-      print('Données envoyées: ${jsonEncode(data)}');
+      print('Sending request to $url');
+      print('Data sent: ${jsonEncode(data)}');
 
       final response = await http.post(
         Uri.parse(url),
@@ -45,18 +59,18 @@ class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
         body: jsonEncode(data),
       );
 
-      print('Code de statut reçu: ${response.statusCode}');
-      print('Corps de la réponse: ${response.body}');
+      print('Status code received: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         print(
-            'Quantité mise à jour avec succès: user_id: ${data['user_id']}, part_id: ${data['part_id']}, quantity: ${data['quantity']}');
+            'Quantity updated successfully: user_id: ${data['user_id']}, part_id: ${data['part_id']}, quantity: ${data['quantity']}');
       } else {
-        print(
-            'Échec de la mise à jour de la quantité, code de statut: ${response.statusCode}');
+        print('Failed to update quantity, status code: ${response.statusCode}');
+        // Add more details if possible from the response body
       }
     } catch (e) {
-      print('Erreur lors de l\'envoi de la requête: $e');
+      print('Error sending request: $e');
     }
   }
 
@@ -68,7 +82,7 @@ class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
       });
       _sendQuantityUpdate().then((_) {
         print(
-            'user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
+            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
         if (_quantity >= 3) {
           _navigateToPay1Page();
         }
@@ -84,7 +98,7 @@ class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
       });
       _sendQuantityUpdate().then((_) {
         print(
-            'user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
+            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
       });
     } else {
       setState(() {
@@ -94,7 +108,7 @@ class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
       });
       _sendQuantityUpdate().then((_) {
         print(
-            'user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
+            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
       });
     }
   }
@@ -106,8 +120,9 @@ class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             Details1ProduitsPage(
-                partId: widget.partId,
-                userId: widget.userId), // Utiliser widget.partId ici
+          partId: widget.partId,
+          userId: widget.userId, // Utiliser user.id ici
+        ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
           const end = Offset.zero;
@@ -141,10 +156,10 @@ class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
                 child: TextButton(
                   onPressed: () {
                     _toggleQuantityControls();
-                    print('Article ajouté avec quantité $_quantity');
+                    print('Article added with quantity $_quantity');
                     _sendQuantityUpdate().then((_) {
                       print(
-                          'user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
+                          'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
                     });
                   },
                   style: TextButton.styleFrom(
@@ -180,11 +195,11 @@ class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
                       onPressed: () {
                         _decrementQuantity();
                         print(
-                            'user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
+                            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
                       },
                       icon: const Icon(Icons.remove),
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      constraints: BoxConstraints(),
                     ),
                     VerticalDivider(
                       color: Colors.grey,
@@ -210,11 +225,11 @@ class _QuantityWidgetFavState extends State<QuantityWidgetFav> {
                       onPressed: () {
                         _incrementQuantity();
                         print(
-                            'user_id: ${widget.userId}, part_id: ${widget.partId}, quantity: $_quantity');
+                            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
                       },
                       icon: const Icon(Icons.add),
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      constraints: BoxConstraints(),
                     ),
                   ],
                 ),

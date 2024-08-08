@@ -1,35 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add2.dart';
 import 'package:le_bolide/screens/src/features/Pages/commande/widgets/slider1.dart';
-
 import 'package:sizer/sizer.dart';
 
-import '../../Home/widgets/bouton_ajouter.dart';
 late User user;
-class Details1ProduitsPage extends StatelessWidget {
+
+class Details1ProduitsPage extends StatefulWidget {
   final int partId;
   final int userId;
+
   const Details1ProduitsPage({
     Key? key,
     required this.partId,
     required this.userId,
   }) : super(key: key);
- void initState() {
-    
+
+  @override
+  State<Details1ProduitsPage> createState() => _Details1ProduitsPageState();
+}
+
+class _Details1ProduitsPageState extends State<Details1ProduitsPage> {
+  int _quantity = 0;
+
+  @override
+  void initState() {
+    super.initState();
     try {
       user = GetIt.instance.get<User>();
-
-      print('User ID from GetIt: ${user.id}');
-      print('User name from GetIt: ${user.name}');
     } catch (e) {
-      print(e);
+      print('Error retrieving user from GetIt: $e');
     }
-   
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,8 +45,8 @@ class Details1ProduitsPage extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => PayPage(
-                  partId: partId,
-                  userId: userId,
+                  partId: widget.partId,
+                  userId: widget.userId,
                   cartItems: [],
                 ),
               ),
@@ -147,23 +152,21 @@ class Details1ProduitsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    "38 000 F",
-                    style: TextStyle(
-                      color: Color(0xFF1A1A1A),
-                      fontWeight: FontWeight.w500,
-                      fontSize: 20,
-                      fontFamily: "Cabin",
-                    ),
+              Expanded(
+                child: Text(
+                  "38 000 F",
+                  style: TextStyle(
+                    color: Color(0xFF1A1A1A),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                    fontFamily: "Cabin",
                   ),
-                ],
+                ),
               ),
-              Add2Page()
+              Add2Page(userId: user.id, partId: widget.partId),
             ],
           ),
           SizedBox(height: 1.h),

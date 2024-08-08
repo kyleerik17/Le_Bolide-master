@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Search/Pages/find_search_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/commande/widgets/slider1.dart';
 import 'package:sizer/sizer.dart';
@@ -30,11 +29,49 @@ class DetailsProduitsPage extends StatefulWidget {
 }
 
 class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
-  bool _isFavorited = false; // Track if the item is favorited
+  bool _isFavorited = false;
   late User user;
+
   Future<void> _toggleFavoriteStatus() async {
+  final action = _isFavorited ? 'remove' : 'add';
+  final url = 'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/$action';
+  final headers = {'Content-Type': 'application/json'};
+  final body = jsonEncode({
+    'user_id': user.id,
+    'part_id': widget.partId,
+  });
+
+  try {
+    // Optimistically update the UI
+    setState(() {
+      _isFavorited = !_isFavorited;
+    });
+
+    final response = await http.post(Uri.parse(url), headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      // La requête a réussi, donc l'état du favori a été mis à jour
+      print('Request successful: ${response.body}');
+    } else {
+      // La requête a échoué, donc annuler les modifications
+      print('Request failed with status: ${response.statusCode}');
+      setState(() {
+        _isFavorited = !_isFavorited;
+      });
+    }
+  } catch (e) {
+    // En cas d'erreur, annuler les modifications
+    print('Error: $e');
+    setState(() {
+      _isFavorited = !_isFavorited;
+    });
+  }
+}
+
+
+  Future<void> _fetchInitialFavoriteStatus() async {
     final url =
-        'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/${_isFavorited ? 'remove' : 'add'}';
+        'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/status';
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'user_id': user.id,
@@ -46,44 +83,39 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
           await http.post(Uri.parse(url), headers: headers, body: body);
 
       if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
         setState(() {
-          _isFavorited = !_isFavorited; // Toggle the favorite status
+          _isFavorited = data['is_favorite'] ?? false;
         });
-        print('Request successful: ${response.body}');
       } else {
-        print('Request failed with status: ${response.statusCode}');
+        print(
+            'Failed to fetch initial favorite status: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error: $e');
+      print('Error fetching initial favorite status: $e');
     }
   }
 
   @override
   void initState() {
+    super.initState();
     try {
       user = GetIt.instance.get<User>();
       print(user.phone);
       print('user info');
+      _fetchInitialFavoriteStatus();
     } catch (e) {
       print(e);
     }
-    super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FindSearchPage(
-                  partId: widget.partId,
-                  userId: widget.userId,
-                ),
-              ),
-            );
+            Navigator.pop(context);
           },
           child: Image.asset(
             'assets/icons/gc.png',
@@ -153,14 +185,15 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
                         ],
                       ),
                     ),
-                    GestureDetector(
-                      onTap: _toggleFavoriteStatus,
-                      child: Image.asset(
-                        _isFavorited
-                            ? 'assets/icons/hrt2.png'
-                            : 'assets/icons/oc1.png',
-                      ),
-                    ),
+                   GestureDetector(
+  onTap: _toggleFavoriteStatus,
+  child: Image.asset(
+    _isFavorited ? 'assets/icons/hrt2.png' : 'assets/icons/cr.png',
+    width: 7.w,
+    height: 7.w,
+  ),
+)
+
                   ],
                 ),
               ),

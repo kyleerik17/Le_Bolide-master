@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:le_bolide/data/services/user.dart';
+import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration_page.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Home/pages/home_page.dart';
@@ -32,8 +33,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       print('user info');
     } catch (e) {
       print(e);
-      // Navigator.pushReplacement(
-      //     context, MaterialPageRoute(builder: (builder) => const RegistrationPage()));
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (builder) =>
+                  RegistrationPage(userId: user.id, partId: widget.partId)));
     }
     super.initState();
     // Configure la barre d'état pour Android

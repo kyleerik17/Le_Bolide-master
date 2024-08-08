@@ -11,17 +11,18 @@ import 'checkout3_page.dart';
 
 class Pay2Page extends StatefulWidget {
   final int partId;
-  final int userId;
   final String deliveryAddress;
-  final List<dynamic> cartItems;
+  final List<Map<String, dynamic>> cartItems;
+  final int userId; // Ajouter ce paramètre
 
   Pay2Page({
     Key? key,
     required this.partId,
-    required this.userId,
     required this.cartItems,
-    required List<Map<String, String>> orderDetails,
     required this.deliveryAddress,
+    required this.userId,
+    required List<Map<String, String>>
+        orderDetails, // Assurez-vous d'initialiser ce paramètre
   }) : super(key: key);
 
   @override
@@ -54,9 +55,8 @@ class _Pay2PageState extends State<Pay2Page> {
     try {
       final response = await http.get(Uri.parse(apiUrl));
       print('Réponse de l\'API reçue. Statut: ${response.statusCode}');
-
       if (response.statusCode == 200) {
-        print(user.id);
+        print(widget.userId); // Utilisez widget.userId ici
         final jsonResponse = jsonDecode(response.body);
         print('Données de l\'API: $jsonResponse');
         final paymentMethods = jsonResponse['Liste des methodes de paiements'];
@@ -95,12 +95,10 @@ class _Pay2PageState extends State<Pay2Page> {
 
     // Construire le corps de la requête
     final Map<String, dynamic> body = {
-      'user_id':
-          user.id, // Récupérer l'ID de l'utilisateur depuis l'instance `User`
-      'payment_method_id':
-          paymentMethodId, // ID de la méthode de paiement sélectionnée
-      'delivery_address': "Abidjan", // Adresse de livraison
-      'cart_items': widget.cartItems, // Articles du panier
+      'user_id': widget.userId, // Utiliser widget.userId ici
+      'payment_method_id': paymentMethodId,
+      'delivery_address': 'Abidjan',
+      'cart_items': widget.cartItems,
     };
 
     print('Corps de la requête: $body  ');
@@ -127,9 +125,9 @@ class _Pay2PageState extends State<Pay2Page> {
             builder: (context) => Pay3Page(
               orderDetails: jsonResponse,
               partId: widget.partId,
-              userid: widget.userId,
               cartItems: widget.cartItems,
-              userId: widget.userId,
+              deliveryAddress: '',
+              userId: user.id,
             ),
           ),
         );
@@ -174,7 +172,7 @@ class _Pay2PageState extends State<Pay2Page> {
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     Pay1Page(
                   partId: widget.partId,
-                  userId: widget.userId,
+                  userId: user.id, // Utiliser user.id au lieu de widget.userId
                   cartItems: const [],
                   deliveryAddress: widget.deliveryAddress,
                 ),
@@ -398,6 +396,10 @@ class _Pay2PageState extends State<Pay2Page> {
   Widget _buildStep(String label) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 1.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Center(
         child: Text(
           label,

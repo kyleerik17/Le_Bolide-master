@@ -230,7 +230,12 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
       ),
       child: Row(
         children: [
-          Image.asset('assets/images/pn2.png', width: 25.w, height: 25.w),
+          Image.asset(
+            'assets/images/pn2.png',
+            width: 25.w,
+            height: 25.w,
+          ),
+          // Image.network(item.img, width: 25.w, height: 25.w),
           SizedBox(width: 2.w),
           Expanded(
             child: Column(
@@ -238,20 +243,20 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
               children: [
                 Text(item.libelle,
                     style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 17,
                         fontFamily: 'Cabin',
                         fontWeight: FontWeight.w500)),
-                SizedBox(height: 1.h),
+                SizedBox(height: 0.5.h),
                 Row(
                   children: [
                     Image.asset('assets/icons/sun.png',
-                        color: Colors.black, width: 4.w),
+                        color: Colors.black, width: 5.w),
                     SizedBox(width: 1.w),
                     Text(
                       item.description,
                       style: TextStyle(
                         fontFamily: "Cabin",
-                        fontSize: 11.sp,
+                        fontSize: 13.sp,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -261,7 +266,7 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
                 Text(
                   item.price,
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 15.sp,
                     fontFamily: 'Cabin',
                     fontWeight: FontWeight.w400,
                     color: const Color(0xFF1A1A1A),
@@ -298,6 +303,10 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
   }
 
   Widget buildOrderSummary() {
+    final subtotal = _calculateSubtotal();
+    final total =
+        subtotal - 10000; // Ex: Si vous avez une réduction fixe de 10,000 F
+
     return Container(
       height: 40.w,
       width: double.infinity,
@@ -305,7 +314,7 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
       child: Column(
         children: [
           SizedBox(height: 5.w),
-          buildSummaryRow('Sous-total', '76 000 F'),
+          buildSummaryRow('Sous-total', '${subtotal.toStringAsFixed(1)} F'),
           SizedBox(height: 1.h),
           buildSummaryRow('Frais de livraison', 'Gratuit'),
           SizedBox(height: 1.h),
@@ -317,10 +326,16 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
             ),
           ),
           SizedBox(height: 1.h),
-          buildSummaryRow('TOTAL', '68 400 F', isTotal: true),
+          buildSummaryRow('TOTAL', '${subtotal.toStringAsFixed(1)} F',
+              isTotal: true),
         ],
       ),
     );
+  }
+
+  double _calculateSubtotal() {
+    return items.fold(
+        0.0, (sum, item) => sum + double.parse(item.price) * item.quantity);
   }
 
   Widget buildSummaryRow(String label, String value, {bool isTotal = false}) {

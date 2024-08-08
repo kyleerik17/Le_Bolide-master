@@ -55,9 +55,9 @@ class _CommandeContainerState extends State<CommandeContainer> {
                     SizedBox(height: 2.w),
                     Text(
                       widget.price,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.black,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        color: Color(0xFF1A1A1A),
                         fontFamily: "Poppins",
                         fontWeight: FontWeight.w600,
                       ),
@@ -68,19 +68,19 @@ class _CommandeContainerState extends State<CommandeContainer> {
                         ImageIcon(
                           AssetImage(widget.assetIcon),
                           size: 5.w,
-                          color: Colors.black,
+                          color: Color(0xFF1A1A1A),
                         ),
                         SizedBox(width: 2.w),
                         Expanded(
                           child: Text(
                             widget.description,
                             style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
+                              fontSize: 17,
+                              color: Color(0xFF1A1A1A),
                               fontFamily: "Cabin",
                               fontWeight: FontWeight.w400,
                             ),
-                            overflow: TextOverflow.ellipsis,
+                         
                           ),
                         ),
                       ],

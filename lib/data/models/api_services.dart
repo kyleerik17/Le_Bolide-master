@@ -10,7 +10,7 @@ class Piece {
   final String img;
   final String libelle;
   final String description;
-  final String price;
+  late final String price;
 
   Piece({
     required this.id,

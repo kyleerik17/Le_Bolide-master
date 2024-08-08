@@ -12,16 +12,19 @@ import 'dart:convert';
 import 'registration_last_page.dart';
 
 class RegistrationAuthPage extends StatefulWidget {
-  final String phoneNumber;
   final int partId;
   final int userId;
+  final String iconPath; // Nouvelle propriété pour l'icône
+  final String phoneNumber;
+  final String flag; // Flag parameter
 
   const RegistrationAuthPage({
     Key? key,
     required this.phoneNumber,
     required this.partId,
     required this.userId,
-    required String flag,
+    required this.flag,
+    required this.iconPath, // Required iconPath parameter
   }) : super(key: key);
 
   @override
@@ -29,20 +32,33 @@ class RegistrationAuthPage extends StatefulWidget {
 }
 
 class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
-  String fullPhoneNumber = ''; // Ensure this variable is defined
-  String _selectedCountry = ''; // Ensure this variable is defined
   final TextEditingController _pinController = TextEditingController();
   String _errorMessage = '';
   bool _isLoading = false;
+  late final User user;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUser();
+  }
+
+  Future<void> _initializeUser() async {
+    try {
+      user = GetIt.instance.get<User>();
+      print(user.name);
+      print('User information retrieved');
+    } catch (e) {
+      print(e);
+      // Handle the error appropriately if user retrieval fails
+    }
+  }
 
   Future<void> _verifyOTP(String otp) async {
     setState(() {
       _isLoading = true;
       _errorMessage = '';
     });
-
-    print('Début de la vérification OTP avec le code: $otp');
-    print('Numéro de téléphone: ${widget.phoneNumber}');
 
     final url = Uri.parse(
       'https://bolide.armasoft.ci/bolide_services/index.php/api/otp/validate',
@@ -58,28 +74,40 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
         }),
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(response.body);
 
         bool isRegistered = responseData['is_registered'];
-        print('Response data registered:');
-        print(isRegistered);
-
         String message = responseData['message'] ?? '';
-        if (message.contains('Utilisateur inscrit')) {
-          isRegistered = true;
-          print('L\'utilisateur semble être inscrit selon le message.');
-        }
 
-        if (!isRegistered) {
-          print(
-              'Utilisateur non enregistré. Navigation vers RegistrationLastPage.');
-          // print(isRegistered);
-          print(responseData['is_registered']);
+        if (isRegistered) {
+          Map<String, dynamic> dataUser = json.decode(response.body);
+          Map<String, dynamic> userData = dataUser['user_info'];
 
+          int userId = int.tryParse(userData['id'].toString()) ?? 0;
+          String userName = userData['name'] ?? '';
+          String surname = userData['surname'] ?? '';
+          String phone = userData['phone'] ?? '';
+
+          User newUser = User(
+            id: userId,
+            name: userName,
+            surname: surname,
+            phone: phone,
+          );
+
+          await DataService.save("user", newUser.toJson().toString());
+          GetIt.instance.registerFactory<User>(() => newUser);
+
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => HomePage(
+                partId: widget.partId,
+                userId: userId,
+              ),
+            ),
+          );
+        } else {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -87,8 +115,10 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
               pageBuilder: (_, __, ___) => RegistrationLastPage(
                 phoneNumber: widget.phoneNumber,
                 partId: widget.partId,
-                userId: widget.userId, // Make sure userId is correctly passed
-                flag: _selectedCountry == 'Senegal' ? 'sng' : 'civ',
+                userId: widget.userId,
+
+                flag: widget.flag,
+                iconPath: widget.iconPath, // Pass the flag to the next page
               ),
               transitionsBuilder: (_, animation, __, child) {
                 return SlideTransition(
@@ -101,44 +131,15 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
               },
             ),
           );
-        } else {
-          Map<String, dynamic> dataUser = json.decode(response.body);
-          // print(dataUser);
-          Map<String, dynamic> userData = dataUser['user_info'];
-          // print(userData);
-
-          // print("UserModel Data: ${userData}");
-
-          User user = User.fromJson(userData);
-            print(user);
-          await DataService.save("user", user.toJson().toString());
-
-          GetIt.instance.registerFactory<User>(() => user);
-
-          print('Utilisateur déjà enregistré. Navigation vers HomePage() .');
-          // print(isRegistered);
-          print(responseData['is_registered']);
-
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => HomePage(
-                partId: widget.partId,
-                userId: widget.userId,
-              ),
-            ),
-          );
         }
       } else {
-        print('Erreur de serveur lors de la vérification OTP.');
         setState(() {
-          _errorMessage = 'Erreur de serveur. Veuillez réessayer.';
+          _errorMessage = 'Server error. Please try again.';
         });
       }
     } catch (e) {
-      print('Erreur lors de la vérification OTP: $e');
-      print(otp);
       setState(() {
-        _errorMessage = 'Erreur de connexion. Veuillez réessayer.';
+        _errorMessage = 'Connection error. Please try again.';
       });
     } finally {
       setState(() {
@@ -275,19 +276,19 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
       length: 4,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       onCompleted: (pin) {
-        print('PIN complet: $pin');
+        print('PIN complete: $pin');
         _verifyOTP(pin);
       },
       defaultPinTheme: PinTheme(
-        width: 60, // Ajustez la largeur du champ PIN ici
-        height: 60, // Ajustez la hauteur du champ PIN ici
+        width: 60,
+        height: 60,
         textStyle: TextStyle(
-          fontSize: 28.sp, // Ajustez la taille du texte ici
+          fontSize: 28.sp,
           fontWeight: FontWeight.bold,
         ),
         decoration: BoxDecoration(
-          color: Colors.grey[300], // Fond gris clair
-          border: Border.all(color: Colors.transparent), // Retire les bordures
+          color: Colors.grey[300],
+          border: Border.all(color: Colors.transparent),
           borderRadius: BorderRadius.circular(10),
         ),
       ),
@@ -323,7 +324,7 @@ class _RegistrationAuthPageState extends State<RegistrationAuthPage> {
             ),
           ),
           TextSpan(
-            text: "Recevoir un appel",
+            text: "Modifier le numéro de téléphone",
             style: TextStyle(
               color: const Color(0xFF1A1A1A),
               fontWeight: FontWeight.bold,
