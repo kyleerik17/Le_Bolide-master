@@ -26,6 +26,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late String categoryName = ''; // Valeur par défaut
+
   @override
   void initState() {
     super.initState();
@@ -45,9 +47,11 @@ class _HomePageState extends State<HomePage> {
 
   PageRouteBuilder _createSlideTransition(Widget page) {
     return PageRouteBuilder(
+      transitionDuration: const Duration(
+          milliseconds: 500), // Set the transition duration to 1 second
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
+        const begin = Offset(0.0, 1.0);
         const end = Offset.zero;
         const curve = Curves.easeInOut;
 
@@ -107,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                                     CategoriesPage(
                                       partId: widget.partId,
                                       userId: widget.userId,
-                                      categoryName: '',
+                                      categoryName: categoryName,
                                     ),
                                   ),
                                 );
@@ -157,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                                     CategoriesPage(
                                       partId: widget.partId,
                                       userId: widget.userId,
-                                      categoryName: '',
+                                      categoryName: categoryName,
                                     ),
                                   ),
                                 );

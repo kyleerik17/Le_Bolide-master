@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
 import '../../Onboarding/onboarding.dart';
 
@@ -27,43 +28,85 @@ class _SplashScreenPageState extends State<SplashScreenPage>
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        _showFirstImage = true;
-      });
-
-      Future.delayed(const Duration(milliseconds: 800), () {
+    // Vérifiez ici si l'utilisateur est connecté
+    if (isUserConnected()) {
+      // Si l'utilisateur est connecté, naviguez directement vers HomePage
+      _navigateToHomePage();
+    } else {
+      // Sinon, continuez l'animation normale de SplashScreen
+      Future.delayed(const Duration(seconds: 2), () {
         setState(() {
-          _imageWidth = 150.w;
-          _imageHeight = 40.w;
+          _showFirstImage = true;
         });
 
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(milliseconds: 800), () {
           setState(() {
-            _isBlackBackground = true;
+            _imageWidth = 150.w;
+            _imageHeight = 40.w;
           });
 
-          Future.delayed(const Duration(milliseconds: 800), () {
+          Future.delayed(const Duration(seconds: 1), () {
             setState(() {
-              _showFirstImage = false;
-              _showSecondImage = true;
+              _isBlackBackground = true;
             });
 
-            Future.delayed(const Duration(milliseconds: 500), () {
+            Future.delayed(const Duration(milliseconds: 800), () {
               setState(() {
-                _showText = true;
+                _showFirstImage = false;
+                _showSecondImage = true;
               });
 
-              Future.delayed(const Duration(seconds: 1), () {
-                _navigateToOnboardingPage();
+              Future.delayed(const Duration(milliseconds: 500), () {
+                setState(() {
+                  _showText = true;
+                });
+
+                Future.delayed(const Duration(seconds: 1), () {
+                  _navigateToOnboardingPage();
+                });
               });
             });
           });
         });
       });
-    });
+    }
   }
 
+  // Méthode pour vérifier si l'utilisateur est connecté
+  bool isUserConnected() {
+    // Implémentez la logique pour vérifier l'état de connexion de l'utilisateur
+    // Par exemple, en vérifiant la présence d'un token ou une session active
+    return false; // Remplacez par la condition réelle
+  }
+
+  // Navigation vers la page HomePage
+  void _navigateToHomePage() {
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 800),
+        pageBuilder: (context, animation, secondaryAnimation) => HomePage(
+          partId: widget.partId,
+          userId: widget.userId,
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset(0.0, 0.0);
+          const curve = Curves.easeInOut;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+
+  // Navigation vers la page OnboardingPage
   void _navigateToOnboardingPage() {
     Navigator.pushReplacement(
       context,

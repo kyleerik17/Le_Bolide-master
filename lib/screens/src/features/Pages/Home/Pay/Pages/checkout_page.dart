@@ -374,7 +374,7 @@ class _PayPageState extends State<PayPage> {
                                   ),
                                   SizedBox(height: 2.h),
                                   Container(
-                                    height: 40.w,
+                                    height: 42.w,
                                     width: double.infinity,
                                     color: Colors.white,
                                     child: Column(
@@ -441,42 +441,42 @@ class _PayPageState extends State<PayPage> {
                                             ),
                                           ],
                                         ),
-                                        SizedBox(height: 1.h),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(left: 4.w),
-                                              child: Text(
-                                                'Code promo',
-                                                style: TextStyle(
-                                                  fontSize: 12.sp,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontFamily: 'Poppins',
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(right: 4.w),
-                                              child: Text(
-                                                'BOL10 (-10%)',
-                                                style: TextStyle(
-                                                  fontSize: 12.sp,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: 'Cabin',
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 1.h),
+                                        // SizedBox(height: 1.h),
+                                        // Row(
+                                        //   mainAxisAlignment:
+                                        //       MainAxisAlignment.spaceBetween,
+                                        //   children: [
+                                        //     Padding(
+                                        //       padding:
+                                        //           EdgeInsets.only(left: 4.w),
+                                        //       child: Text(
+                                        //         'Code promo',
+                                        //         style: TextStyle(
+                                        //           fontSize: 12.sp,
+                                        //           fontWeight: FontWeight.w400,
+                                        //           fontFamily: 'Poppins',
+                                        //         ),
+                                        //       ),
+                                        //     ),
+                                        //     Padding(
+                                        //       padding:
+                                        //           EdgeInsets.only(right: 4.w),
+                                        //       child: Text(
+                                        //         'BOL10 (-10%)',
+                                        //         style: TextStyle(
+                                        //           fontSize: 12.sp,
+                                        //           fontWeight: FontWeight.w600,
+                                        //           fontFamily: 'Cabin',
+                                        //         ),
+                                        //       ),
+                                        //     ),
+                                        //   ],
+                                        // ),
+                                        // SizedBox(height: 1.h),
                                         Container(
                                           child: Center(
                                             child: SizedBox(
-                                              width: 88.w,
+                                              width: 92.w,
                                               child: Divider(
                                                 height: 2.h,
                                                 color: Colors.grey,
@@ -484,7 +484,7 @@ class _PayPageState extends State<PayPage> {
                                             ),
                                           ),
                                         ),
-                                        SizedBox(height: 1.h),
+                                        SizedBox(height: 1.5.h),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Search/Pages/find_search_page.dart';
+import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
 import 'package:le_bolide/screens/src/features/Pages/commande/widgets/slider1.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import '../../Home/widgets/bouton_ajouter.dart';
 
 class DetailsProduitsPage extends StatefulWidget {
   final int userId;
@@ -31,43 +29,68 @@ class DetailsProduitsPage extends StatefulWidget {
 class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
   bool _isFavorited = false;
   late User user;
+  bool _isProcessingFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      user = GetIt.instance.get<User>();
+      _fetchInitialFavoriteStatus();
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future<void> _toggleFavoriteStatus() async {
-  final action = _isFavorited ? 'remove' : 'add';
-  final url = 'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/$action';
-  final headers = {'Content-Type': 'application/json'};
-  final body = jsonEncode({
-    'user_id': user.id,
-    'part_id': widget.partId,
-  });
+    if (_isProcessingFavorite) return;
 
-  try {
-    // Optimistically update the UI
-    setState(() {
-      _isFavorited = !_isFavorited;
+    _isProcessingFavorite = true;
+    final action = _isFavorited ? 'remove' : 'add';
+    final url =
+        'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/$action';
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      'user_id': user.id,
+      'part_id': widget.partId,
     });
 
-    final response = await http.post(Uri.parse(url), headers: headers, body: body);
+    try {
+      final response =
+          await http.post(Uri.parse(url), headers: headers, body: body);
 
-    if (response.statusCode == 200) {
-      // La requête a réussi, donc l'état du favori a été mis à jour
-      print('Request successful: ${response.body}');
-    } else {
-      // La requête a échoué, donc annuler les modifications
-      print('Request failed with status: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        // La requête a réussi, donc l'état du favori a été mis à jour
+        print('Request successful: ${response.body}');
+        final data = jsonDecode(response.body);
+        if (data['message'] == 'removed') {
+          setState(() {
+            _isFavorited = false;
+          });
+        } else {
+          setState(() {
+            _isFavorited = true;
+          });
+        }
+        // Recharger la page pour refléter les changements
+        await _fetchInitialFavoriteStatus();
+      } else {
+        // La requête a échoué, donc annuler les modifications
+        print('Request failed with status: ${response.statusCode}');
+        setState(() {
+          _isFavorited = !_isFavorited;
+        });
+      }
+    } catch (e) {
+      // En cas d'erreur, annuler les modifications
+      print('Error: $e');
       setState(() {
         _isFavorited = !_isFavorited;
       });
+    } finally {
+      _isProcessingFavorite = false;
     }
-  } catch (e) {
-    // En cas d'erreur, annuler les modifications
-    print('Error: $e');
-    setState(() {
-      _isFavorited = !_isFavorited;
-    });
   }
-}
-
 
   Future<void> _fetchInitialFavoriteStatus() async {
     final url =
@@ -93,19 +116,6 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
       }
     } catch (e) {
       print('Error fetching initial favorite status: $e');
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    try {
-      user = GetIt.instance.get<User>();
-      print(user.phone);
-      print('user info');
-      _fetchInitialFavoriteStatus();
-    } catch (e) {
-      print(e);
     }
   }
 
@@ -185,15 +195,16 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
                         ],
                       ),
                     ),
-                   GestureDetector(
-  onTap: _toggleFavoriteStatus,
-  child: Image.asset(
-    _isFavorited ? 'assets/icons/hrt2.png' : 'assets/icons/cr.png',
-    width: 7.w,
-    height: 7.w,
-  ),
-)
-
+                    GestureDetector(
+                      onTap: _toggleFavoriteStatus,
+                      child: Image.asset(
+                        _isFavorited
+                            ? 'assets/icons/hrt2.png'
+                            : 'assets/icons/cr.png',
+                        width: 7.w,
+                        height: 7.w,
+                      ),
+                    )
                   ],
                 ),
               ),

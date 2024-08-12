@@ -126,7 +126,7 @@ class _Pay2PageState extends State<Pay2Page> {
               orderDetails: jsonResponse,
               partId: widget.partId,
               cartItems: widget.cartItems,
-              deliveryAddress: '',
+              deliveryAddress: widget.deliveryAddress,
               userId: user.id,
             ),
           ),
@@ -396,10 +396,6 @@ class _Pay2PageState extends State<Pay2Page> {
   Widget _buildStep(String label) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 1.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
       child: Center(
         child: Text(
           label,

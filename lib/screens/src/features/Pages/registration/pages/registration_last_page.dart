@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:le_bolide/data/services/getit.dart';
@@ -153,6 +154,8 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
       } else {
         _showErrorDialog('Erreur du serveur');
       }
+    } on SocketException {
+      _showErrorDialog('Vérifiez votre connexion');
     } catch (e) {
       print("Exception: $e");
       _showErrorDialog('Une erreur est survenue');
@@ -321,6 +324,7 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
                           'SUIVANT',
                           style: TextStyle(
                             fontSize: 12.sp,
+                            color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -344,38 +348,38 @@ class _RegistrationLastPageState extends State<RegistrationLastPage> {
     String? iconPath,
   }) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFEBEBEB),
-        borderRadius: BorderRadius.circular(1.5.w),
+        color: Colors.white,
+        border: Border.all(
+          color: Colors.grey.withOpacity(0.5),
+          width: 1.0,
+        ),
+        borderRadius: BorderRadius.circular(8.0),
       ),
-      child: Row(
-        children: [
-          if (isPhoneNumber && iconPath != null) ...[
-            Image.asset(
-              iconPath, // Utilisez ici iconPath
+      child: TextField(
+        controller: controller,
+        readOnly: readOnly,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.symmetric(vertical: 14.0),
+          hintText: hintText,
+          hintStyle: TextStyle(
+            fontSize: 12.sp,
+            color: Color(0xFF999999),
+          ),
+          errorText: errorText,
+          prefixIcon: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.0),
+            child: Image.asset(
+              isPhoneNumber && iconPath != null
+                  ? iconPath
+                  : 'assets/icons/crt.png',
               width: 6.w,
               height: 6.w,
               fit: BoxFit.contain,
             ),
-            SizedBox(width: 2.w),
-          ],
-          Expanded(
-            child: TextField(
-              controller: controller,
-              readOnly: readOnly,
-              decoration: InputDecoration(
-                hintText: hintText,
-                errorText: errorText,
-                hintStyle: TextStyle(
-                  fontSize: 12.sp,
-                  color: const Color(0xFF999999),
-                ),
-                border: InputBorder.none,
-              ),
-            ),
           ),
-        ],
+          border: InputBorder.none,
+        ),
       ),
     );
   }

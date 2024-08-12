@@ -52,6 +52,7 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 500),
                         pageBuilder: (context, animation, secondaryAnimation) =>
                             HomePage(
                           partId: widget.partId,

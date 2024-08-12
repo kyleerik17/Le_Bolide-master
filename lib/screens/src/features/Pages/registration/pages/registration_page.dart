@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -54,76 +55,82 @@ class _RegistrationPageState extends State<RegistrationPage> {
     print('Validation échouée pour le pays sélectionné.');
     return false;
   }
-Future<void> _generateOTP() async {
-  final phoneNumber = _phoneController.text.trim();
 
-  if (!_isPhoneNumberValid(phoneNumber)) {
-    _showErrorDialog('Numéro de téléphone invalide pour $_selectedCountry.');
-    return;
-  }
+  Future<void> _generateOTP() async {
+    final phoneNumber = _phoneController.text.trim();
 
-  setState(() {
-    _isLoading = true;
-  });
-
-  final url = Uri.parse('${baseUrl}api/otp/generate');
-  final fullPhoneNumber = '${_countryCodes[_selectedCountry]}$phoneNumber';
-  final iconPath = _selectedCountry == 'Senegal' ? 'assets/icons/sng.png' : 'assets/icons/civ.png';
-
-  print('Numéro complet envoyé à l\'API: $fullPhoneNumber');
-  print('Icône sélectionnée: $iconPath'); // Ajoutez cette ligne
-
-  try {
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'phone': fullPhoneNumber}),
-    );
-
-    print('Code de statut de la réponse: ${response.statusCode}');
-    print('Réponse brute de l\'API: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      print('Réponse décodée: $responseData');
-
-      await Future.delayed(const Duration(seconds: 1));
-
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 300),
-          pageBuilder: (_, __, ___) => RegistrationAuthPage(
-            phoneNumber: fullPhoneNumber,
-            flag: _selectedCountry == 'Senegal' ? 'sng' : 'civ',
-            userId: widget.userId,
-            partId: widget.partId,
-            iconPath: iconPath, // Passez l'icône ici
-          ),
-          transitionsBuilder: (_, animation, __, child) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            );
-          },
-        ),
-      );
-    } else {
-      print('Erreur lors de la requête: ${response.statusCode}');
-      _showErrorDialog('Erreur de la demande OTP.');
+    if (!_isPhoneNumberValid(phoneNumber)) {
+      _showErrorDialog('Numéro de téléphone invalide pour $_selectedCountry.');
+      return;
     }
-  } catch (e) {
-    print('Erreur lors de la connexion: $e');
-    _showErrorDialog('Erreur: $e');
-  } finally {
+
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
     });
+
+    final url = Uri.parse('${baseUrl}api/otp/generate');
+    final fullPhoneNumber = '${_countryCodes[_selectedCountry]}$phoneNumber';
+    final iconPath = _selectedCountry == 'Senegal'
+        ? 'assets/icons/sng.png'
+        : 'assets/icons/civ.png';
+
+    print('Numéro complet envoyé à l\'API: $fullPhoneNumber');
+    print('Icône sélectionnée: $iconPath');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'phone': fullPhoneNumber}),
+      );
+
+      print('Code de statut de la réponse: ${response.statusCode}');
+      print('Réponse brute de l\'API: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        print('Réponse décodée: $responseData');
+
+        await Future.delayed(const Duration(seconds: 1));
+
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 300),
+            pageBuilder: (_, __, ___) => RegistrationAuthPage(
+              phoneNumber: fullPhoneNumber,
+              flag: _selectedCountry == 'Senegal' ? 'sng' : 'civ',
+              userId: widget.userId,
+              partId: widget.partId,
+              iconPath: iconPath,
+            ),
+            transitionsBuilder: (_, animation, __, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            },
+          ),
+        );
+      } else {
+        print('Erreur lors de la requête: ${response.statusCode}');
+        _showErrorDialog('Erreur de la demande OTP.');
+      }
+    } on SocketException {
+      print('Erreur: problème de connexion Internet');
+      _showErrorDialog('Vérifiez votre connexion Internet.');
+    } catch (e) {
+      print('Erreur lors de la connexion: $e');
+      _showErrorDialog('Erreur: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
-}
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -390,7 +397,10 @@ Future<void> _generateOTP() async {
                                 )
                               : Text(
                                   'Suivant',
-                                  style: TextStyle(fontSize: 14.sp),
+                                  style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Colors
+                                          .white), // Le texte du bouton est maintenant en blanc
                                 ),
                         ),
                       ),

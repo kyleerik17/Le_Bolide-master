@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:le_bolide/data/services/user.dart';
+import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout1_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
 import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/OrderSummary.dart';
@@ -26,7 +29,11 @@ class Pay3Page extends StatelessWidget {
   final int userId;
 
   double _calculateTotal() {
-    return cartItems.fold(0.0, (sum, item) => sum + (item['price'] ?? 0.0));
+    return cartItems.fold(0.0, (sum, item) {
+      final price = double.tryParse(item['prix'].toString()) ?? 0.0;
+      final quantity = int.tryParse(item['quantite'].toString()) ?? 0;
+      return sum + (price * quantity);
+    });
   }
 
   @override
@@ -195,10 +202,39 @@ class Pay3Page extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 2.h),
-              buildOrderSummaryWidget(cartItems),
+              Container(
+                padding: EdgeInsets.all(0.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(0.w),
+                  color: Colors.white,
+                ),
+                child: Column(
+                  children: cartItems.map((item) {
+                    return CartItem2Widget(
+                      img: item['img'] ?? '',
+                      libelle: item['libelle'] ?? '',
+                      prix: double.tryParse(item['prix'].toString()) ?? 0.0,
+                      quantite: int.tryParse(item['quantite'].toString()) ?? 0,
+                      partId: int.tryParse(item['id_produit'].toString()) ?? 0,
+                      userId: userId,
+                      total_price:
+                          (double.tryParse(item['prix'].toString()) ?? 0.0) *
+                              (int.tryParse(item['quantite'].toString()) ?? 0),
+                      onRemove: (userId, partId) {
+                        print(
+                            'Remove item with userId: $userId, partId: $partId');
+                        print('Cart items: $cartItems');
+
+                        // Define the removal logic here
+                        print('Cart items: $cartItems');
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
               SizedBox(height: 1.w),
               Container(
-                height: 40.w,
+                height: 43.w,
                 width: double.infinity,
                 color: Colors.white,
                 child: Column(
@@ -221,9 +257,9 @@ class Pay3Page extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(right: 4.w),
                           child: Text(
-                            '${_calculateTotal()} F',
+                            '${_calculateTotal().toStringAsFixed(0)} F',
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Cabin',
                             ),
@@ -259,6 +295,43 @@ class Pay3Page extends StatelessWidget {
                         ),
                       ],
                     ),
+                    // SizedBox(height: 1.h),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Padding(
+                    //       padding: EdgeInsets.only(left: 4.w),
+                    //       child: Text(
+                    //         'Code promo',
+                    //         style: TextStyle(
+                    //           fontSize: 12.sp,
+                    //           fontWeight: FontWeight.w400,
+                    //           fontFamily: 'Poppins',
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsets.only(right: 4.w),
+                    //       child: Text(
+                    //         'BOLI10',
+                    //         style: TextStyle(
+                    //           fontSize: 12.sp,
+                    //           fontWeight: FontWeight.w600,
+                    //           fontFamily: 'Cabin',
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    Center(
+                      child: SizedBox(
+                        width: 85.w,
+                        child: Divider(
+                          height: 2.h,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
                     SizedBox(height: 1.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -266,40 +339,7 @@ class Pay3Page extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(left: 4.w),
                           child: Text(
-                            'Code promo',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 4.w),
-                          child: Text(
-                            'BOLI10',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Cabin',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 1.h),
-                    Divider(
-                      color: Colors.grey.shade300,
-                      thickness: 2,
-                    ),
-                    SizedBox(height: 1.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 4.w),
-                          child: Text(
-                            'Total',
+                            'TOTAL',
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w600,
@@ -310,7 +350,7 @@ class Pay3Page extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(right: 4.w),
                           child: Text(
-                            '${_calculateTotal()} F',
+                            '${_calculateTotal().toStringAsFixed(0)} F',
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w600,
@@ -323,7 +363,7 @@ class Pay3Page extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 4.h),
+              SizedBox(height: 3.h),
               Center(
                 child: TextButton(
                   onPressed: () {
@@ -363,6 +403,132 @@ class Pay3Page extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CartItem2Widget extends StatefulWidget {
+  final String img;
+  final String libelle;
+  final double prix;
+  final int quantite;
+  final double total_price;
+  final int partId;
+  final int userId;
+  final Function(int userId, int partId) onRemove;
+
+  CartItem2Widget({
+    Key? key,
+    required this.img,
+    required this.libelle,
+    required this.prix,
+    required this.quantite,
+    required this.partId,
+    required this.userId,
+    required this.onRemove,
+    required this.total_price,
+  }) : super(key: key);
+
+  @override
+  State<CartItem2Widget> createState() => _CartItem2WidgetState();
+}
+
+class _CartItem2WidgetState extends State<CartItem2Widget> {
+  int userIdConnect = 0;
+  late User user;
+
+  @override
+  void initState() {
+    try {
+      user = GetIt.instance.get<User>();
+      userIdConnect = user.id;
+      print(user.name);
+      print('user info');
+    } catch (e) {
+      print(e);
+    }
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 0.5.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Image.asset(
+            'assets/images/pn2.png',
+            width: 25.w,
+            height: 25.w,
+          ),
+          SizedBox(width: 2.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.libelle,
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 0.5.h),
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/icons/ea.png',
+                      color: const Color(0xFF1A1A1A),
+                      width: 5.w,
+                    ),
+                    SizedBox(width: 1.w),
+                    Text(
+                      'Pneu été',
+                      style: TextStyle(
+                        fontFamily: "Cabin",
+                        color: const Color(0xFF1A1A1A),
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 1.h),
+                Row(
+                  children: [
+                    Text(
+                      '${widget.prix.toString()} F',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontFamily: 'Cabin',
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF1A1A1A),
+                      ),
+                    ),
+                    SizedBox(width: 30.w),
+                    Add3Page(
+                      userId: widget.userId,
+                      partId: widget.partId,
+                      initialQuantity: widget.quantite,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

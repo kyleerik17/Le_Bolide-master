@@ -89,15 +89,14 @@ class $AssetsImagesGen {
   SvgGenImage get home => const SvgGenImage('assets/images/home.svg');
 
   /// File path: assets/images/ic_launcher.png
-  AssetGenImage get icLauncher =>
-      const AssetGenImage('assets/images/ic_launcher.png');
+  AssetGenImage get icLauncher => const AssetGenImage('assets/images/lgo.png');
 
   /// File path: assets/images/id-card-solid 1.svg
   SvgGenImage get idCardSolid1 =>
       const SvgGenImage('assets/images/id-card-solid 1.svg');
 
   /// File path: assets/images/illustration_welcome.svg
-  AssetGenImage get onboarding3 =>const AssetGenImage('assets/icons/24.gif');
+  AssetGenImage get onboarding3 => const AssetGenImage('assets/icons/24.gif');
 
   /// File path: assets/images/info.png
   AssetGenImage get infoPng => const AssetGenImage('assets/images/info.png');
@@ -111,13 +110,11 @@ class $AssetsImagesGen {
           'assets/images/interface-radio-button-checked-checkmark-done-to-do-radio-icon 1.svg');
 
   /// File path: assets/images/intro2.png
-  AssetGenImage get Onboarding2 =>
-      const AssetGenImage('assets/icons/car.gif');
+  AssetGenImage get Onboarding2 => const AssetGenImage('assets/icons/car.gif');
 
   /// File path: assets/images/intro3.png
   AssetGenImage get Onboarding1 =>
       const AssetGenImage('assets/icons/search.gif');
-
 
   /// File path: assets/images/location 1.svg
   SvgGenImage get location1 =>
@@ -125,8 +122,6 @@ class $AssetsImagesGen {
 
   /// File path: assets/images/logo_text.svg
   SvgGenImage get logoText => const SvgGenImage('assets/images/logo_text.svg');
-
-
 
   /// List of all assets
   List<dynamic> get values => [
@@ -161,7 +156,6 @@ class $AssetsImagesGen {
         Onboarding1,
         location1,
         logoText,
-
       ];
 }
 

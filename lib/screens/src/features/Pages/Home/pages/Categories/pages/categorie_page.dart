@@ -8,12 +8,13 @@ import '../../home_page.dart';
 class CategoriesPage extends StatefulWidget {
   final int partId;
   final int userId;
+  final String categoryName; // Ajouté ici
 
   const CategoriesPage({
     super.key,
     required this.partId,
     required this.userId,
-    required String categoryName,
+    required this.categoryName, // Assurez-vous que ce champ est requis dans le constructeur
   });
 
   @override
@@ -46,7 +47,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
     }
   }
 
-  void navigateToCategory(String categoryId) {
+  void navigateToCategory(String categoryId, String categoryName) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -54,7 +55,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
           categoryId: categoryId,
           partId: widget.partId,
           userId: widget.userId,
-          categoryName: '',
+          categoryName: categoryName,
         ),
       ),
     );
@@ -130,7 +131,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 mainAxisSpacing: 12,
                 children: snapshot.data!.map((category) {
                   return GestureDetector(
-                    onTap: () => navigateToCategory(category['id']),
+                    onTap: () =>
+                        navigateToCategory(category['id'], category['label']),
                     child: CategoryItem(
                       icon: category['icon'],
                       label: category['label'],

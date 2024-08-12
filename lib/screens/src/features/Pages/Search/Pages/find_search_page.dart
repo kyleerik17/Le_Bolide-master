@@ -189,35 +189,35 @@ class _FindSearchPageState extends State<FindSearchPage> {
                 },
               ),
               SizedBox(height: 9.w),
-              Center(
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FindSearchPlusPage(
-                              partId: widget.partId, userId: widget.userId)),
-                    );
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A1A1A),
-                    padding:
-                        EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 35.w),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(1.w),
-                    ),
-                  ),
-                  child: Text(
-                    "Charger plus",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Cabin',
-                    ),
-                  ),
-                ),
-              ),
+              // Center(
+              //   child: TextButton(
+              //     onPressed: () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //             builder: (context) => FindSearchPlusPage(
+              //                 partId: widget.partId, userId: widget.userId)),
+              //       );
+              //     },
+              //     style: TextButton.styleFrom(
+              //       backgroundColor: const Color(0xFF1A1A1A),
+              //       padding:
+              //           EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 35.w),
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(1.w),
+              //       ),
+              //     ),
+              //     child: Text(
+              //       "Charger plus",
+              //       style: TextStyle(
+              //         color: Colors.white,
+              //         fontSize: 12.sp,
+              //         fontWeight: FontWeight.w500,
+              //         fontFamily: 'Cabin',
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),

@@ -19,7 +19,7 @@ Widget buildSecurePaymentWidget() {
               'assets/icons/lock.png',
               width: 8.w,
             ),
-            SizedBox(width: 4.w),
+            SizedBox(width: 2.w),
             Text(
               'Paiement sécurisé',
               style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400),

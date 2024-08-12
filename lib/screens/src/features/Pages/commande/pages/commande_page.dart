@@ -239,7 +239,7 @@ class _CommandePageState extends State<CommandePage> {
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 300),
+                  transitionDuration: const Duration(milliseconds: 500),
                   pageBuilder: (_, __, ___) => SearchLoadPage(
                       partId: widget.partId, userId: widget.userId),
                   transitionsBuilder: (_, animation, __, child) {

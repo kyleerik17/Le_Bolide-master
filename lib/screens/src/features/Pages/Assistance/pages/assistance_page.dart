@@ -190,7 +190,7 @@ class AssistancePage extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 300),
+                  transitionDuration: const Duration(milliseconds: 500),
                   pageBuilder: (_, __, ___) => SearchLoadPage(
                     partId: partId,
                     userId: userId,

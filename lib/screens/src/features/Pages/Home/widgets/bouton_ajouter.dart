@@ -37,10 +37,10 @@ class _QuantityWidgetState extends State<QuantityWidget> {
 
   // Function to send quantity update to the API
   Future<void> _sendQuantityUpdate() async {
-    const url = '${baseUrl}api/cart/add/';
+    final url = '${baseUrl}api/cart/add/';
 
     final data = {
-      'user_id': user.id.toString(), // Utiliser user.id ici
+      'user_id': user.id.toString(), 
       'part_id': widget.partId.toString(),
       'quantity': _quantity.toString(),
     };
@@ -66,10 +66,62 @@ class _QuantityWidgetState extends State<QuantityWidget> {
             'Quantity updated successfully: user_id: ${data['user_id']}, part_id: ${data['part_id']}, quantity: ${data['quantity']}');
       } else {
         print('Failed to update quantity, status code: ${response.statusCode}');
-        // Add more details if possible from the response body
       }
     } catch (e) {
       print('Error sending request: $e');
+    }
+  }
+
+  // Remove item from cart
+  Future<void> _removeFromCart() async {
+    final url = '${baseUrl}api/cart/remove/';
+    final data = {
+      'user_id': user.id.toString(),
+      'part_id': widget.partId.toString(),
+    };
+
+    try {
+      print('Sending request to $url');
+      print('Data sent: ${jsonEncode(data)}');
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+
+      print('Status code received: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        print('Item removed from cart successfully');
+      } else {
+        print('Failed to remove item from cart, status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending request: $e');
+    }
+  }
+
+  // Decrement quantity and possibly remove from cart
+  Future<void> _decrementQuantity() async {
+    if (_quantity > 0) {
+      setState(() {
+        _quantity--;
+      });
+      await _sendQuantityUpdate();
+      print(
+        'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
+      if (_quantity == 1) {
+        await _removeFromCart();
+        setState(() {
+          _showQuantityControls =
+            false; // Hide controls and show "Ajouter" button
+        });
+      }
     }
   }
 
@@ -89,29 +141,6 @@ class _QuantityWidgetState extends State<QuantityWidget> {
     }
   }
 
-  // Decrement quantity and possibly hide controls
-  void _decrementQuantity() {
-    if (_quantity > 1) {
-      setState(() {
-        _quantity--;
-      });
-      _sendQuantityUpdate().then((_) {
-        print(
-            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
-      });
-    } else {
-      setState(() {
-        _quantity = 1; // Ensure quantity doesn't go below 1
-        _showQuantityControls =
-            false; // Hide controls and show "Ajouter" button
-      });
-      _sendQuantityUpdate().then((_) {
-        print(
-            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
-      });
-    }
-  }
-
   // Navigate to another page with animation
   void _navigateToPay1Page() {
     Navigator.pushReplacement(
@@ -120,7 +149,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
         pageBuilder: (context, animation, secondaryAnimation) =>
             Details1ProduitsPage(
           partId: widget.partId,
-          userId: widget.userId, // Utiliser user.id ici
+          userId: widget.userId, 
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
@@ -193,8 +222,6 @@ class _QuantityWidgetState extends State<QuantityWidget> {
                     IconButton(
                       onPressed: () {
                         _decrementQuantity();
-                        print(
-                            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
                       },
                       icon: const Icon(Icons.remove),
                       padding: EdgeInsets.zero,
@@ -223,8 +250,6 @@ class _QuantityWidgetState extends State<QuantityWidget> {
                     IconButton(
                       onPressed: () {
                         _incrementQuantity();
-                        print(
-                            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
                       },
                       icon: const Icon(Icons.add),
                       padding: EdgeInsets.zero,
