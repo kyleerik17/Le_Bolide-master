@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
-import 'package:le_bolide/core/di/service_locator.dart';
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration_page.dart';
+import 'package:Bolide/core/di/service_locator.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/registration/pages/registration_page.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Home/pages/home_page.dart';
@@ -49,6 +49,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       statusBarColor: Color(0xFF1A1A1A),
       statusBarIconBrightness: Brightness.light,
     ));
+  }
+
+  String _getInitials(String name) {
+    List<String> parts = name.split(' ');
+    if (parts.length > 1) {
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    } else {
+      return '${name[0]}${name[0]}'.toUpperCase();
+    }
   }
 
   void _confirmSignOut() {
@@ -164,17 +173,23 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 300),
+                  transitionDuration: const Duration(
+                      milliseconds: 600), // Augmentez la durée de l'animation
                   pageBuilder: (_, __, ___) =>
                       HomePage(partId: widget.partId, userId: widget.userId),
-                  transitionsBuilder: (_, animation, __, child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const offsetBegin = Offset(1.0, 0.0); // Start from right
+                    const offsetEnd =
+                        Offset.zero; // End at the current position
+                    const curve = Curves.easeInOutCubic; // Courbe plus fluide
+
+                    var tween = Tween(begin: offsetBegin, end: offsetEnd)
+                        .chain(CurveTween(curve: curve));
+                    var offsetAnimation = animation.drive(tween);
+
                     return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(-1.0, 0.0),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    );
+                        position: offsetAnimation, child: child);
                   },
                 ),
               );
@@ -210,7 +225,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           ),
                           child: Center(
                             child: Text(
-                              'AS',
+                              _getInitials(
+                                  user.name), // Utilisation des initiales
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,

@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
 import 'package:sizer/sizer.dart';
 
 class FormulaireLivraison extends StatefulWidget {

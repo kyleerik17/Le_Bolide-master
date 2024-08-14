@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
 
 import 'package:gap/gap.dart';
@@ -9,7 +9,8 @@ import '../../../profile/pages/pages.dart';
 class MenuPage extends StatelessWidget {
   final int partId;
   final int userId;
-  const MenuPage({Key? key, required this.partId, required this.userId}) : super(key: key);
+  const MenuPage({Key? key, required this.partId, required this.userId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +49,29 @@ class MenuPage extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ProfilePage(partId ,userId)),
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      ProfilePage(partId, userId),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin = Offset(1.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.easeInOut;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                var offsetAnimation = animation.drive(tween);
+
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: child,
+                                );
+                              },
+                              transitionDuration:
+                                  const Duration(milliseconds: 300),
+                            ),
                           );
                         },
                         child: Row(

@@ -1,8 +1,13 @@
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 class SearchResult2Page extends StatefulWidget {
-  const SearchResult2Page({Key? key}) : super(key: key);
+  final int userId;
+  final int partId;
+  const SearchResult2Page(
+      {Key? key, required this.userId, required this.partId})
+      : super(key: key);
 
   @override
   _SearchResult2PageState createState() => _SearchResult2PageState();
@@ -194,11 +199,32 @@ class _SearchResult2PageState extends State<SearchResult2Page> {
               Center(
                 child: TextButton(
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => const FindSearchPage()),
-                    // );
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        transitionDuration: const Duration(milliseconds: 300),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            FindSearchPage(
+                          partId: widget.partId,
+                          userId: widget.userId,
+                        ),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          const offsetBegin =
+                              Offset(1.0, 0.0); // Start from left
+                          const offsetEnd =
+                              Offset.zero; // End at the current position
+                          const curve = Curves.easeInOutCubic; // Smooth curve
+
+                          var tween = Tween(begin: offsetBegin, end: offsetEnd)
+                              .chain(CurveTween(curve: curve));
+                          var offsetAnimation = animation.drive(tween);
+
+                          return SlideTransition(
+                              position: offsetAnimation, child: child);
+                        },
+                      ),
+                    );
                   },
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),

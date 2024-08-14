@@ -1,70 +1,153 @@
+import 'package:Bolide/screens/src/features/Pages/profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/loading%20modal/pages/resultat_search2_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
+import 'package:gap/gap.dart';
 
+class MenuPage extends StatelessWidget {
+  final int partId;
+  final int userId;
 
-class SearchButton extends StatelessWidget {
-  const SearchButton({super.key});
+  const MenuPage({Key? key, required this.partId, required this.userId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        _showLoadingDialog(context);
-        Future.delayed(const Duration(seconds: 2), () {
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SearchResult2Page(),
-            ),
-          );
-        });
-      },
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(2.w),
-          color: const Color(0xFF232323),
-        ),
-        padding: EdgeInsets.symmetric(vertical: 1.8.h, horizontal: 2.w),
-        child: Center(
-          child: Text(
-            'Rechercher',
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Cabin',
-              fontWeight: FontWeight.w500,
-              fontSize: 13.sp,
-            ),
+    return Align(
+      child: SizedBox(
+        child: Container(
+          color: const Color(0xFF1A1A1A),
+          child: ListView(
+            children: [
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 25.w),
+                          Image.asset(
+                            'assets/icons/home.png',
+                            width: 45.w,
+                            height: 13.w,
+                            fit: BoxFit.contain,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(9.w),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return ProfilePage(partId, userId);
+                            },
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const offsetBegin =
+                                  Offset(1.0, 0.0); // Start from right
+                              const offsetEnd =
+                                  Offset.zero; // End at the current position
+                              const curve =
+                                  Curves.easeInOutCubic; // Smooth curve
+
+                              var tween =
+                                  Tween(begin: offsetBegin, end: offsetEnd)
+                                      .chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+
+                              return SlideTransition(
+                                  position: offsetAnimation, child: child);
+                            },
+                          ));
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(Icons.person, color: Colors.white),
+                            SizedBox(width: 4.w),
+                            const Text(
+                              'Profil',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 18,
+                                fontFamily: "Cabin",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Row(
+                        children: [
+                          const Icon(Icons.settings, color: Colors.white),
+                          SizedBox(width: 4.w),
+                          const Text(
+                            'Paramètres',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Gap(105.w),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/icons/insta.png',
+                    color: Colors.white,
+                  ),
+                  Gap(8.w),
+                  Image.asset(
+                    'assets/icons/fb.png',
+                    color: Colors.white,
+                  ),
+                  Gap(8.w),
+                  Image.asset(
+                    'assets/icons/tt.png',
+                    color: Colors.white,
+                  ),
+                  Gap(8.w),
+                  Image.asset(
+                    'assets/icons/lg.png',
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              Gap(15.w),
+              Center(
+                child: Text(
+                  'À Propos Du Développeur',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 4.w,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: "Cabin",
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-void _showLoadingDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          insetPadding: EdgeInsets.all(0),
-          child: Container(
-            alignment: Alignment.center,
-                 color: Colors.transparent,
-            child: SizedBox(
-              width: 20.w,
-              height: 20.w,
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                strokeWidth: 6,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }

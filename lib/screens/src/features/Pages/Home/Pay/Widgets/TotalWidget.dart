@@ -1,5 +1,5 @@
 // import 'package:flutter/material.dart';
-// import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
+// import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
 // import 'package:sizer/sizer.dart';
 
 // Widget buildTotalWidget(

@@ -1,16 +1,17 @@
 import 'dart:convert';
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/quantity_widget1.dart';
-import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/search2.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/appbar.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add2.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/search.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Favoris/Widgets/quantity_widget1.dart';
+import 'package:Bolide/screens/src/features/Pages/Favoris/Widgets/search2.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/appbar.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Widgets/add.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Widgets/add2.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/search.dart';
 import 'package:sizer/sizer.dart';
 import '../../loading modal/pages/pages.dart';
 import '../Widgets/bottom.dart';
@@ -112,7 +113,72 @@ class _FavorisPageState extends State<FavorisPage> {
               padding: EdgeInsets.all(4.w),
               child: Column(
                 children: [
-                  Search2(partId: widget.partId, userId: widget.userId),
+                   Container(
+        width: 358,
+        height: 40,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: const Color(0xFFCED0D4)),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+          ),
+        ),
+        child: TextField(
+          onTap: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 300),
+                pageBuilder: (_, __, ___) => FindSearchPage(
+                  partId: widget.partId,
+                  userId: widget.userId,
+                ),
+                transitionsBuilder: (_, animation, __, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0.0, 1.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                },
+              ),
+            );
+          },
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+            filled: true,
+            fillColor: Colors.white,
+            hintText: 'Rechercher...',
+            hintStyle: TextStyle(
+              color: Color(0xFF737373),
+              fontFamily: 'Poppins',
+              fontSize: 14,
+            ),
+            prefixIcon: Padding(
+              padding: EdgeInsets.only(left: 0),
+              child: ImageIcon(
+                AssetImage('assets/icons/search.png'),
+                size: 16,
+                color: Colors.black,
+              ),
+            ),
+            suffixIcon: Padding(
+              padding: EdgeInsets.only(right: 0),
+              child: ImageIcon(
+                AssetImage('assets/icons/mc.png'),
+                size: 16,
+                color: Colors.black,
+              ),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: 9),
+          ),
+          style: const TextStyle(
+            color: Color(0xFF737373),
+          ),
+        ),
+      ),
                   FutureBuilder<List<Item>>(
                     future: _futureFavorites,
                     builder: (context, snapshot) {
@@ -123,7 +189,6 @@ class _FavorisPageState extends State<FavorisPage> {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return Center(
-                          
                           child: Text(
                             'Pas de favoris',
                             style: TextStyle(
@@ -169,7 +234,6 @@ class _FavorisPageState extends State<FavorisPage> {
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
-                  
                   transitionDuration: const Duration(milliseconds: 500),
                   pageBuilder: (_, __, ___) => SearchLoadPage(
                       partId: widget.partId, userId: widget.userId),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/commande/pages/details_commande_page.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/pages/details_commande_page.dart';
 import 'package:sizer/sizer.dart';
 
 class CommandeContainer extends StatefulWidget {
@@ -28,12 +28,29 @@ class _CommandeContainerState extends State<CommandeContainer> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => DetailsCommandePage(
-              partId: widget.partId,
-              userId: widget.userId,
-              price: widget.price,
-            ),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return DetailsCommandePage(
+                partId: widget.partId,
+                userId: widget.userId,
+                price: widget.price,
+              );
+            },
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var offsetAnimation = animation.drive(tween);
+
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            },
           ),
         );
       },
@@ -80,7 +97,6 @@ class _CommandeContainerState extends State<CommandeContainer> {
                               fontFamily: "Cabin",
                               fontWeight: FontWeight.w400,
                             ),
-                         
                           ),
                         ),
                       ],

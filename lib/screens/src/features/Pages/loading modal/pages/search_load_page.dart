@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/loading%20modal/pages/resultat_search2_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/loading%20modal/pages/resultat_search_page.dart';
-
+import 'package:Bolide/screens/src/features/Pages/loading%20modal/pages/resultat_search2_page.dart';
+import 'package:Bolide/screens/src/features/Pages/loading%20modal/pages/resultat_search_page.dart';
 import 'package:sizer/sizer.dart';
-
 import '../../Home/pages/pages.dart';
 
 class SearchLoadPage extends StatefulWidget {
@@ -52,7 +50,7 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                          transitionDuration: const Duration(milliseconds: 500),
+                        transitionDuration: const Duration(milliseconds: 300),
                         pageBuilder: (context, animation, secondaryAnimation) =>
                             HomePage(
                           partId: widget.partId,
@@ -64,7 +62,8 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                               Offset(-1.0, 0.0); // Start from right
                           const offsetEnd =
                               Offset.zero; // End at the current position
-                          const curve = Curves.easeInOut;
+                          const curve =
+                              Curves.easeInOutCubic; // Courbe plus fluide
 
                           var tween = Tween(begin: offsetBegin, end: offsetEnd)
                               .chain(CurveTween(curve: curve));
@@ -119,7 +118,7 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const SearchResultPage(),
+                      builder: (context) =>  SearchResultPage(partId: widget.partId,userId: widget.userId,),
                     ),
                   );
                 });
@@ -198,8 +197,8 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                     border: const OutlineInputBorder(),
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 2.w),
-                    filled: true, // Ajoutez cette ligne
-                    fillColor: Colors.white, // Ajoute
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   value: selectedManufacturer,
                   items: [
@@ -213,7 +212,7 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                   ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(value),
+                      child: Text(value, textAlign: TextAlign.center),
                     );
                   }).toList(),
                   onChanged: (newValue) {
@@ -245,8 +244,8 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                     border: const OutlineInputBorder(),
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 2.w),
-                    filled: true, // Ajoutez cette ligne
-                    fillColor: Colors.white, // Ajoute
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   value: selectedModel,
                   items: [
@@ -260,7 +259,7 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                   ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(value),
+                      child: Text(value, textAlign: TextAlign.center),
                     );
                   }).toList(),
                   onChanged: (newValue) {
@@ -291,8 +290,8 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                     border: const OutlineInputBorder(),
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 2.w),
-                    filled: true, // Ajoutez cette ligne
-                    fillColor: Colors.white, // Ajoutez cette ligne
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   value: selectedEngine,
                   items: [
@@ -306,7 +305,7 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                   ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(value),
+                      child: Text(value, textAlign: TextAlign.center),
                     );
                   }).toList(),
                   onChanged: (newValue) {
@@ -359,8 +358,30 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
                         Navigator.pop(context);
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const SearchResult2Page(),
+                          PageRouteBuilder(
+                            transitionDuration:
+                                const Duration(milliseconds: 300),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    SearchResult2Page(partId: widget.partId,
+                          userId: widget.userId,),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const offsetBegin =
+                                  Offset(1.0, 0.0); // Start from right
+                              const offsetEnd =
+                                  Offset.zero; // End at the current position
+                              const curve =
+                                  Curves.easeInOutCubic; // Courbe plus fluide
+
+                              var tween =
+                                  Tween(begin: offsetBegin, end: offsetEnd)
+                                      .chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+
+                              return SlideTransition(
+                                  position: offsetAnimation, child: child);
+                            },
                           ),
                         );
                       });

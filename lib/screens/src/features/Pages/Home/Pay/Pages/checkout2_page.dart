@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:le_bolide/data/models/api_services.dart';
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout1_page.dart';
+import 'package:Bolide/data/models/api_services.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout1_page.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -178,18 +178,16 @@ class _Pay2PageState extends State<Pay2Page> {
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(-1.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.ease;
+                  const offsetBegin = Offset(-1.0, 0.0); // Start from right
+                  const offsetEnd = Offset.zero; // End at the current position
+                  const curve = Curves.easeInOutCubic; // Courbe plus fluide
 
-                  final tween = Tween(begin: begin, end: end)
+                  var tween = Tween(begin: offsetBegin, end: offsetEnd)
                       .chain(CurveTween(curve: curve));
-                  final offsetAnimation = animation.drive(tween);
+                  var offsetAnimation = animation.drive(tween);
 
                   return SlideTransition(
-                    position: offsetAnimation,
-                    child: child,
-                  );
+                      position: offsetAnimation, child: child);
                 },
               ),
             );
@@ -241,13 +239,12 @@ class _Pay2PageState extends State<Pay2Page> {
                     padding:
                         EdgeInsets.symmetric(vertical: 1.h, horizontal: 0.w),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(width: 2.w),
                         Image.asset(
                           'assets/icons/lgo.png',
                           width: 8.w,
                         ),
-                        SizedBox(width: 40.w),
                         Row(
                           children: [
                             Image.asset(
@@ -363,6 +360,38 @@ class _Pay2PageState extends State<Pay2Page> {
                         await createOrder(
                           paymentMethodId: selectedPaymentMethodId!,
                           deliveryAddress: widget.deliveryAddress,
+                        );
+
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    Pay3Page(
+                              orderDetails: {/* détails de la commande ici */},
+                              partId: widget.partId,
+                              cartItems: widget.cartItems,
+                              deliveryAddress: widget.deliveryAddress,
+                              userId: user.id,
+                            ),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const offsetBegin =
+                                  Offset(1.0, 0.0); // Commence de la gauche
+                              const offsetEnd =
+                                  Offset.zero; // Finit à la position actuelle
+                              const curve =
+                                  Curves.easeInOutCubic; // Courbe plus fluide
+
+                              var tween =
+                                  Tween(begin: offsetBegin, end: offsetEnd)
+                                      .chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+
+                              return SlideTransition(
+                                  position: offsetAnimation, child: child);
+                            },
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(

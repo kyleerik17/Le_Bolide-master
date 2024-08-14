@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/Search/Pages/find_search_full_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/pages/home_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_full_page.dart';
 import 'package:sizer/sizer.dart';
 import '../../Search/Pages/find_search_page.dart';
 

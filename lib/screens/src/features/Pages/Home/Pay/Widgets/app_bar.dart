@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Menu/pages/menu_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Menu/pages/menu_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
 import 'package:sizer/sizer.dart';
 
 class AppBarWidget extends StatefulWidget {
@@ -73,8 +73,8 @@ class _AppBarWidgetState extends State<AppBarWidget>
                           type: MaterialType.transparency,
                           child: Container(
                             color: Colors.white,
-                            child:
-                                MenuPage(partId: widget.partId, userId:widget.userId),
+                            child: MenuPage(
+                                partId: widget.partId, userId: widget.userId),
                           ),
                         ),
                       ),

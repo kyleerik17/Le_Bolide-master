@@ -1,8 +1,12 @@
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 class SearchResultPage extends StatelessWidget {
-  const SearchResultPage({Key? key});
+  final int partId;
+  final int userId;
+  const SearchResultPage(
+      {Key? key, required this.partId, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -116,11 +120,32 @@ class SearchResultPage extends StatelessWidget {
               Center(
                 child: TextButton(
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => const FindSearchPage()),
-                    // );
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        transitionDuration: const Duration(milliseconds: 300),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            FindSearchPage(
+                          partId: partId,
+                          userId: userId,
+                        ),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          const offsetBegin =
+                              Offset(1.0, 0.0); // Start from left
+                          const offsetEnd =
+                              Offset.zero; // End at the current position
+                          const curve = Curves.easeInOutCubic; // Smooth curve
+
+                          var tween = Tween(begin: offsetBegin, end: offsetEnd)
+                              .chain(CurveTween(curve: curve));
+                          var offsetAnimation = animation.drive(tween);
+
+                          return SlideTransition(
+                              position: offsetAnimation, child: child);
+                        },
+                      ),
+                    );
                   },
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),

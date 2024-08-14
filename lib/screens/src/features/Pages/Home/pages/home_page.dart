@@ -1,6 +1,7 @@
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Importez ceci pour accéder à SystemChrome
-import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration_page.dart';
+import 'package:flutter/services.dart';
+import 'package:Bolide/screens/src/features/Pages/registration/pages/registration_page.dart';
 import 'package:sizer/sizer.dart';
 import '../../loading modal/pages/pages.dart';
 import '../widgets/appbar.dart';
@@ -32,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    // Vérifiez si l'ID utilisateur est valide, sinon redirigez vers RegistrationPage
+    //Vérifiez si l'ID utilisateur est valide, sinon redirigez vers RegistrationPage
     if (widget.userId <= 0) {
       Future.delayed(Duration.zero, () {
         Navigator.pushReplacement(
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
           milliseconds: 500), // Set the transition duration to 1 second
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0);
+        const begin = Offset(1.0, 0.0);
         const end = Offset.zero;
         const curve = Curves.easeInOut;
 
@@ -132,7 +133,78 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   SizedBox(height: 1.h),
-                  SearchBarWidget(partId: widget.partId, userId: widget.userId),
+                  Container(
+                    width: 358,
+                    height: 40,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFCED0D4)),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                      ),
+                    ),
+                    child: TextField(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            transitionDuration:
+                                const Duration(milliseconds: 500),
+                            pageBuilder: (_, __, ___) => FindSearchPage(
+                              partId: widget.partId,
+                              userId: widget.userId,
+                            ),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const begin = Offset(0.0, 1.0);
+                              const end = Offset.zero;
+                              const curve = Curves.easeInOut;
+
+                              var tween = Tween(begin: begin, end: end);
+                              var offsetAnimation = animation
+                                  .drive(tween.chain(CurveTween(curve: curve)));
+
+                              return SlideTransition(
+                                  position: offsetAnimation, child: child);
+                            },
+                          ),
+                        );
+                      },
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Rechercher...',
+                        hintStyle: TextStyle(
+                          color: Color(0xFF737373),
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                        ),
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.only(left: 0),
+                          child: ImageIcon(
+                            AssetImage('assets/icons/search.png'),
+                            size: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                        suffixIcon: Padding(
+                          padding: EdgeInsets.only(right: 0),
+                          child: ImageIcon(
+                            AssetImage('assets/icons/mc.png'),
+                            size: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 9),
+                      ),
+                      style: const TextStyle(
+                        color: Color(0xFF737373),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 2.h),
                   const SliderPage(),
                   SizedBox(height: 1.h),

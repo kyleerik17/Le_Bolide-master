@@ -1,13 +1,14 @@
 import 'dart:convert';
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/search.dart';
-import 'package:le_bolide/screens/src/features/Pages/commande/widgets/search1.dart';
-import 'package:le_bolide/screens/src/features/Pages/registration/pages/pages.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/search.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/widgets/search1.dart';
+import 'package:Bolide/screens/src/features/Pages/registration/pages/pages.dart';
 import 'package:sizer/sizer.dart';
 import '../../Home/widgets/appbar.dart';
 import '../../loading modal/pages/pages.dart';
@@ -25,7 +26,8 @@ class CommandePage extends StatefulWidget {
 }
 
 class _CommandePageState extends State<CommandePage> {
-  String _selectedButton = '';
+  String _selectedButton = 'Tout';
+  List<dynamic> _allCommandes = [];
   List<dynamic> _commandes = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -60,11 +62,13 @@ class _CommandePageState extends State<CommandePage> {
 
         if (data['status'] == 'success' && data['commandes'] is List) {
           setState(() {
-            _commandes = data['commandes'];
+            _allCommandes = data['commandes'];
+            _commandes = _allCommandes;
             _isLoading = false;
           });
         } else {
           setState(() {
+            _allCommandes = [];
             _commandes = [];
             _isLoading = false;
             _errorMessage = 'Pas de commande';
@@ -87,6 +91,21 @@ class _CommandePageState extends State<CommandePage> {
   void _onButtonPressed(String buttonText) {
     setState(() {
       _selectedButton = buttonText;
+      switch (buttonText) {
+        case 'Tout':
+          _commandes = _allCommandes;
+          break;
+        case 'En cours':
+          _commandes = _allCommandes
+              .where((commande) => commande['status'] == 'E')
+              .toList();
+          break;
+        case 'Terminées':
+          _commandes = _allCommandes
+              .where((commande) => commande['status'] == 'T')
+              .toList();
+          break;
+      }
     });
   }
 
@@ -109,7 +128,74 @@ class _CommandePageState extends State<CommandePage> {
               padding: EdgeInsets.all(4.w),
               child: Column(
                 children: [
-                  Search1(partId: widget.partId, userId: widget.userId),
+                  Container(
+                    width: 358,
+                    height: 40,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFCED0D4)),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                      ),
+                    ),
+                    child: TextField(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            transitionDuration:
+                                const Duration(milliseconds: 300),
+                            pageBuilder: (_, __, ___) => FindSearchPage(
+                              partId: widget.partId,
+                              userId: widget.userId,
+                            ),
+                            transitionsBuilder: (_, animation, __, child) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(0.0, 1.0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Rechercher...',
+                        hintStyle: TextStyle(
+                          color: Color(0xFF737373),
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                        ),
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.only(left: 0),
+                          child: ImageIcon(
+                            AssetImage('assets/icons/search.png'),
+                            size: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                        suffixIcon: Padding(
+                          padding: EdgeInsets.only(right: 0),
+                          child: ImageIcon(
+                            AssetImage('assets/icons/mc.png'),
+                            size: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 9),
+                      ),
+                      style: const TextStyle(
+                        color: Color(0xFF737373),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 1.h),
                   Row(
                     children: [
@@ -188,7 +274,7 @@ class _CommandePageState extends State<CommandePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Commandes en cours',
+                        'Toutes les commandes',
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: "Poppins",
@@ -208,18 +294,23 @@ class _CommandePageState extends State<CommandePage> {
                     ],
                   ),
                   SizedBox(height: 2.h),
-                  for (var commande in _commandes) ...[
-                    CommandeContainer(
-                      price: '${commande['total_price']} F',
-                      description: 'Commande ${commande['order_code']}',
-                      assetIcon: 'assets/icons/rec.png',
-                      partId: int.parse(commande['id']),
-                      userId: widget.userId,
-                    ),
-                    SizedBox(
-                        height: 2
-                            .h), // Ajoute un espace vertical entre les commandes
-                  ],
+                  if (_isLoading)
+                    CircularProgressIndicator()
+                  else if (_errorMessage != null)
+                    Text(_errorMessage!)
+                  else if (_commandes.isEmpty)
+                    Text('Aucune commande trouvée')
+                  else
+                    for (var commande in _commandes) ...[
+                      CommandeContainer(
+                        price: '${commande['total_price']} F',
+                        description: 'Commande ${commande['order_code']}',
+                        assetIcon: 'assets/icons/rec.png',
+                        partId: int.parse(commande['id']),
+                        userId: widget.userId,
+                      ),
+                      SizedBox(height: 2.h),
+                    ],
                 ],
               ),
             ),

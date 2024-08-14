@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/services/user.dart'; // Assurez-vous que ce chemin est correct
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout2_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
+import 'package:Bolide/data/services/user.dart'; // Assurez-vous que ce chemin est correct
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout2_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout3_page.dart';
 import 'package:sizer/sizer.dart';
 import '../Widgets/formulaire_livraison.dart';
 
@@ -65,12 +65,14 @@ class _Pay1PageState extends State<Pay1Page> {
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(-1.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.ease;
-                  final tween = Tween(begin: begin, end: end)
+                  const offsetBegin = Offset(-1.0, 0.0); // Start from right
+                  const offsetEnd = Offset.zero; // End at the current position
+                  const curve = Curves.easeInOutCubic; // Courbe plus fluide
+
+                  var tween = Tween(begin: offsetBegin, end: offsetEnd)
                       .chain(CurveTween(curve: curve));
-                  final offsetAnimation = animation.drive(tween);
+                  var offsetAnimation = animation.drive(tween);
+
                   return SlideTransition(
                       position: offsetAnimation, child: child);
                 },
@@ -108,13 +110,13 @@ class _Pay1PageState extends State<Pay1Page> {
                 color: Colors.white,
                 padding: EdgeInsets.symmetric(vertical: 1.h),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(width: 2.w),
                     Image.asset(
                       'assets/icons/lgo.png',
                       width: 8.w,
                     ),
-                    SizedBox(width: 40.w),
+                    // SizedBox(width: 40.w),
                     Row(
                       children: [
                         Image.asset(
@@ -252,13 +254,19 @@ class _Pay1PageState extends State<Pay1Page> {
                                   ),
                                   transitionsBuilder: (context, animation,
                                       secondaryAnimation, child) {
-                                    const begin = Offset(1.0, 0.0);
-                                    const end = Offset.zero;
-                                    const curve = Curves.ease;
-                                    final tween = Tween(begin: begin, end: end)
+                                    const offsetBegin = Offset(
+                                        1.0, 0.0); // Commence de la gauche
+                                    const offsetEnd = Offset
+                                        .zero; // Finit à la position actuelle
+                                    const curve = Curves
+                                        .easeInOutCubic; // Courbe plus fluide
+
+                                    var tween = Tween(
+                                            begin: offsetBegin, end: offsetEnd)
                                         .chain(CurveTween(curve: curve));
-                                    final offsetAnimation =
+                                    var offsetAnimation =
                                         animation.drive(tween);
+
                                     return SlideTransition(
                                         position: offsetAnimation,
                                         child: child);

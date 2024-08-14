@@ -1,6 +1,6 @@
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
-// import 'package:le_bolide/screens/src/features/Pages/Home/pages/Categories/widgets/search_pneu.dart';
+// import 'package:Bolide/screens/src/features/Pages/Home/pages/Categories/widgets/search_pneu.dart';
 // import 'package:sizer/sizer.dart';
 
 // import '../../../Pay/Widgets/article3.dart';

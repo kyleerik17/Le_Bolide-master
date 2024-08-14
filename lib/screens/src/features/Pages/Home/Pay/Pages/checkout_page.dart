@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout2_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/TotalWidget.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
-import 'package:le_bolide/screens/src/features/Pages/profile/pages/pages.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout2_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Widgets/TotalWidget.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Widgets/add.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
+import 'package:Bolide/screens/src/features/Pages/profile/pages/pages.dart';
 import 'package:sizer/sizer.dart';
 import 'dart:convert';
 
@@ -127,18 +127,15 @@ class _PayPageState extends State<PayPage> {
           // Vous pouvez également passer d'autres paramètres nécessaires
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
+          const offsetBegin = Offset(1.0, 0.0); // Commence de la gauche
+          const offsetEnd = Offset.zero; // Finit à la position actuelle
+          const curve = Curves.easeInOutCubic; // Courbe plus fluide
 
-          final tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          final offsetAnimation = animation.drive(tween);
+          var tween = Tween(begin: offsetBegin, end: offsetEnd)
+              .chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
 
-          return SlideTransition(
-            position: offsetAnimation,
-            child: child,
-          );
+          return SlideTransition(position: offsetAnimation, child: child);
         },
       ),
     ).then((_) {
@@ -177,18 +174,16 @@ class _PayPageState extends State<PayPage> {
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(-1.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.ease;
+                  const offsetBegin = Offset(-1.0, 0.0); // Start from right
+                  const offsetEnd = Offset.zero; // End at the current position
+                  const curve = Curves.easeInOutCubic; // Courbe plus fluide
 
-                  final tween = Tween(begin: begin, end: end)
+                  var tween = Tween(begin: offsetBegin, end: offsetEnd)
                       .chain(CurveTween(curve: curve));
-                  final offsetAnimation = animation.drive(tween);
+                  var offsetAnimation = animation.drive(tween);
 
                   return SlideTransition(
-                    position: offsetAnimation,
-                    child: child,
-                  );
+                      position: offsetAnimation, child: child);
                 },
               ),
             );
@@ -347,34 +342,14 @@ class _PayPageState extends State<PayPage> {
                                             ),
                                           ),
                                           const SizedBox(width: 8),
-                                          TextButton(
-                                            onPressed: () {},
-                                            style: TextButton.styleFrom(
-                                              backgroundColor: Colors.black,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 8),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                            ),
-                                            child: const Text(
-                                              'Appliquer',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
+                                          
                                         ],
                                       ),
                                     ),
                                   ),
                                   SizedBox(height: 2.h),
                                   Container(
-                                    height: 42.w,
+                                    height: 34.w,
                                     width: double.infinity,
                                     color: Colors.white,
                                     child: Column(
@@ -518,22 +493,22 @@ class _PayPageState extends State<PayPage> {
                                       ],
                                     ),
                                   ),
-                                  SizedBox(height: 7.w),
+                                  SizedBox(height: 4.w),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      elevation: 10,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(1.w)),
                                       backgroundColor: _cartItems.isNotEmpty
                                           ? const Color(0xFF1A1A1A)
-                                          : Colors.grey, // Color when disabled
+                                          : Colors
+                                              .grey, // Couleur lorsque désactivé
                                       padding: EdgeInsets.symmetric(
                                           vertical: 1.5.h, horizontal: 10.h),
                                     ),
                                     onPressed: _cartItems.isNotEmpty
                                         ? _navigateToPay1Page
-                                        : null, // Disable the button if cart is empty
+                                        : null, // Désactiver le bouton si le panier est vide
                                     child: Text(
                                       'Passer la commande',
                                       style: TextStyle(
@@ -609,90 +584,103 @@ class _CartItemWidgetState extends State<CartItemWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(2.w),
-      margin: EdgeInsets.symmetric(vertical: 0.5.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Image.network(
-          widget.img,
-          width: 25.w,
-          height: 25.w,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0.5.h),
+      child: Container(
+        height: 34.w,
+        margin: EdgeInsets.symmetric(vertical: 0.5.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
         ),
-        SizedBox(width: 2.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 0.w),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    widget.libelle,
-                    style: TextStyle(
-                      fontFamily: "Poppins",
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => _showConfirmationDialog(context),
-                    child: Image.asset(
-                      'assets/icons/trash.png',
-                      width: 6.w,
-                      height: 6.w,
-                    ),
-                  ),
-                ],
+              Image.network(
+                widget.img,
+                width: 25.w,
+                height: 25.w,
+                fit: BoxFit.cover,
               ),
-              SizedBox(height: 0.5.h),
-              Row(
-                children: [
-                  Image.asset(
-                    'assets/icons/ea.png',
-                    color: const Color(0xFF1A1A1A),
-                    width: 5.w,
-                  ),
-                  SizedBox(width: 1.w),
-                  Text(
-                    'Pneu été',
-                    style: TextStyle(
-                      fontFamily: "Cabin",
-                      color: const Color(0xFF1A1A1A),
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w400,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 1.w),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.libelle,
+                            style: TextStyle(
+                              fontFamily: "Poppins",
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => _showConfirmationDialog(context),
+                          child: Image.asset(
+                            'assets/icons/trash.png',
+                            width: 6.w,
+                            height: 7.w,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 1.h),
-              Row(
-                children: [
-                  Text(
-                    '${widget.prix.toString()} F',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontFamily: 'Cabin',
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF1A1A1A),
+                    SizedBox(height: 0.5.h),
+                    Row(
+                      children: [
+                        Image.asset(
+                          'assets/icons/ea.png',
+                          color: const Color(0xFF1A1A1A),
+                          width: 5.w,
+                        ),
+                        SizedBox(width: 1.w),
+                        Text(
+                          'Pneu été',
+                          style: TextStyle(
+                            fontFamily: "Cabin",
+                            color: const Color(0xFF1A1A1A),
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(width: 8.w),
-                  AddPage(
-                    userId: widget.userId,
-                    partId: widget.partId,
-                    initialQuantity: widget.quantite,
-                    quantity: widget.quantite,
-                  ),
-                ],
+                    SizedBox(height: 0.5.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${widget.prix.toString()} F',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontFamily: 'Cabin',
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFF1A1A1A),
+                          ),
+                        ),
+                        AddPage(
+                          userId: widget.userId,
+                          partId: widget.partId,
+                          initialQuantity: widget.quantite,
+                          quantity: widget.quantite,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-      ]),
+      ),
     );
   }
 

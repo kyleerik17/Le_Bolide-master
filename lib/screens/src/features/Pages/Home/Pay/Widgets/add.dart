@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/models/api_services.dart';
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
+import 'package:Bolide/data/models/api_services.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
 import 'dart:convert';
 import 'package:sizer/sizer.dart';
 

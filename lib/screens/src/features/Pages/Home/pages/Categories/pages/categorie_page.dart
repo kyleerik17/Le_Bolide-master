@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/categorie.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/categorie.dart';
 import 'package:sizer/sizer.dart';
 import '../../home_page.dart';
 
@@ -48,15 +48,30 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   void navigateToCategory(String categoryId, String categoryName) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CategoryDetailPage(
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            CategoryDetailPage(
           categoryId: categoryId,
           partId: widget.partId,
           userId: widget.userId,
           categoryName: categoryName,
         ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
   }
@@ -102,11 +117,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Catégories',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 18,
+            fontSize: 10.w,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -114,7 +129,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
       ),
       body: Container(
         color: const Color(0xFFFCFCFC),
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(4.w),
         child: FutureBuilder<List<Map<String, dynamic>>>(
           future: categories,
           builder: (context, snapshot) {
@@ -163,8 +178,8 @@ class CategoryItem extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 80,
-          height: 80,
+          width: 25.w,
+          height: 25.w,
           decoration: BoxDecoration(
             shape: BoxShape.rectangle,
             color: Colors.black,
@@ -173,13 +188,13 @@ class CategoryItem extends StatelessWidget {
           child: Center(
             child: Image.network(
               icon,
-              width: 10.w,
-              height: 10.w,
+              width: 12.w,
+              height: 12.w,
               fit: BoxFit.contain,
             ),
           ),
         ),
-        SizedBox(height: 1.w),
+        SizedBox(height: 1.h),
         Text(
           label,
           style: TextStyle(

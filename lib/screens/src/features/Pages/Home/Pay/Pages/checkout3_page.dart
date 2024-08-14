@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout1_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/OrderSummary.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/SecurePayment.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout1_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Pages/checkout_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Widgets/OrderSummary.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Widgets/SecurePayment.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
 
 import '../Widgets/TotalWidget.dart';
@@ -53,18 +53,16 @@ class Pay3Page extends StatelessWidget {
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(-1.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.ease;
+                  const offsetBegin = Offset(-1.0, 0.0); // Start from right
+                  const offsetEnd = Offset.zero; // End at the current position
+                  const curve = Curves.easeInOutCubic; // Courbe plus fluide
 
-                  final tween = Tween(begin: begin, end: end)
+                  var tween = Tween(begin: offsetBegin, end: offsetEnd)
                       .chain(CurveTween(curve: curve));
-                  final offsetAnimation = animation.drive(tween);
+                  var offsetAnimation = animation.drive(tween);
 
                   return SlideTransition(
-                    position: offsetAnimation,
-                    child: child,
-                  );
+                      position: offsetAnimation, child: child);
                 },
               ),
             );
@@ -168,20 +166,23 @@ class Pay3Page extends StatelessWidget {
                 color: Colors.white,
                 padding: EdgeInsets.symmetric(vertical: 1.h),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Row(children: [
+                      Image.asset(
+                        'assets/icons/rec.png',
+                        width: 8.w,
+                      ),
+                    ]),
+                    SizedBox(width: 1.w),
                     Row(
                       children: [
-                        Image.asset(
-                          'assets/icons/rec.png',
-                          width: 8.w,
-                        ),
-                        SizedBox(width: 1.w),
                         Text(
                           'Commande XDR 980 992',
                           style: TextStyle(
                               fontSize: 12.sp, fontWeight: FontWeight.w400),
                         ),
-                        SizedBox(width: 35.w),
+                        SizedBox(width: 2.w),
                         Image.asset(
                           'assets/icons/fw.png',
                           color: Colors.black,
@@ -234,7 +235,7 @@ class Pay3Page extends StatelessWidget {
               ),
               SizedBox(height: 1.w),
               Container(
-                height: 43.w,
+                height: 35.w,
                 width: double.infinity,
                 color: Colors.white,
                 child: Column(
@@ -259,7 +260,7 @@ class Pay3Page extends StatelessWidget {
                           child: Text(
                             '${_calculateTotal().toStringAsFixed(0)} F',
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Cabin',
                             ),
@@ -341,7 +342,7 @@ class Pay3Page extends StatelessWidget {
                           child: Text(
                             'TOTAL',
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Poppins',
                             ),
@@ -352,7 +353,7 @@ class Pay3Page extends StatelessWidget {
                           child: Text(
                             '${_calculateTotal().toStringAsFixed(0)} F',
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Cabin',
                             ),
@@ -365,41 +366,54 @@ class Pay3Page extends StatelessWidget {
               ),
               SizedBox(height: 3.h),
               Center(
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => HomePage(
-                                userId: userId,
-                                partId: partId,
-                              )),
-                    );
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A1A1A),
-                    padding:
-                        EdgeInsets.symmetric(vertical: 1.h, horizontal: 20.w),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(1.w),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Terminer",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14.sp,
-                          fontFamily: 'Cabin',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+  child: TextButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (context, animation, secondaryAnimation) => HomePage(
+            userId: userId,
+            partId: partId,
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const offsetBegin = Offset(1.0, 0.0); // Commence de la droite
+            const offsetEnd = Offset.zero; // Finit à la position actuelle
+            const curve = Curves.easeInOutCubic; // Courbe plus fluide
+
+            var tween = Tween(begin: offsetBegin, end: offsetEnd)
+                .chain(CurveTween(curve: curve));
+            var offsetAnimation = animation.drive(tween);
+
+            return SlideTransition(position: offsetAnimation, child: child);
+          },
+        ),
+      );
+    },
+    style: TextButton.styleFrom(
+      backgroundColor: const Color(0xFF1A1A1A),
+      padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 20.w),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(1.w),
+      ),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          "Terminer",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14.sp,
+            fontFamily: 'Cabin',
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    ),
+  ),
+)
+
             ],
           ),
         ),
@@ -454,33 +468,30 @@ class _CartItem2WidgetState extends State<CartItem2Widget> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 30.w,
       margin: EdgeInsets.symmetric(vertical: 0.5.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(
-            'assets/images/pn2.png',
-            width: 25.w,
+          Image.network(
+            widget.img,
             height: 25.w,
+            width: 25.w,
           ),
-          SizedBox(width: 2.w),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
                   children: [
                     Text(
                       widget.libelle,
                       style: TextStyle(
                         fontFamily: "Poppins",
                         fontWeight: FontWeight.w600,
-                        fontSize: 12.sp,
+                        fontSize: 14.sp,
                       ),
                     ),
                   ],
@@ -491,7 +502,6 @@ class _CartItem2WidgetState extends State<CartItem2Widget> {
                     Image.asset(
                       'assets/icons/ea.png',
                       color: const Color(0xFF1A1A1A),
-                      width: 5.w,
                     ),
                     SizedBox(width: 1.w),
                     Text(
@@ -505,7 +515,6 @@ class _CartItem2WidgetState extends State<CartItem2Widget> {
                     ),
                   ],
                 ),
-                SizedBox(height: 1.h),
                 Row(
                   children: [
                     Text(

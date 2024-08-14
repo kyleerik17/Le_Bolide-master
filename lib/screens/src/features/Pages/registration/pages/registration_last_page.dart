@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:le_bolide/data/services/getit.dart';
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration-auth_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/registration/pages/registration_congratulation_page.dart';
+import 'package:Bolide/data/services/getit.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/pages/home_page.dart';
+import 'package:Bolide/screens/src/features/Pages/registration/pages/registration-auth_page.dart';
+import 'package:Bolide/screens/src/features/Pages/registration/pages/registration_congratulation_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
 

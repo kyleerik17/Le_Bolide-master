@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:le_bolide/data/models/api_services.dart';
+import 'package:Bolide/data/models/api_services.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
 

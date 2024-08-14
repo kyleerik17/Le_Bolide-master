@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/appbar.dart';
-import 'package:le_bolide/screens/src/features/Pages/loading%20modal/pages/search_load_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/appbar.dart';
+import 'package:Bolide/screens/src/features/Pages/loading%20modal/pages/search_load_page.dart';
 
 import 'package:sizer/sizer.dart';
 

@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/commande/pages/commande_page.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/pages/commande_page.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Home/Pay/Widgets/buildStep.dart';
@@ -105,6 +105,20 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
                   builder: (context) => CommandePage(
                       partId: widget.partId, userId: widget.userId)),
             );
+            (context, animation, secondaryAnimation, child) {
+              const begin = Offset(-1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var offsetAnimation = animation.drive(tween);
+
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            };
           },
           child: Container(
             padding: EdgeInsets.all(0.w),

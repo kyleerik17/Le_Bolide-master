@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bar_search1.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
-import 'package:le_bolide/screens/src/features/Pages/Search/Pages/find_search_full_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/pages/home_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/bar_search1.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_full_page.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
 import 'package:sizer/sizer.dart';
-import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal2_page.dart';
-import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal_page.dart';
-import 'package:le_bolide/data/models/api_services.dart';
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/modal2_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/modal_page.dart';
+import 'package:Bolide/data/models/api_services.dart';
 
 class FindSearchPage extends StatefulWidget {
   final int partId;
@@ -390,7 +390,7 @@ class ArticleCard extends StatelessWidget {
       },
       child: Container(
         width: 92.w,
-        height: 32.w,
+        height: 33.w,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(0.5.h),
@@ -422,14 +422,6 @@ class ArticleCard extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontFamily: "Cabin",
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
                   Row(
                     children: [
                       Image.asset(
@@ -439,11 +431,10 @@ class ArticleCard extends StatelessWidget {
                       ),
                       SizedBox(width: 1.w),
                       Text(
-                        'Pneu été',
+                        description,
                         style: TextStyle(
+                          fontSize: 12.sp,
                           fontFamily: "Cabin",
-                          color: const Color(0xFF1A1A1A),
-                          fontSize: 13.sp,
                           fontWeight: FontWeight.w400,
                         ),
                       ),

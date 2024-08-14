@@ -1,6 +1,6 @@
 {
-    "name": "le_bolide",
-    "short_name": "le_bolide",
+    "name": "Bolide",
+    "short_name": "Bolide",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#B7FF00",

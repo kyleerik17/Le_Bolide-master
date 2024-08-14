@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/models/api_services.dart';
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
+import 'package:Bolide/data/models/api_services.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/detail_produit.dart';
 import 'package:sizer/sizer.dart';
 
 // ignore: must_be_immutable
@@ -40,7 +40,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
     final url = '${baseUrl}api/cart/add/';
 
     final data = {
-      'user_id': user.id.toString(), 
+      'user_id': user.id.toString(),
       'part_id': widget.partId.toString(),
       'quantity': _quantity.toString(),
     };
@@ -99,7 +99,8 @@ class _QuantityWidgetState extends State<QuantityWidget> {
       if (response.statusCode == 200) {
         print('Item removed from cart successfully');
       } else {
-        print('Failed to remove item from cart, status code: ${response.statusCode}');
+        print(
+            'Failed to remove item from cart, status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error sending request: $e');
@@ -114,12 +115,12 @@ class _QuantityWidgetState extends State<QuantityWidget> {
       });
       await _sendQuantityUpdate();
       print(
-        'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
+          'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
       if (_quantity == 1) {
         await _removeFromCart();
         setState(() {
           _showQuantityControls =
-            false; // Hide controls and show "Ajouter" button
+              false; // Hide controls and show "Ajouter" button
         });
       }
     }
@@ -149,7 +150,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
         pageBuilder: (context, animation, secondaryAnimation) =>
             Details1ProduitsPage(
           partId: widget.partId,
-          userId: widget.userId, 
+          userId: widget.userId,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);

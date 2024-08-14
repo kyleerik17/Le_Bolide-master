@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
 
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/add2.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Widgets/add2.dart';
 import 'package:sizer/sizer.dart';
 
 Widget buildOrderSummaryWidget(List<Map<String, dynamic>> cartItems) {

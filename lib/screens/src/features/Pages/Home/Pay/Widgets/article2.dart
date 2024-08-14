@@ -2,13 +2,13 @@
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
 // import 'package:http/http.dart' as http;
-// import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
-// import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bar_search1.dart';
-// import 'package:le_bolide/screens/src/features/Pages/Search/Pages/find_search_full_page.dart';
+// import 'package:Bolide/screens/src/features/Pages/Home/pages/home_page.dart';
+// import 'package:Bolide/screens/src/features/Pages/Home/widgets/bar_search1.dart';
+// import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_full_page.dart';
 // import 'package:sizer/sizer.dart';
-// import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal2_page.dart';
-// import 'package:le_bolide/screens/src/features/Pages/Search/Pages/modal_page.dart';
-// import 'package:le_bolide/data/models/piece_api.dart';
+// import 'package:Bolide/screens/src/features/Pages/Search/Pages/modal2_page.dart';
+// import 'package:Bolide/screens/src/features/Pages/Search/Pages/modal_page.dart';
+// import 'package:Bolide/data/models/piece_api.dart';
 
 // class FindSearchPage extends StatefulWidget {
 //   const FindSearchPage({Key? key}) : super(key: key);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/loading%20modal/widgets/dropdown_items.dart';
+import 'package:Bolide/screens/src/features/Pages/loading%20modal/widgets/dropdown_items.dart';
 import 'package:sizer/sizer.dart';
 
 import 'model_dropdown.dart';

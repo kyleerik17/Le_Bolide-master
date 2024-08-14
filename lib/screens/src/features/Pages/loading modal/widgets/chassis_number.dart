@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/loading%20modal/pages/resultat_search_page.dart';
+import 'package:Bolide/screens/src/features/Pages/loading%20modal/pages/resultat_search_page.dart';
 import 'package:sizer/sizer.dart';
 import 'loading_dialog.dart';
 
-
 class ChassisNumber extends StatelessWidget {
-  const ChassisNumber({Key? key}) : super(key: key);
+  final int userId;
+  final int partId;
+  const ChassisNumber({Key? key, required this.userId, required this.partId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,10 @@ class ChassisNumber extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const SearchResultPage(),
+                  builder: (context) => SearchResultPage(
+                    partId: partId,
+                    userId: userId,
+                  ),
                 ),
               );
             });
@@ -77,28 +81,29 @@ class ChassisNumber extends StatelessWidget {
     );
   }
 }
+
 void _showLoadingDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          insetPadding: EdgeInsets.all(0),
-          child: Container(
-            alignment: Alignment.center,
-                 color: Colors.transparent,
-            child: SizedBox(
-              width: 20.w,
-              height: 20.w,
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                strokeWidth: 6,
-              ),
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        insetPadding: EdgeInsets.all(0),
+        child: Container(
+          alignment: Alignment.center,
+          color: Colors.transparent,
+          child: SizedBox(
+            width: 20.w,
+            height: 20.w,
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+              strokeWidth: 6,
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}

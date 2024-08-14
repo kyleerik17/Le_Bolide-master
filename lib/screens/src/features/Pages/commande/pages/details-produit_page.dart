@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
-import 'package:le_bolide/screens/src/features/Pages/commande/widgets/slider1.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/widgets/slider1.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';

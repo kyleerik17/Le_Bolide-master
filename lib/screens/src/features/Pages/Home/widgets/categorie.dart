@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/models/api_services.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/Pay/Widgets/article3.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/pages/Categories/widgets/search_pneu.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/pages/home_page.dart';
+import 'package:Bolide/data/models/api_services.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/Pay/Widgets/article3.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/pages/Categories/widgets/search_pneu.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/pages/home_page.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../../../data/services/user.dart';
@@ -89,7 +89,8 @@ class _CategorieState extends State<Categorie> {
                     icon: category['icon'],
                     label: category['label'],
                     categoryName: category['label'],
-                    onTap: () => navigateToCategory(category['id'], category['label']),
+                    onTap: () =>
+                        navigateToCategory(category['id'], category['label']),
                   ),
                 );
               }).toList(),
@@ -130,7 +131,7 @@ class _CategorieState extends State<Categorie> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 10.sp,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w600,
               fontFamily: 'Cabin',
             ),
@@ -202,25 +203,26 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
           appBar: AppBar(
             leading: GestureDetector(
               onTap: () {
-                Navigator.pop(
+                Navigator.push(
                   context,
                   PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        HomePage(partId: widget.partId, userId: widget.userId),
+                    transitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (_, __, ___) => HomePage(
+                      partId: widget.partId,
+                      userId: widget.userId,
+                    ),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(-1.0, 0.0);
                       const end = Offset.zero;
-                      const curve = Curves.ease;
+                      const curve = Curves.easeInOut;
 
-                      final tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-                      final offsetAnimation = animation.drive(tween);
+                      var tween = Tween(begin: begin, end: end);
+                      var offsetAnimation = animation
+                          .drive(tween.chain(CurveTween(curve: curve)));
 
                       return SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      );
+                          position: offsetAnimation, child: child);
                     },
                   ),
                 );
@@ -360,5 +362,3 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     );
   }
 }
-
-

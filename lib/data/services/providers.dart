@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/data/services/user.dart';
+import 'package:Bolide/data/services/user.dart';
 import 'package:provider/provider.dart';
-
 
 class UserProfilePage extends StatelessWidget {
   @override
@@ -30,4 +29,3 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 }
-

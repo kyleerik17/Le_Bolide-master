@@ -1,13 +1,11 @@
-
 import 'package:flutter/material.dart';
-import 'package:le_bolide/gen/assets.gen.dart';
-
+import 'package:Bolide/gen/assets.gen.dart';
 
 class AppLogo extends StatelessWidget {
   final Color? color;
 
-  const AppLogo({Key? key, 
-   
+  const AppLogo({
+    Key? key,
     this.color,
   }) : super(key: key);
 

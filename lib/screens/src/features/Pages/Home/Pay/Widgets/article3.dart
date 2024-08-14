@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:le_bolide/data/models/api_services.dart';
-import 'package:le_bolide/data/services/user.dart';
-import 'package:le_bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
-import 'package:le_bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
+import 'package:Bolide/data/models/api_services.dart';
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
 
 import 'dart:convert';
 import 'package:sizer/sizer.dart';
@@ -124,8 +124,15 @@ class _Article3PageState extends State<Article3Page> {
         Navigator.of(context).push(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                DetailsProduitsPage(partId: partId, userId: user.id, description: description, price: price, libelle: libelle,),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                DetailsProduitsPage(
+              partId: partId,
+              userId: user.id,
+              description: description,
+              price: price,
+              libelle: libelle,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               const begin = Offset(1.0, 0.0);
               const end = Offset.zero;
               const curve = Curves.ease;
@@ -148,8 +155,9 @@ class _Article3PageState extends State<Article3Page> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(0.5.h),
         ),
-        padding: EdgeInsets.symmetric(vertical: 2.w, horizontal: 2.w),
+        padding: EdgeInsets.symmetric(vertical: 1.w, horizontal: 2.w),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
@@ -163,7 +171,6 @@ class _Article3PageState extends State<Article3Page> {
                 borderRadius: BorderRadius.circular(0.5.h),
               ),
             ),
-            SizedBox(width: 2.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,8 +178,9 @@ class _Article3PageState extends State<Article3Page> {
                   Text(
                     libelle,
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 5.w,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Cabin',
                     ),
                   ),
                   SizedBox(height: 1.h),
@@ -195,14 +203,14 @@ class _Article3PageState extends State<Article3Page> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 1.h),
+                  SizedBox(height: 0.5.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         price,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 5.w,
                           fontFamily: "Cabin",
                           fontWeight: FontWeight.w500,
                         ),

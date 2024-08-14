@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
-import 'package:le_bolide/screens/src/features/Pages/Favoris/Widgets/quantity_widget_fav.dart';
+import 'package:Bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
+import 'package:Bolide/screens/src/features/Pages/Favoris/Widgets/quantity_widget_fav.dart';
 import 'package:sizer/sizer.dart';
 
 class Article4Page extends StatelessWidget {
@@ -174,7 +174,7 @@ class _ArticleContentState extends State<ArticleContent> {
                   ),
                 ),
                 QuantityWidgetFav(
-                  userId:widget.userId,
+                  userId: widget.userId,
                   partId: widget.partId,
                 ),
               ],

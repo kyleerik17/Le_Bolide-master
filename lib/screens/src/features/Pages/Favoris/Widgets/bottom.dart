@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:le_bolide/screens/src/features/Pages/Assistance/pages/assistance_page.dart';
+import 'package:Bolide/screens/src/features/Pages/Assistance/pages/assistance_page.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Home/pages/home_page.dart';
@@ -61,8 +61,8 @@ class _FavorisBottomNavBarState extends State<FavorisBottomNavBar> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            HomePage(partId: widget.partId, userId:widget.userId)),
+                        builder: (context) => HomePage(
+                            partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(
@@ -139,9 +139,7 @@ class _FavorisBottomNavBarState extends State<FavorisBottomNavBar> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AssistancePage(
-                              partId: widget.partId,
-                              userId: widget.userId
-                            )),
+                            partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(
