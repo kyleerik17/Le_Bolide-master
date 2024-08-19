@@ -106,6 +106,43 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Transition pour glisser depuis le bas
+  PageRouteBuilder _createSlide2Transition(Widget page) {
+    return PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 500),
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOut;
+
+        var tween = Tween(begin: begin, end: end);
+        var offsetAnimation =
+            animation.drive(tween.chain(CurveTween(curve: curve)));
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
+    );
+  }
+
+  PageRouteBuilder _createSlide3Transition(Widget page) {
+    return PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 500),
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOut;
+
+        var tween = Tween(begin: begin, end: end);
+        var offsetAnimation =
+            animation.drive(tween.chain(CurveTween(curve: curve)));
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
+    );
+  }
+
   // Transition pour glisser depuis la droite
   PageRouteBuilder _createSlide1Transition(Widget page) {
     return PageRouteBuilder(
@@ -188,9 +225,28 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(height: 1.h),
                   Categorie(partId: widget.partId, userId: widget.userId),
                   SizedBox(height: 2.h),
+                  Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                    Text('Selectionner pour vous',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13.sp,
+                          fontFamily: "Poppins",
+                        ),
+                        textAlign: TextAlign.center),
+                  ]),
                   ContaiRizon(
                     userId: user.id,
                     partId: widget.partId,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        _createSlide3Transition(
+                          FindSearchPage(
+                              partId: widget.partId, userId: widget.userId),
+                        ),
+                      );
+                    },
                   ),
                   _buildSectionHeader(
                     title: "Les marques populaires",
@@ -240,14 +296,14 @@ class _HomePageState extends State<HomePage> {
           filled: true,
           fillColor: Colors.white,
           hintText: 'Rechercher...',
-          hintStyle: TextStyle(
+          hintStyle: const TextStyle(
             color: Color(0xFF737373),
             fontFamily: 'Cabin',
             fontWeight: FontWeight.w400,
             fontSize: 14,
           ),
           prefixIcon: Padding(
-            padding: EdgeInsets.only(left: 0),
+            padding: const EdgeInsets.only(left: 0),
             child: SvgPicture.asset(
               'assets/icons/search.svg',
               width: 16,
@@ -255,7 +311,7 @@ class _HomePageState extends State<HomePage> {
               color: Colors.black,
             ),
           ),
-          contentPadding: EdgeInsets.symmetric(vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(vertical: 8),
         ),
         style: const TextStyle(
           color: Color(0xFF737373),

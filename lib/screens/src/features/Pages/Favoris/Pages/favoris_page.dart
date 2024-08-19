@@ -221,11 +221,11 @@ class _FavorisPageState extends State<FavorisPage> {
           ],
         ),
       ),
-      // bottomNavigationBar: FavorisBottomNavBar(
-      //   partId: widget.partId,
-      //   userId: user.id,
-      //   onTap: (int) {},
-      // ),
+      bottomNavigationBar: BottomNavBar(
+        partId: widget.partId,
+        userId: user.id,
+        onTap: (int) {},
+      ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
         child: Container(

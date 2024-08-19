@@ -176,10 +176,11 @@ class AssistancePage extends StatelessWidget {
           )
         ],
       ),
-      // bottomNavigationBar: AssisBottom(
-      //   partId: partId,
-      //   userId: userId, onTap: (int ) {  },
-      // ),
+      bottomNavigationBar: BottomNavBar(
+        partId: partId,
+        userId: userId,
+        onTap: (int) {},
+      ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
         child: Container(

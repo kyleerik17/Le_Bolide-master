@@ -5,18 +5,17 @@ import 'package:Bolide/data/models/api_services.dart';
 import 'package:Bolide/data/services/user.dart';
 import 'package:Bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
 import 'package:Bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
-
 import 'dart:convert';
 import 'package:sizer/sizer.dart';
 
 class Article3Page extends StatefulWidget {
   final int categoryId;
-
   final int userId;
+
   const Article3Page({
     Key? key,
     required this.categoryId,
-    required this.userId, 
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -49,7 +48,7 @@ class _Article3PageState extends State<Article3Page> {
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         setState(() {
-          _pieces = jsonDecode(response.body);
+          _pieces = jsonDecode(response.body) as List<dynamic>;
           _isLoading = false;
 
           // Afficher l'URL du logo pour chaque pièce
@@ -79,19 +78,23 @@ class _Article3PageState extends State<Article3Page> {
       return SingleChildScrollView(
         child: Column(
           children: _pieces.map((piece) {
+            // Vérifie la présence des clés avant de les utiliser
+            final imageUrl = piece['img'] ?? 'assets/images/pn2.png';
+            final iconUrl =
+                piece['sous_category']?['img'] ?? 'assets/icons/sun.png';
+            final sousCategoryName = piece['sous_category']?['name'] ?? '';
+            final sousCategoryImg = piece['sous_category']?['img'] ?? '';
+
             return _buildArticle(
-              imageUrl: '${piece['img']}',
+              imageUrl: imageUrl,
               libelle: piece['libelle'] ?? '',
-              iconUrl: piece['sous_category']['img'] ??
-                  '', // Utiliser l'image de sous-category
+              iconUrl: iconUrl,
               description: piece['description'] ?? '',
               price: _formatPrice(piece['price']),
               categoryName: piece['category_name'] ?? '',
               categoryImg: piece['category_img'] ?? '',
-              sousCategoryName: piece['sous_category']['name'] ??
-                  '', // Récupérer le nom de sous-category
-              sousCategoryImg: piece['sous_category']['img'] ??
-                  '', // Récupérer l'image de sous-category
+              sousCategoryName: sousCategoryName,
+              sousCategoryImg: sousCategoryImg,
               partId: piece['id'] != null
                   ? int.tryParse(piece['id'].toString()) ?? 0
                   : 0,
@@ -131,7 +134,7 @@ class _Article3PageState extends State<Article3Page> {
     required String sousCategoryName,
     required String sousCategoryImg,
     required int partId,
-    required categoryImg,
+    required String categoryImg,
   }) {
     // Afficher l'URL du logo à chaque fois qu'un article est construit
     print('Building article with icon URL: $iconUrl');
@@ -151,10 +154,10 @@ class _Article3PageState extends State<Article3Page> {
               price: price,
               imageUrl: imageUrl,
               libelle: libelle,
-              sousCategoryName:
-                  sousCategoryName, // Passer le nom de sous-category
-              sousCategoryImg: sousCategoryImg, categoryImg: categoryImg,
-               title: '',  // Passer l'image de sous-category
+              sousCategoryName: sousCategoryName,
+              sousCategoryImg: sousCategoryImg,
+              categoryImg: categoryImg,
+              title: '', // Passer l'image de sous-category
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -174,6 +177,7 @@ class _Article3PageState extends State<Article3Page> {
         );
       },
       child: Container(
+        alignment: Alignment.center,
         width: 90.w,
         margin: EdgeInsets.only(bottom: 2.h),
         decoration: BoxDecoration(
@@ -185,15 +189,23 @@ class _Article3PageState extends State<Article3Page> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 25.w,
-              height: 28.w,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(imageUrl),
-                  fit: BoxFit.cover,
+            Center(
+              child: Container(
+                width: 25.w,
+                height: 28.w,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(0.5.h),
                 ),
-                borderRadius: BorderRadius.circular(0.5.h),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/icons/error.png', // Image locale par défaut
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
               ),
             ),
             Expanded(
@@ -213,12 +225,17 @@ class _Article3PageState extends State<Article3Page> {
                     children: [
                       // Vérifier si l'URL commence par 'http' pour utiliser NetworkImage
                       Image.network(
-                        iconUrl, // Utilisation de l'image de sous-category
+                        sousCategoryImg,
                         width: 5.w,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(
+                          'assets/icons/sun.png', // Image locale par défaut
+                          width: 5.w,
+                        ),
                       ),
                       SizedBox(width: 1.w),
                       Text(
-                        sousCategoryName, // Utilisation du nom de sous-category
+                        'Pneu été', // Utilisation du nom de sous-category
                         style: TextStyle(
                           fontFamily: "Cabin",
                           color: Color(0xFF1A1A1A),

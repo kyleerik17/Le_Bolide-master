@@ -11,12 +11,13 @@ class DetailsProduitsPage extends StatefulWidget {
   final int partId;
   final String imageUrl;
   final String sousCategoryImg;
+
   final String categoryName;
   final String title;
   final String description;
   final String price;
   final int userId;
-
+  final String sousCategoryName;
   const DetailsProduitsPage({
     Key? key,
     required this.imageUrl,
@@ -26,11 +27,11 @@ class DetailsProduitsPage extends StatefulWidget {
     required this.userId,
     required String iconUrl,
     required this.title,
-    required String sousCategoryName,
     required String categoryImg,
     required String libelle,
     required this.sousCategoryImg,
     required this.categoryName,
+    required this.sousCategoryName,
   }) : super(key: key);
 
   @override
@@ -56,8 +57,9 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
       if (response.statusCode == 200) {
         setState(() {
           // Changez l'icône en fonction de l'état actuel des favoris
-          iconPath =
-              isFavorite ? 'assets/icons/oc1.png' : 'assets/icons/hrt2.png';
+          iconPath = isFavorite
+              ? 'assets/icons/heart.svg'
+              : 'assets/icons/hearted.png';
         });
 
         // Affichez le Snackbar pour informer l'utilisateur
@@ -146,22 +148,22 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
                             widget.title,
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 12.sp,
+                              fontSize: 13.sp,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w500,
                             ),
                             textAlign: TextAlign.left,
                           ),
-                          SizedBox(height: 0.5.h),
+                          SizedBox(height: 0.3.h),
                           Row(
                             children: [
                               Image.network(widget.sousCategoryImg),
                               SizedBox(width: 1.w),
                               Text(
-                                widget.categoryName,
+                                widget.sousCategoryName,
                                 style: TextStyle(
                                   fontFamily: "Cabin",
-                                  fontSize: 11.sp,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
@@ -311,36 +313,45 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
       ),
     );
   }
+Widget _buildCharacteristicRow(String title, String description,
+    {Color? backgroundColor}) {
+  return Container(
+    color: backgroundColor ?? Colors.transparent,
+    width: double.infinity,
+    height: 4.h,
+    child: Row(
+      children: [
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              '  $title',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Cabin',
+                color: Colors.black,
+                fontSize: 12.sp,
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              '$description  ',
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Cabin',
+                color: const Color(0xFF7C7C7C),
+                fontSize: 12.sp,
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
-  Widget _buildCharacteristicRow(String title, String description,
-      {Color? backgroundColor}) {
-    return Container(
-      color: backgroundColor ?? Colors.transparent,
-      width: double.infinity,
-      height: 4.h,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '  $title',
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Cabin',
-              color: Colors.black,
-              fontSize: 12.sp,
-            ),
-          ),
-          Text(
-            '$description  ',
-            style: TextStyle(
-              fontWeight: FontWeight.w400,
-              fontFamily: 'Cabin',
-              color: const Color(0xFF7C7C7C),
-              fontSize: 12.sp,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

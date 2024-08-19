@@ -12,7 +12,12 @@ import 'dart:convert';
 class ContaiRizon extends StatefulWidget {
   final int userId;
   final int partId;
-  const ContaiRizon({Key? key, required this.userId, required this.partId})
+  final VoidCallback onTap;
+  const ContaiRizon(
+      {Key? key,
+      required this.userId,
+      required this.partId,
+      required this.onTap})
       : super(key: key);
 
   @override
@@ -85,7 +90,7 @@ class _ContaiRizonState extends State<ContaiRizon> {
                           child: Image.network(
                             piece['img'],
                             width: 25.w,
-                            height: 25.w,
+                            height: 24.w,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -95,8 +100,8 @@ class _ContaiRizonState extends State<ContaiRizon> {
                         padding: EdgeInsets.symmetric(horizontal: 2.w),
                         child: Text(
                           piece['libelle'],
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: 14.sp,
                             fontFamily: 'Cabin',
                             fontWeight: FontWeight.w500,
                           ),

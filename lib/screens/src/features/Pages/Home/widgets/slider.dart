@@ -30,7 +30,7 @@ class _SliderState extends State<SliderPage> {
       List<dynamic> data = json.decode(response.body);
       setState(() {
         _images = data
-            .where((item) => item['status'] == '3') // Filtrer par le statut '1'
+            .where((item) => item['status'] == '1') // Filtrer par le statut '1'
             .map<String>((item) => item['img'] as String)
             .toList();
       });

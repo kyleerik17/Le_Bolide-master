@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:Bolide/screens/src/features/Pages/splash_screen/pages/splash_screen_page.dart';
 import 'package:sizer/sizer.dart';

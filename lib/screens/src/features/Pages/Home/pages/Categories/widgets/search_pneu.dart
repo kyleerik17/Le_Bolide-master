@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:sizer/sizer.dart';
 
@@ -7,30 +8,44 @@ class SearchPneu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      onTap: () {},
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 4.w),
-        border: OutlineInputBorder(
-          borderSide: const BorderSide(color: Color(0xFFCED0D4)),
-          borderRadius: BorderRadius.circular(1.h),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        hintText: 'Rechercher...',
-        hintStyle: TextStyle(
-          color: const Color(0xFF737373),
-          fontFamily: 'Poppins',
-          fontSize: 10.sp,
-        ),
-        prefixIcon: ImageIcon(
-          const AssetImage('assets/icons/search.png'),
-          size: 5.w,
-          color: Colors.black,
+    return Container(
+      width: 92.w,
+      height: 40,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFCED0D4)),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(4),
         ),
       ),
-      style: const TextStyle(
-        color: Colors.black,
+      child: TextField(
+        onTap: () {},
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          filled: true,
+          fillColor: Colors.white,
+          hintText: 'Rechercher...',
+          hintStyle: TextStyle(
+            color: Color(0xFF737373),
+            fontFamily: 'Cabin',
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+          ),
+          prefixIcon: Padding(
+            padding: EdgeInsets.only(left: 0),
+            child: SvgPicture.asset(
+              'assets/icons/search.svg',
+              width: 16,
+              height: 16,
+              color: Colors.black,
+            ),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 8),
+        ),
+        style: const TextStyle(
+          color: Color(0xFF737373),
+        ),
       ),
     );
   }

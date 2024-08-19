@@ -367,9 +367,10 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                                   style: TextStyle(color: Colors.black),
                                 ),
                                 SizedBox(width: 1.w),
-                                Image.asset(
-                                  'assets/icons/fltr.png',
-                                  color: Colors.black,
+                                SvgPicture.asset(
+                                  'assets/icons/filter.svg',
+                                  width: 4.w,
+                                  height: 4.w,
                                 ),
                               ],
                             ),
@@ -397,8 +398,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                                 SizedBox(width: 1.w),
                                 SvgPicture.asset(
                                   'assets/icons/filter.svg',
-                                  width: 7.w,
-                                  height: 7.w,
+                                  width: 4.w,
+                                  height: 4.w,
                                 ),
                               ],
                             ),

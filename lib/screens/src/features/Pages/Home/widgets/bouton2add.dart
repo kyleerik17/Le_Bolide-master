@@ -9,12 +9,8 @@ import 'package:sizer/sizer.dart';
 class QuantityWidget1 extends StatefulWidget {
   final int partId;
   final int userId;
-
-  const QuantityWidget1({
-    Key? key,
-    required this.partId,
-    required this.userId,
-  }) : super(key: key);
+  const QuantityWidget1({Key? key, required this.partId, required this.userId})
+      : super(key: key);
 
   @override
   _QuantityWidget1State createState() => _QuantityWidget1State();
@@ -22,14 +18,13 @@ class QuantityWidget1 extends StatefulWidget {
 
 class _QuantityWidget1State extends State<QuantityWidget1> {
   bool _showQuantityControls = false;
-  int _quantity = 1; // Initialize with 1 to start with adding a product
+  int _quantity = 0;
   late User user;
 
   @override
   void initState() {
     super.initState();
     try {
-      // Initialize the User object using GetIt
       user = GetIt.instance.get<User>();
       print('User name: ${user.name}');
       print('User ID: ${user.id}');
@@ -43,7 +38,7 @@ class _QuantityWidget1State extends State<QuantityWidget1> {
     final url = '${baseUrl}api/cart/add/';
 
     final data = {
-      'user_id': user.id.toString(), // Using the user ID from the User object
+      'user_id': user.id.toString(),
       'part_id': widget.partId.toString(),
       'quantity': _quantity.toString(),
     };
@@ -79,7 +74,7 @@ class _QuantityWidget1State extends State<QuantityWidget1> {
   Future<void> _removeFromCart() async {
     final url = '${baseUrl}api/cart/remove/';
     final data = {
-      'user_id': user.id.toString(), // Using the user ID from the User object
+      'user_id': user.id.toString(),
       'part_id': widget.partId.toString(),
     };
 
@@ -119,7 +114,7 @@ class _QuantityWidget1State extends State<QuantityWidget1> {
       await _sendQuantityUpdate();
       print(
           'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
-      if (_quantity == 0) {
+      if (_quantity == 1) {
         await _removeFromCart();
         setState(() {
           _showQuantityControls =
@@ -156,7 +151,7 @@ class _QuantityWidget1State extends State<QuantityWidget1> {
             color: Colors.black.withOpacity(0.7),
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 16.0,
               ),
@@ -167,7 +162,7 @@ class _QuantityWidget1State extends State<QuantityWidget1> {
     );
 
     overlay.insert(overlayEntry);
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 2), () {
       overlayEntry.remove();
     });
   }
@@ -198,7 +193,7 @@ class _QuantityWidget1State extends State<QuantityWidget1> {
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),
                     padding:
-                        EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 14.w),
+                        EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 15.w),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(1.5.w),
                     ),
@@ -230,7 +225,7 @@ class _QuantityWidget1State extends State<QuantityWidget1> {
                       },
                       icon: const Icon(Icons.remove),
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      constraints: BoxConstraints(),
                     ),
                     VerticalDivider(
                       color: Colors.grey,
@@ -258,7 +253,7 @@ class _QuantityWidget1State extends State<QuantityWidget1> {
                       },
                       icon: const Icon(Icons.add),
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      constraints: BoxConstraints(),
                     ),
                   ],
                 ),

@@ -357,11 +357,11 @@ class _CommandePageState extends State<CommandePage> {
           ],
         ),
       ),
-      // bottomNavigationBar: ReservBottomNavBar(
-      //   partId: widget.partId,
-      //   userId: widget.userId,
-      //   onTap: (int) {},
-      // ),
+      bottomNavigationBar: ReservBottomNavBar(
+        partId: widget.partId,
+        userId: widget.userId,
+        onTap: (int) {},
+      ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
         child: Container(

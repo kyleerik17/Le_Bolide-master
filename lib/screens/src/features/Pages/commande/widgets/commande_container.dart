@@ -40,7 +40,7 @@ class _CommandeContainerState extends State<CommandeContainer> {
       case 'e':
         return const Color(0xFFFF9D0B); // Orange
       case 'livrée':
-      case 'l':
+      case 't':
         return const Color(0xFF09C961); // Green
       case 'annulée':
       case 'a':
@@ -56,7 +56,7 @@ class _CommandeContainerState extends State<CommandeContainer> {
       case 'e':
         return 'En cours';
       case 'livrée':
-      case 'l':
+      case 't':
         return 'Livrée';
       case 'annulée':
       case 'a':
@@ -122,7 +122,7 @@ class _CommandeContainerState extends State<CommandeContainer> {
           // Container contenant les détails de la commande
           Container(
             width: 90.w,
-            height: 22.w,
+            height: 25.w,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(0.5.h),
@@ -147,8 +147,8 @@ class _CommandeContainerState extends State<CommandeContainer> {
                             Expanded(
                               child: Text(
                                 widget.description,
-                                style: const TextStyle(
-                                  fontSize: 16,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
                                   color: Color(0xFF1A1A1A),
                                   fontFamily: "Cabin",
                                   fontWeight: FontWeight.w400,
@@ -157,7 +157,7 @@ class _CommandeContainerState extends State<CommandeContainer> {
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                  horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 color: statusColor,
                                 borderRadius: const BorderRadius.only(
@@ -183,8 +183,8 @@ class _CommandeContainerState extends State<CommandeContainer> {
                         SizedBox(height: 1.5.h),
                         Text(
                           widget.price,
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: 14.sp,
                             color: Color(0xFF1A1A1A),
                             fontFamily: "Poppins",
                             fontWeight: FontWeight.w600,

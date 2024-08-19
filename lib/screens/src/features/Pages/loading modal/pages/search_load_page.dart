@@ -32,31 +32,29 @@ class _SearchLoadPageState extends State<SearchLoadPage> {
     super.initState();
     loadManufacturers();
   }
-
-  Future<void> loadManufacturers() async {
-    try {
-      final response = await http.get(Uri.parse(
-          'https://bolide.armasoft.ci/bolide_services/index.php/api/maker/marque-pieces/'));
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        if (data.containsKey('data') && data['data'] is List) {
-          setState(() {
-            manufacturers = (data['data'] as List)
-                .map((item) => item['nom_marque'].toString())
-                .where((name) => name.isNotEmpty)
-                .toList();
-          });
-        } else {
-          print('Unexpected data format: ${response.body}');
-        }
+Future<void> loadManufacturers() async {
+  try {
+    final response = await http.get(Uri.parse(
+        'https://bolide.armasoft.ci/bolide_services/index.php/api/maker/marque-pieces/'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      if (data.containsKey('data') && data['data'] is List) {
+        setState(() {
+          manufacturers = (data['data'] as List)
+              .map((item) => item['name'].toString())
+              .where((name) => name.isNotEmpty)
+              .toList();
+        });
       } else {
-        print('Failed to load manufacturers: ${response.statusCode}');
+        print('Unexpected data format: ${response.body}');
       }
-    } catch (e) {
-      print('Error loading manufacturers: $e');
+    } else {
+      print('Failed to load manufacturers: ${response.statusCode}');
     }
+  } catch (e) {
+    print('Error loading manufacturers: $e');
   }
-
+}
   @override
   Widget build(BuildContext context) {
     bool isDropdownSelected = selectedManufacturer != null ||

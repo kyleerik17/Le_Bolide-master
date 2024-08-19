@@ -198,15 +198,15 @@ class CategoryItem extends StatelessWidget {
               width: 12.w,
               height: 12.w,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                // Afficher une image par défaut en cas d'erreur de chargement
-                return Image.network(
-                  'https://default.image.url/default.png',
-                  width: 12.w,
-                  height: 12.w,
-                  fit: BoxFit.contain,
-                );
-              },
+              // errorBuilder: (context, error, stackTrace) {
+              //   // Afficher une image par défaut en cas d'erreur de chargement
+              //   return Image.network(
+              //     'https://default.image.url/default.png',
+              //     width: 12.w,
+              //     height: 12.w,
+              //     fit: BoxFit.contain,
+              //   );
+              // },
             ),
           ),
         ),
