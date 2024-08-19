@@ -1,25 +1,36 @@
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:Bolide/data/services/user.dart';
-import 'package:Bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
-import 'package:Bolide/screens/src/features/Pages/commande/widgets/slider1.dart';
-import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:sizer/sizer.dart';
+import '../../Home/widgets/bouton_ajouter.dart';
+import '../widgets/widgets.dart';
 
 class DetailsProduitsPage extends StatefulWidget {
-  final int userId;
-  final String price;
   final int partId;
-  final String libelle;
+  final String imageUrl;
+  final String sousCategoryImg;
+  final String categoryName;
+  final String title;
+  final String description;
+  final String price;
+  final int userId;
 
   const DetailsProduitsPage({
     Key? key,
-    required this.userId,
-    required this.partId,
-    required String description,
+    required this.imageUrl,
+    required this.description,
     required this.price,
-    required this.libelle,
+    required this.partId,
+    required this.userId,
+    required String iconUrl,
+    required this.title,
+    required String sousCategoryName,
+    required String categoryImg,
+    required String libelle,
+    required this.sousCategoryImg,
+    required this.categoryName,
   }) : super(key: key);
 
   @override
@@ -27,105 +38,72 @@ class DetailsProduitsPage extends StatefulWidget {
 }
 
 class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
-  bool _isFavorited = false;
+  String iconPath = 'assets/icons/hrt2.png';
   late User user;
-  bool _isProcessingFavorite = false;
 
+  void toggleIcon() async {
+    // Vérifiez si l'article est déjà dans les favoris
+    final isFavorite = iconPath == 'assets/icons/hrt2.png';
+    final url = isFavorite
+        ? 'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/add/${widget.userId}/${widget.partId}'
+        : 'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/remove/${widget.userId}/${widget.partId}';
+
+    try {
+      final response = isFavorite
+          ? await http.post(Uri.parse(url))
+          : await http.delete(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        setState(() {
+          // Changez l'icône en fonction de l'état actuel des favoris
+          iconPath =
+              isFavorite ? 'assets/icons/oc1.png' : 'assets/icons/hrt2.png';
+        });
+
+        // Affichez le Snackbar pour informer l'utilisateur
+        final message = isFavorite
+            ? "L'article a bien été ajouté aux favoris"
+            : "L'article a bien été retiré des favoris";
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      } else {
+        print(
+            'Échec de la mise à jour des favoris, code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erreur lors de la mise à jour des favoris: $e');
+    }
+  }
+
+  @override
   @override
   void initState() {
     super.initState();
     try {
       user = GetIt.instance.get<User>();
-      _fetchInitialFavoriteStatus();
+      print('User ID: ${user.id}');
     } catch (e) {
-      print(e);
+      print('Error getting user: $e');
     }
   }
 
-  Future<void> _toggleFavoriteStatus() async {
-    if (_isProcessingFavorite) return;
-
-    _isProcessingFavorite = true;
-    final action = _isFavorited ? 'remove' : 'add';
-    final url =
-        'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/$action';
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      'user_id': user.id,
-      'part_id': widget.partId,
-    });
-
-    try {
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        // La requête a réussi, donc l'état du favori a été mis à jour
-        print('Request successful: ${response.body}');
-        final data = jsonDecode(response.body);
-        if (data['message'] == 'removed') {
-          setState(() {
-            _isFavorited = false;
-          });
-        } else {
-          setState(() {
-            _isFavorited = true;
-          });
-        }
-        // Recharger la page pour refléter les changements
-        await _fetchInitialFavoriteStatus();
-      } else {
-        // La requête a échoué, donc annuler les modifications
-        print('Request failed with status: ${response.statusCode}');
-        setState(() {
-          _isFavorited = !_isFavorited;
-        });
-      }
-    } catch (e) {
-      // En cas d'erreur, annuler les modifications
-      print('Error: $e');
-      setState(() {
-        _isFavorited = !_isFavorited;
-      });
-    } finally {
-      _isProcessingFavorite = false;
-    }
-  }
-
-  Future<void> _fetchInitialFavoriteStatus() async {
-    final url =
-        'https://bolide.armasoft.ci/bolide_services/index.php/api/favorites/status';
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      'user_id': user.id,
-      'part_id': widget.partId,
-    });
-
-    try {
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          _isFavorited = data['is_favorite'] ?? false;
-        });
-      } else {
-        print(
-            'Failed to fetch initial favorite status: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching initial favorite status: $e');
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FindSearchPage(
+                    partId: widget.partId, userId: widget.userId),
+              ),
+            );
           },
           child: Image.asset(
             'assets/icons/gc.png',
@@ -139,10 +117,11 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
         title: Text(
           'Détails produit',
           style: TextStyle(
-              color: Colors.black,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Poppins'),
+            color: Colors.black,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
+          ),
         ),
         centerTitle: true,
       ),
@@ -164,7 +143,7 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
                         children: [
                           SizedBox(height: 1.h),
                           Text(
-                            widget.libelle,
+                            widget.title,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 12.sp,
@@ -176,14 +155,10 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
                           SizedBox(height: 0.5.h),
                           Row(
                             children: [
-                              Image.asset(
-                                'assets/icons/sun.png',
-                                color: Colors.black,
-                                width: 4.w,
-                              ),
+                              Image.network(widget.sousCategoryImg),
                               SizedBox(width: 1.w),
                               Text(
-                                'Pneu été',
+                                widget.categoryName,
                                 style: TextStyle(
                                   fontFamily: "Cabin",
                                   fontSize: 11.sp,
@@ -196,22 +171,22 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: _toggleFavoriteStatus,
+                      onTap: toggleIcon,
                       child: Image.asset(
-                        _isFavorited
-                            ? 'assets/icons/hrt2.png'
-                            : 'assets/icons/cr.png',
-                        width: 7.w,
-                        height: 7.w,
+                        iconPath,
+                        width: 6.w,
+                        height: 10.w,
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
               SizedBox(height: 2.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 4.w),
-                child: const Slider1Page(),
+                child: Slider1Page(
+                  imageUrl: widget.imageUrl,
+                ), // Adjust as needed
               ),
               SizedBox(height: 2.h),
               _buildReservationContainer(context),
@@ -237,23 +212,18 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    widget.price,
-                    style: const TextStyle(
-                      color: Color(0xFF1A1A1A),
-                      fontWeight: FontWeight.w500,
-                      fontSize: 20,
-                      fontFamily: "Cabin",
-                    ),
-                  ),
-                ],
+              Text(
+                '${widget.price} F',
+                style: TextStyle(
+                  color: Color(0xFF1A1A1A),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20.sp,
+                  fontFamily: "Cabin",
+                ),
               ),
               QuantityWidget(
-                userId: widget.userId,
-                partId: widget.partId,
-              )
+                  partId: widget.partId,
+                  userId: user.id) // Ensure this is defined elsewhere
             ],
           ),
           SizedBox(height: 1.h),
@@ -286,13 +256,16 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
                       "Ces pneus sont parfaits pour une utilisation sur terrains difficiles et c'est avec une puissance de ",
                 ),
                 TextSpan(
-                  text: "... voir plus",
+                  text: "... voir plus ",
                   style: TextStyle(
                     fontSize: 11.sp,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                // TextSpan(
+                //   text: "$description... voir plus",
+                // ),
               ],
             ),
           ),
@@ -346,29 +319,24 @@ class _DetailsProduitsPageState extends State<DetailsProduitsPage> {
       width: double.infinity,
       height: 4.h,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Text(
-              '  $title',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Cabin',
-                color: Colors.black,
-                fontSize: 12.sp,
-              ),
+          Text(
+            '  $title',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Cabin',
+              color: Colors.black,
+              fontSize: 12.sp,
             ),
           ),
-          Expanded(
-            child: Center(
-              child: Text(
-                '$description  ',
-                style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontFamily: 'Cabin',
-                  color: const Color(0xFF7C7C7C),
-                  fontSize: 12.sp,
-                ),
-              ),
+          Text(
+            '$description  ',
+            style: TextStyle(
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Cabin',
+              color: const Color(0xFF7C7C7C),
+              fontSize: 12.sp,
             ),
           ),
         ],

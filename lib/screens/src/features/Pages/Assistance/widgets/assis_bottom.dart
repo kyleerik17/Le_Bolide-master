@@ -60,7 +60,7 @@ class _AssisBottomState extends State<AssisBottom> {
                     _selectedIndex = 0;
                   });
                   widget.onTap(0);
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => HomePage(
@@ -98,7 +98,7 @@ class _AssisBottomState extends State<AssisBottom> {
                     _selectedIndex = 1;
                   });
                   widget.onTap(1);
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => CommandePage(
@@ -175,7 +175,7 @@ class _AssisBottomState extends State<AssisBottom> {
                     _selectedIndex = 4;
                   });
                   widget.onTap(4);
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) =>

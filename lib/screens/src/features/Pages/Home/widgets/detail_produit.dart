@@ -129,7 +129,9 @@ class _Details1ProduitsPageState extends State<Details1ProduitsPage> {
               SizedBox(height: 2.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 4.w),
-                child: const Slider1Page(),
+                child: Slider1Page(
+                  imageUrl: '',
+                ),
               ),
               SizedBox(height: 2.h),
               _buildReservationContainer(context),

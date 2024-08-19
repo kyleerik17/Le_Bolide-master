@@ -1,3 +1,5 @@
+import 'package:Bolide/screens/src/features/Pages/Home/Menu/pages/menu_page.dart';
+import 'package:Bolide/screens/src/features/Pages/profile/profil_user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,13 +53,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     ));
   }
 
-  String _getInitials(String name) {
-    List<String> parts = name.split(' ');
-    if (parts.length > 1) {
-      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+  String _getInitials(String name, String surname) {
+    // Prend la première lettre du prénom et du nom de famille
+    return '${name.isNotEmpty ? name[0] : ''}${surname.isNotEmpty ? surname[0] : ''}'
+        .toUpperCase();
+  }
+
+  String _getFormattedPhone(String phone) {
+    String indicatif = '';
+    String numero = '';
+
+    if (phone.startsWith('+')) {
+      indicatif = phone.substring(0, 4);
+      numero = phone.substring(4);
     } else {
-      return '${name[0]}${name[0]}'.toUpperCase();
+      indicatif = phone.substring(0, 3);
+      numero = phone.substring(3);
     }
+
+    return '$indicatif $numero';
   }
 
   void _confirmSignOut() {
@@ -225,8 +239,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           ),
                           child: Center(
                             child: Text(
-                              _getInitials(
-                                  user.name), // Utilisation des initiales
+                              _getInitials(user.name,
+                                  user.surname), // Utilisation des initiales
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
@@ -241,7 +255,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Text(
-                          user.name,
+                          '${user.name} ${user.surname}', // Ajoute un espace ici
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w400,
@@ -253,14 +267,36 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       SizedBox(height: 0.5.h),
                       Align(
                         alignment: Alignment.bottomCenter,
-                        child: Text(
-                          user.phone,
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: 'Cabin',
-                            color: const Color(0xFF7F7F7F),
-                          ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (user.phone.startsWith('225') ||
+                                user.phone.startsWith('+225'))
+                              Image.asset(
+                                'assets/icons/civ.png',
+                                width: 5.w,
+                                height: 5.w,
+                              )
+                            else if (user.phone.startsWith('221') ||
+                                user.phone.startsWith('+221'))
+                              Image.asset(
+                                'assets/icons/sng.png',
+                                width: 5.w,
+                                height: 5.w,
+                              ),
+                            SizedBox(
+                                width:
+                                    2.w), // Espace entre l'icône et l'indicatif
+                            Text(
+                              _getFormattedPhone(user.phone),
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: 'Cabin',
+                                color: const Color(0xFF7F7F7F),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -278,28 +314,65 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Modifier profil",
-                                      style: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w400,
-                                        fontFamily: 'Cabin',
-                                        color: Colors.black,
-                                      ),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    transitionDuration:
+                                        const Duration(milliseconds: 600),
+                                    pageBuilder: (_, __, ___) =>
+                                        UserProfilePage(
+                                      userId: user.id,
+                                      partId: widget.partId,
                                     ),
-                                  ],
-                                ),
-                              ],
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      var begin =
+                                          Offset(1.0, 0.0); // Start from right
+                                      var end = Offset
+                                          .zero; // End at the current position
+                                      var curve = Curves.easeInOut;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      var offsetAnimation =
+                                          animation.drive(tween);
+
+                                      return SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Modifier profil",
+                                        style: TextStyle(
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w400,
+                                          fontFamily: 'Cabin',
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
+                    // Rest of the code
+
                     Gap(5.h),
                     Padding(
                       padding: EdgeInsets.all(0.w),

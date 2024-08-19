@@ -40,6 +40,8 @@ class _MarquePopuState extends State<MarquePopu> {
       } else {
         throw Exception('Failed to load marques: ${response.statusCode}');
       }
+    } on http.ClientException catch (_) {
+      throw Exception('No Internet connection');
     } catch (e) {
       print('Error fetching marques: $e');
       throw Exception('Failed to connect to server');
@@ -54,12 +56,27 @@ class _MarquePopuState extends State<MarquePopu> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Erreur: ${snapshot.error}'));
+          String errorMessage = 'Erreur inconnue';
+          if (snapshot.error.toString().contains('No Internet connection')) {
+            errorMessage = 'Pas de connexion Internet';
+          } else {
+            errorMessage = 'Erreur: ${snapshot.error}';
+          }
+          return Center(
+            child: Text(
+              errorMessage,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          );
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(child: Text('Aucune marque trouvée'));
         } else {
           return Container(
-            height: 30
+            height: 32
                 .w, // Ajustez la hauteur du conteneur pour le défilement horizontal
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -87,7 +104,8 @@ class _MarquePopuState extends State<MarquePopu> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 30.w, // Largeur du conteneur pour chaque marque
+        width: 25.w, // Largeur du conteneur pour chaque marque
+
         padding: EdgeInsets.symmetric(horizontal: 2.w),
         child: Column(
           children: [
@@ -98,7 +116,7 @@ class _MarquePopuState extends State<MarquePopu> {
                 child: Image.network(
                   imagePath,
                   width: 25.w,
-                  height: 20.w, // Ajustez la hauteur selon vos besoins
+                  height: 22.w, // Ajustez la hauteur selon vos besoins
                   fit: BoxFit.contain,
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) {

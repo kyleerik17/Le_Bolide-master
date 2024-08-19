@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:http/http.dart' as http;
 
 class SliderPage extends StatefulWidget {
   const SliderPage({Key? key}) : super(key: key);
@@ -10,16 +12,33 @@ class SliderPage extends StatefulWidget {
 
 class _SliderState extends State<SliderPage> {
   int _currentIndex = 0;
+  List<String> _images = [];
 
-  final List<String> _images = [
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchImages();
+  }
+
+  Future<void> _fetchImages() async {
+    final response = await http.get(
+      Uri.parse(
+          'https://bolide.armasoft.ci/bolide_services/index.php/api/annonces'),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      setState(() {
+        _images = data
+            .where((item) => item['status'] == '3') // Filtrer par le statut '1'
+            .map<String>((item) => item['img'] as String)
+            .toList();
+      });
+    } else {
+      // Gérer les erreurs ou afficher un fallback
+      // Par exemple, vous pouvez afficher un message ou une image par défaut
+    }
+  }
 
   void _previousImage() {
     if (_currentIndex > 0) {
@@ -39,48 +58,52 @@ class _SliderState extends State<SliderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.2,
-          child: PageView.builder(
-            itemCount: _images.length,
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            itemBuilder: (context, index) {
-              return SlideItem(
-                image: _images[index],
-                onPreviousPressed: _previousImage,
-                onNextPressed: _nextImage,
-              );
-            },
-          ),
-        ),
-        SizedBox(height: 1.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            _images.length,
-            (index) => Padding(
-              padding: EdgeInsets.symmetric(horizontal: 1.w),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(2.sp),
-                child: Container(
-                  width: 15.sp,
-                  height: 4.sp,
-                  decoration: BoxDecoration(
-                    color: _currentIndex == index ? Colors.black : Colors.grey,
+    return _images.isEmpty
+        ? Center(child: CircularProgressIndicator())
+        : Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.2,
+                child: PageView.builder(
+                  itemCount: _images.length,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    return SlideItem(
+                      image: _images[index],
+                      onPreviousPressed: _previousImage,
+                      onNextPressed: _nextImage,
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 1.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  _images.length,
+                  (index) => Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 1.w),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(2.sp),
+                      child: Container(
+                        width: 15.sp,
+                        height: 4.sp,
+                        decoration: BoxDecoration(
+                          color: _currentIndex == index
+                              ? Colors.black
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
-      ],
-    );
+            ],
+          );
   }
 }
 
@@ -106,21 +129,9 @@ class SlideItem extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.asset(
+                Image.network(
                   image,
                   fit: BoxFit.cover,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.center,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        const Color(0xFFFFFFFF).withOpacity(0),
-                        const Color(0xFF1A1A1A).withOpacity(0.8),
-                      ],
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -135,7 +146,7 @@ class SlideItem extends StatelessWidget {
               'assets/icons/gc.png',
               width: 10.w,
               height: 12.h,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
         ),
@@ -148,48 +159,8 @@ class SlideItem extends StatelessWidget {
               'assets/icons/dt.png',
               width: 10.w,
               height: 12.h,
+              color: Colors.black,
             ),
-          ),
-        ),
-        Positioned(
-          bottom: 10,
-          left: 50,
-          right: 20,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'NOUVEAU !',
-                style: TextStyle(
-                  color: Color(0xFFFFBC39),
-                  fontSize: 14.sp,
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Text.rich(
-                TextSpan(
-                  text: "PIÈCES DE RECHANGE\nET ACCESSOIRES \n",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: "Poppins",
-                  ),
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: "POUR VOITURES ÉLECTRIQUES",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w300,
-                        fontFamily: "Poppins",
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
         ),
       ],

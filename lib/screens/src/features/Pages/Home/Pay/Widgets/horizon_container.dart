@@ -1,218 +1,146 @@
+import 'package:Bolide/data/services/user.dart';
+import 'package:Bolide/screens/src/features/Pages/Favoris/Widgets/quantity_widget1.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/bouton2add.dart';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/bouton_ajouter.dart';
+import 'package:Bolide/screens/src/features/Pages/registration/pages/registration_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:sizer/sizer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class ContaiRizon extends StatelessWidget {
-  const ContaiRizon({Key? key}) : super(key: key);
+class ContaiRizon extends StatefulWidget {
+  final int userId;
+  final int partId;
+  const ContaiRizon({Key? key, required this.userId, required this.partId})
+      : super(key: key);
+
+  @override
+  _ContaiRizonState createState() => _ContaiRizonState();
+}
+
+class _ContaiRizonState extends State<ContaiRizon> {
+  List<dynamic> _pieces = [];
+  late User user;
+
+  @override
+  void initState() {
+    super.initState();
+
+    try {
+      user = GetIt.instance.get<User>();
+      print('User Name: ${user.name}');
+      print('User ID: ${user.id}');
+    } catch (e) {
+      print('Error fetching user: $e');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              RegistrationPage(userId: widget.userId, partId: widget.partId),
+        ),
+      );
+    }
+
+    _fetchPieces(widget.partId, user.id);
+  }
+
+  Future<void> _fetchPieces(partId, userId) async {
+    final response = await http.get(Uri.parse(
+        'https://bolide.armasoft.ci/bolide_services/index.php/api/pieces'));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        _pieces = data['Liste des pieces'];
+      });
+    } else {
+      print('Failed to load pieces');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.all(4.w),
-      child: Row(
-        children: [
-          Container(
-            width: 45.w,
-            height: 75.w,
-            margin: const EdgeInsets.only(right: 12),
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(4),
-              ),
-              color: Colors.white,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(2.w),
-                    child: Image.asset(
-                      'assets/images/fr.jpeg',
-                      width: 84,
-                      height: 84,
-                      fit: BoxFit.cover,
+    return _pieces.isNotEmpty
+        ? SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.all(4.w),
+            child: Row(
+              children: _pieces.map((piece) {
+                return Container(
+                  width: 45.w,
+                  height: 69.w,
+                  margin: const EdgeInsets.only(right: 12),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(4),
                     ),
+                    color: Colors.white,
                   ),
-                ),
-                SizedBox(height: 1.w),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 2.w),
-                  child: Text(
-                    'RIDEX 3405B1\nDisques et\nplaquettes de freins',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontFamily: 'Cabin',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 1.w),
-                Row(
-                  children: [
-                    SizedBox(width: 2.w),
-                    Image.asset(
-                      'assets/icons/ea.png',
-                      color: const Color(0xFF1A1A1A),
-                      width: 4.w,
-                    ),
-                    SizedBox(width: 2.w),
-                    Text(
-                      'Essieu arrière',
-                      style: TextStyle(
-                        fontFamily: "Cabin",
-                        color: const Color(0xFF1A1A1A),
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w400,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(2.w),
+                          child: Image.network(
+                            piece['img'],
+                            width: 25.w,
+                            height: 25.w,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 1.w),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 2.w),
-                  child: Text(
-                    '69 000 F',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 1.w),
-                Center(
-                  child: TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      backgroundColor: const Color(0xFF1A1A1A),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 11.w, vertical: 1.w),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(1.5.w),
-                      ),
-                      minimumSize: const Size(0, 0),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.sp,
+                      SizedBox(height: 1.w),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2.w),
+                        child: Text(
+                          piece['libelle'],
+                          style: const TextStyle(
+                            fontSize: 16,
                             fontFamily: 'Cabin',
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 45.w,
-            height: 75.w,
-            margin: const EdgeInsets.only(right: 12),
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(4),
-              ),
-              color: Colors.white,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(2.w),
-                    child: Image.asset(
-                      'assets/images/fr.jpeg',
-                      width: 84,
-                      height: 84,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 1.w),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 2.w),
-                  child: Text(
-                    'RIDEX 3405B1\nDisques et\nplaquettes de freins',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontFamily: 'Cabin',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 1.w),
-                Row(
-                  children: [
-                    SizedBox(width: 2.w),
-                    Image.asset(
-                      'assets/icons/ea.png',
-                      color: const Color(0xFF1A1A1A),
-                      width: 4.w,
-                    ),
-                    SizedBox(width: 2.w),
-                    Text(
-                      'Essieu arrière',
-                      style: TextStyle(
-                        fontFamily: "Cabin",
-                        color: const Color(0xFF1A1A1A),
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w400,
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 1.w),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 2.w),
-                  child: Text(
-                    '69 000 F',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 1.w),
-                Center(
-                  child: TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      backgroundColor: const Color(0xFF1A1A1A),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 11.w, vertical: 1.w),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(1.5.w),
+                      SizedBox(height: 1.w),
+                      Row(
+                        children: [
+                          SizedBox(width: 2.w),
+                          Image.network(
+                            piece['sous_category']['img'],
+                            color: const Color(0xFF1A1A1A),
+                            width: 4.w,
+                          ),
+                          Text(
+                            piece['sous_category']['name'],
+                            style: TextStyle(
+                              fontFamily: "Cabin",
+                              color: const Color(0xFF1A1A1A),
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                      minimumSize: const Size(0, 0),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Ajouter",
+                      SizedBox(height: 1.w),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2.w),
+                        child: Text(
+                          '${piece['price']} F',
                           style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.sp,
-                            fontFamily: 'Cabin',
-                            fontWeight: FontWeight.w500,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(height: 1.w),
+                      QuantityWidget1(partId: widget.partId, userId: user.id),
+                    ],
                   ),
-                ),
-              ],
+                );
+              }).toList(),
             ),
-          ),
-        ],
-      ),
-    );
+          )
+        : const Center(child: CircularProgressIndicator());
   }
 }

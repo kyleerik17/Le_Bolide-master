@@ -8,13 +8,13 @@ import '../../home_page.dart';
 class CategoriesPage extends StatefulWidget {
   final int partId;
   final int userId;
-  final String categoryName; // Ajouté ici
+  final String categoryName;
 
   const CategoriesPage({
     super.key,
     required this.partId,
     required this.userId,
-    required this.categoryName, // Assurez-vous que ce champ est requis dans le constructeur
+    required this.categoryName,
   });
 
   @override
@@ -32,16 +32,23 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   Future<List<Map<String, dynamic>>> fetchCategories() async {
     final response = await http.get(Uri.parse(
-        'https://bolide.armasoft.ci/bolide_services/index.php/api/categorie/parts'));
+        'https://bolide.armasoft.ci/bolide_services/index.php/api/categorie'));
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
-      return data
-          .map<Map<String, dynamic>>((category) => {
-                'icon': category['logo'],
-                'label': category['libelle'],
-                'id': category['id'],
-              })
-          .toList();
+      return data.map<Map<String, dynamic>>((category) {
+        final String logo = category['logo'];
+        // Vérifier si l'URL du logo commence par 'http' ou 'https'
+        final validIconUrl = logo.startsWith('http://') ||
+                logo.startsWith('https://')
+            ? logo
+            : 'https://default.image.url/default.png'; // URL de remplacement si nécessaire
+
+        return {
+          'icon': validIconUrl,
+          'label': category['libelle'],
+          'id': category['id'],
+        };
+      }).toList();
     } else {
       throw Exception('Failed to load categories');
     }
@@ -121,7 +128,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
           'Catégories',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 10.w,
+            fontSize: 6.w,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -178,8 +185,8 @@ class CategoryItem extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 25.w,
-          height: 25.w,
+          width: 20.w,
+          height: 20.w,
           decoration: BoxDecoration(
             shape: BoxShape.rectangle,
             color: Colors.black,
@@ -191,10 +198,19 @@ class CategoryItem extends StatelessWidget {
               width: 12.w,
               height: 12.w,
               fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                // Afficher une image par défaut en cas d'erreur de chargement
+                return Image.network(
+                  'https://default.image.url/default.png',
+                  width: 12.w,
+                  height: 12.w,
+                  fit: BoxFit.contain,
+                );
+              },
             ),
           ),
         ),
-        SizedBox(height: 1.h),
+        SizedBox(height: 0.5.h),
         Text(
           label,
           style: TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sizer/sizer.dart';
 
 Widget buildSecurePaymentWidget() {
@@ -15,10 +16,12 @@ Widget buildSecurePaymentWidget() {
         ),
         Row(
           children: [
-            Image.asset(
-              'assets/icons/lock.png',
-              width: 8.w,
-            ),
+           SvgPicture.asset(
+                            'assets/icons/lock.svg',
+                            width: 16,
+                            height: 16,
+                            color: Colors.black,
+                          ),
             SizedBox(width: 2.w),
             Text(
               'Paiement sécurisé',

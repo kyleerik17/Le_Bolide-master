@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:Bolide/data/services/user.dart';
@@ -201,7 +202,12 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
         SizedBox(width: 2.h),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-          child: Image.asset('assets/icons/cs.png'),
+          child: SvgPicture.asset(
+            'assets/icons/cs.svg',
+            width: 16,
+            height: 16,
+            color: Colors.black,
+          ),
         ),
         SizedBox(
           width: 33.w,
@@ -209,7 +215,12 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-          child: Image.asset('assets/icons/cs1.png'),
+          child: SvgPicture.asset(
+            'assets/icons/cs1.svg',
+            width: 16,
+            height: 16,
+            color: Colors.black,
+          ),
         ),
         SizedBox(
           width: 33.w,
@@ -217,7 +228,12 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-          child: Image.asset('assets/icons/cs2.png'),
+          child: SvgPicture.asset(
+            'assets/icons/cs2.svg',
+            width: 16,
+            height: 16,
+            color: Colors.black,
+          ),
         ),
       ],
     );
@@ -256,8 +272,8 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item.libelle,
-                    style: const TextStyle(
-                        fontSize: 17,
+                    style: TextStyle(
+                        fontSize: 13.sp,
                         fontFamily: 'Cabin',
                         fontWeight: FontWeight.w500)),
                 SizedBox(height: 0.5.h),
@@ -278,7 +294,7 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
                 ),
                 SizedBox(height: 0.5.h),
                 Text(
-                  item.price,
+                  '${double.parse(item.price).toStringAsFixed(0)} F',
                   style: TextStyle(
                     fontSize: 15.sp,
                     fontFamily: 'Cabin',
@@ -292,7 +308,12 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
           Column(
             children: [
               SizedBox(height: 1.h),
-              Image.asset('assets/icons/trash.png'),
+              SvgPicture.asset(
+                'assets/icons/trash.svg',
+                width: 16.w,
+                height: 3.h,
+                color: Colors.black,
+              ),
               SizedBox(height: 5.h),
               Container(
                 width: 12.w,
@@ -322,13 +343,13 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
         subtotal - 10000; // Ex: Si vous avez une réduction fixe de 10,000 F
 
     return Container(
-      height: 40.w,
+      height: 42.w,
       width: double.infinity,
       color: Colors.white,
       child: Column(
         children: [
           SizedBox(height: 5.w),
-          buildSummaryRow('Sous-total', '${subtotal.toStringAsFixed(1)} F'),
+          buildSummaryRow('Sous-total', '${subtotal.toStringAsFixed(0)} F'),
           SizedBox(height: 1.h),
           buildSummaryRow('Frais de livraison', 'Gratuit'),
           SizedBox(height: 1.h),
@@ -340,7 +361,7 @@ class _DetailsCommandePageState extends State<DetailsCommandePage> {
             ),
           ),
           SizedBox(height: 1.h),
-          buildSummaryRow('TOTAL', '${subtotal.toStringAsFixed(1)} F',
+          buildSummaryRow('TOTAL', '${total.toStringAsFixed(0)} F',
               isTotal: true),
         ],
       ),

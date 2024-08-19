@@ -58,7 +58,7 @@ class _FavorisBottomNavBarState extends State<FavorisBottomNavBar> {
                     _selectedIndex = 0;
                   });
                   widget.onTap(0);
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => HomePage(
@@ -96,7 +96,7 @@ class _FavorisBottomNavBarState extends State<FavorisBottomNavBar> {
                     _selectedIndex = 1;
                   });
                   widget.onTap(1);
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => CommandePage(
@@ -135,7 +135,7 @@ class _FavorisBottomNavBarState extends State<FavorisBottomNavBar> {
                     _selectedIndex = 3;
                   });
                   widget.onTap(3);
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => AssistancePage(

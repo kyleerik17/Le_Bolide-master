@@ -136,9 +136,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AssistancePage(
-                              partId: widget.partId,
-                              userId: widget.userId
-                            )),
+                            partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(
@@ -174,8 +172,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            FavorisPage(partId: widget.partId, userId: widget.userId)),
+                        builder: (context) => FavorisPage(
+                            partId: widget.partId, userId: widget.userId)),
                   );
                 },
                 child: Padding(

@@ -132,7 +132,7 @@ class _AppBarWidgetState extends State<AppBarWidget>
                   child: Image.asset(
                     'assets/icons/carte.png',
                     width: 10.w,
-                    height: 6.0.h,
+                    height: 7.0.h,
                   ),
                 ),
               ),

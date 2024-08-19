@@ -1,3 +1,6 @@
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/bottom.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/widgets/botom.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/widgets/bottom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Bolide/screens/src/features/Pages/Home/widgets/appbar.dart';
@@ -173,11 +176,10 @@ class AssistancePage extends StatelessWidget {
           )
         ],
       ),
-      bottomNavigationBar: AssisBottom(
-        onTap: (int) {},
-        partId: partId,
-        userId: userId,
-      ),
+      // bottomNavigationBar: AssisBottom(
+      //   partId: partId,
+      //   userId: userId, onTap: (int ) {  },
+      // ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
         child: Container(

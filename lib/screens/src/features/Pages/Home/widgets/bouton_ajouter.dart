@@ -123,49 +123,50 @@ class _QuantityWidgetState extends State<QuantityWidget> {
               false; // Hide controls and show "Ajouter" button
         });
       }
+      _showAlert('Le produit a bien été retiré');
     }
   }
 
   // Increment quantity and possibly navigate to another page
   void _incrementQuantity() {
-    if (_quantity < 2) {
-      setState(() {
-        _quantity++;
-      });
-      _sendQuantityUpdate().then((_) {
-        print(
-            'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
-        if (_quantity >= 3) {
-          _navigateToPay1Page();
-        }
-      });
-    }
+    setState(() {
+      _quantity++;
+    });
+    _sendQuantityUpdate().then((_) {
+      print(
+          'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
+      _showAlert('Le produit a bien été ajouté');
+    });
   }
 
-  // Navigate to another page with animation
-  void _navigateToPay1Page() {
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            Details1ProduitsPage(
-          partId: widget.partId,
-          userId: widget.userId,
+  // Function to show alert message
+  void _showAlert(String message) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: 20.0,
+        left: MediaQuery.of(context).size.width * 0.25,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            color: Colors.black.withOpacity(0.7),
+            child: Text(
+              message,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+              ),
+            ),
+          ),
         ),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
-          final tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          final offsetAnimation = animation.drive(tween);
-          return SlideTransition(
-            position: offsetAnimation,
-            child: child,
-          );
-        },
       ),
     );
+
+    overlay.insert(overlayEntry);
+    Future.delayed(Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
   }
 
   // Toggle the visibility of quantity controls

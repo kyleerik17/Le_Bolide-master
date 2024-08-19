@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -39,30 +40,52 @@ class _CategorieState extends State<Categorie> {
   }
 
   Future<List<Map<String, dynamic>>> fetchCategories() async {
-    final response = await http.get(Uri.parse('${baseUrl}api/categorie/parts'));
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
-      return data
-          .map<Map<String, dynamic>>((category) => {
-                'icon': category['logo'],
-                'label': category['libelle'],
-                'id': category['id'],
-              })
-          .toList();
-    } else {
-      throw Exception('Failed to load categories');
+    try {
+      final response = await http.get(Uri.parse('${baseUrl}api/categorie'));
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        return data
+            .map<Map<String, dynamic>>((category) => {
+                  'icon': category['logo'],
+                  'label': category['libelle'],
+                  'id': category['id'],
+                })
+            .toList();
+      } else {
+        throw Exception('Failed to load categories');
+      }
+    } on http.ClientException catch (_) {
+      throw Exception('No Internet connection');
     }
   }
 
   void navigateToCategory(String categoryId, String categoryName) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => CategoryDetailPage(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return CategoryDetailPage(
             categoryId: categoryId,
             partId: widget.partId,
             userId: widget.userId,
-            categoryName: categoryName),
+            categoryName: categoryName,
+          );
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          // Définir les courbes et la transition
+          const begin = Offset(1.0, 0.0); // Départ à droite
+          const end = Offset.zero; // Arrivée au centre
+          const curve = Curves.easeInOut;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
       ),
     );
   }
@@ -75,9 +98,33 @@ class _CategorieState extends State<Categorie> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Erreur: ${snapshot.error}'));
+          String errorMessage = 'Erreur inconnue';
+          if (snapshot.error.toString().contains('No Internet connection')) {
+            errorMessage = 'Pas de connexion Internet';
+          } else {
+            errorMessage = 'Erreur: ${snapshot.error}';
+          }
+          return Center(
+            child: Text(
+              errorMessage,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          );
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('Aucune catégorie trouvée'));
+          return Center(
+            child: Text(
+              'Aucune catégorie trouvée',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          );
         } else {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -183,9 +230,13 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     final response =
         await http.get(Uri.parse('${baseUrl}api/pieces/category/$categoryId'));
     if (response.statusCode == 200) {
-      return jsonDecode(response.body)[0];
+      final data = jsonDecode(response.body);
+      if (data.isEmpty) {
+        return {}; // Retourne un dictionnaire vide si aucune donnée
+      }
+      return data[0];
     } else {
-      throw Exception('echec de chargement');
+      throw Exception('Echec de chargement');
     }
   }
 
@@ -253,8 +304,17 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(child: Text('Erreur: ${snapshot.error}'));
-              } else if (!snapshot.hasData) {
-                return const Center(child: Text('Aucune donnée trouvée'));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(
+                  child: Text(
+                    'Aucun article trouvé',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
+                  ),
+                );
               } else {
                 return Container(
                   color: const Color(0xFFF7F8F9),
@@ -335,9 +395,10 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                                   ),
                                 ),
                                 SizedBox(width: 1.w),
-                                Image.asset(
-                                  'assets/icons/fltr.png',
-                                  color: Colors.black,
+                                SvgPicture.asset(
+                                  'assets/icons/filter.svg',
+                                  width: 7.w,
+                                  height: 7.w,
                                 ),
                               ],
                             ),

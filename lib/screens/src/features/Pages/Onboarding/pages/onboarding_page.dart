@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../../../gen/assets.gen.dart';
 import '../../registration/pages/pages.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 List<String> titles = [
   "Trouvez vos pièces détachées devient si simple",
@@ -144,9 +145,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 ),
               if (currentPage == 2)
                 TextButton(
-                  onPressed: () {
-                    _showCenteredDialog();
-                  },
+                  onPressed: _showNotificationPermissionDialog,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1A1A1A),
                     padding:
@@ -173,88 +172,121 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  void _showCenteredDialog() {
+  void _showNotificationPermissionDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: const Color(0x545458).withOpacity(0.95),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(1.5.h),
+            borderRadius: BorderRadius.circular(20),
           ),
-          child: Padding(
-            padding: EdgeInsets.all(4.w),
+          child: Container(
+            padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                const Icon(
+                  Icons.notifications_outlined,
+                  size: 50,
+                  color: Color(0xFF1A1A1A),
+                ),
+                const SizedBox(height: 20),
                 Text(
-                  "Voulez-vous activer les notifications ?",
+                  "Voulez vous activer les notifications ?",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.sp,
-                    fontFamily: "Cabin",
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 2.h),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            transitionDuration:
-                                const Duration(milliseconds: 300),
-                            pageBuilder: (_, __, ___) => RegistrationPage(
-                              partId: widget.partId,
-                              userId: widget.userId,
-                            ),
-                            transitionsBuilder: (_, animation, __, child) {
-                              return SlideTransition(
-                                position: Tween<Offset>(
-                                  begin: const Offset(1.0, 0.0),
-                                  end: Offset.zero,
-                                ).animate(animation),
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      child: Text(
-                        "Continuer",
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 14.sp,
-                          fontFamily: "Cabin",
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 1.h),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context); // Close the dialog
-                      },
-                      child: Text(
-                        "Annuler",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 14.sp,
-                          fontFamily: "Cabin",
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  child: const Text("Activer"),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: const Color(0xFF1A1A1A),
+                    backgroundColor: Colors.green.shade200,
+                    minimumSize: const Size(double.infinity, 40),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _requestNotificationPermission();
+                  },
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  child: const Text("Ne pas activer"),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: const Color(0xFF1A1A1A),
+                    backgroundColor: Colors.grey.shade200,
+                    minimumSize: const Size(double.infinity, 40),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+
+  void _requestNotificationPermission() async {
+    PermissionStatus status = await Permission.notification.request();
+    if (status.isGranted) {
+      _navigateToRegistrationPage();
+    } else {
+      _showPermissionDeniedDialog();
+    }
+  }
+
+  void _navigateToRegistrationPage() {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (_, __, ___) => RegistrationPage(
+          partId: widget.partId,
+          userId: widget.userId,
+        ),
+        transitionsBuilder: (_, animation, __, child) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(1.0, 0.0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Permissions refusées'),
+          content: const Text(
+              'Les notifications sont nécessaires pour une meilleure expérience. Voulez-vous les activer dans les paramètres ?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Non'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _navigateToRegistrationPage();
+              },
+            ),
+            TextButton(
+              child: const Text('Oui'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                openAppSettings();
+              },
+            ),
+          ],
         );
       },
     );

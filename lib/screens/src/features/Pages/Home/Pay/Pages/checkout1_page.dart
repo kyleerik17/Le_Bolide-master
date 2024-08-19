@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:Bolide/data/services/user.dart'; // Assurez-vous que ce chemin est correct
@@ -119,10 +120,12 @@ class _Pay1PageState extends State<Pay1Page> {
                     // SizedBox(width: 40.w),
                     Row(
                       children: [
-                        Image.asset(
-                          'assets/icons/lock.png',
-                          width: 8.w,
-                        ),
+                       SvgPicture.asset(
+                            'assets/icons/lock.svg',
+                            width: 16,
+                            height: 16,
+                            color: Colors.black,
+                          ),
                         SizedBox(width: 2.w),
                         Text(
                           'Paiement sécurisé',
@@ -140,9 +143,12 @@ class _Pay1PageState extends State<Pay1Page> {
                   SizedBox(width: 2.h),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-                    child: Image.asset(
-                      'assets/icons/cs1.png',
-                    ),
+                    child:SvgPicture.asset(
+                           
+                                'assets/icons/cs1.svg',
+                            width: 7.w,
+                            height: 7.w,
+                          ),
                   ),
                   SizedBox(
                     width: 30.w,
@@ -153,9 +159,12 @@ class _Pay1PageState extends State<Pay1Page> {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-                    child: Image.asset(
-                      'assets/icons/cs2.png',
-                    ),
+                    child:SvgPicture.asset(
+                           
+                                'assets/icons/cs2.svg',
+                            width: 7.w,
+                            height: 7.w,
+                          ),
                   ),
                   SizedBox(
                     width: 33.w,
@@ -166,9 +175,12 @@ class _Pay1PageState extends State<Pay1Page> {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-                    child: Image.asset(
-                      'assets/icons/cs2.png',
-                    ),
+                    child: SvgPicture.asset(
+                           
+                                'assets/icons/cs2.svg',
+                            width: 7.w,
+                            height: 7.w,
+                          ),
                   ),
                 ],
               ),
@@ -215,6 +227,7 @@ class _Pay1PageState extends State<Pay1Page> {
                   });
                 },
               ),
+              SizedBox(height: 4.h),
               Center(
                 child: TextButton(
                   onPressed: _isLoading

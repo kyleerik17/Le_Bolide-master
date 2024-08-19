@@ -71,7 +71,7 @@ class RegistrationCongratulationPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   print('Navigating to HomePage with partId: $partId');
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => HomePage(
@@ -80,6 +80,20 @@ class RegistrationCongratulationPage extends StatelessWidget {
                       ),
                     ),
                   );
+                    (context, animation, secondaryAnimation, child) {
+              const begin = Offset(1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var offsetAnimation = animation.drive(tween);
+
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            };
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFFFFFF),

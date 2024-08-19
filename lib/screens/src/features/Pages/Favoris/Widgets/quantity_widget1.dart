@@ -85,10 +85,6 @@ class _Quantity1WidgetState extends State<Quantity1Widget> {
             'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
       });
     }
-    // Naviguer vers la page si la quantité est maintenant supérieure à 2
-    if (_quantity > 2) {
-      _navigateToPay1Page();
-    }
   }
 
   // Decrement quantity and possibly hide controls
@@ -115,31 +111,6 @@ class _Quantity1WidgetState extends State<Quantity1Widget> {
   }
 
   // Navigate to another page with animation
-  void _navigateToPay1Page() {
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            DetailsProduitsPage(
-          partId: widget.partId,
-          userId: widget.userId, description: '', price: '',
-          libelle: '', // Utiliser user.id ici
-        ),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
-          final tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          final offsetAnimation = animation.drive(tween);
-          return SlideTransition(
-            position: offsetAnimation,
-            child: child,
-          );
-        },
-      ),
-    );
-  }
 
   // Toggle the visibility of quantity controls
   void _toggleQuantityControls() {

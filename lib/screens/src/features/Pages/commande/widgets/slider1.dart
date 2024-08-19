@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/slider.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
 
 class Slider1Page extends StatefulWidget {
-  const Slider1Page({Key? key}) : super(key: key);
+  final String imageUrl; // Ajoutez ce paramètre pour recevoir l'URL de l'image
+
+  const Slider1Page({Key? key, required this.imageUrl}) : super(key: key);
 
   @override
   _Slider1State createState() => _Slider1State();
@@ -11,15 +16,13 @@ class Slider1Page extends StatefulWidget {
 class _Slider1State extends State<Slider1Page> {
   int _currentIndex = 0;
 
-  final List<String> _images = [
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-    'assets/images/slidee.jpeg',
-  ];
+  late final List<String> _images; // Utilisez late pour initialiser plus tard
+
+  @override
+  void initState() {
+    super.initState();
+    _images = [widget.imageUrl]; // Initialisez la liste avec l'URL reçue
+  }
 
   void _previousImage() {
     if (_currentIndex > 0) {
@@ -76,78 +79,6 @@ class _Slider1State extends State<Slider1Page> {
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class SlideItem extends StatelessWidget {
-  final String image;
-  final VoidCallback? onPreviousPressed;
-  final VoidCallback? onNextPressed;
-
-  const SlideItem({
-    Key? key,
-    required this.image,
-    this.onPreviousPressed,
-    this.onNextPressed,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(0.5.h),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  image,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.center,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        const Color(0xFFFFFFFF).withOpacity(0),
-                        const Color(0xFF1A1A1A).withOpacity(0.8),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          top: 30,
-          left: 1,
-          child: GestureDetector(
-            onTap: onPreviousPressed,
-            child: Image.asset(
-              'assets/icons/gc.png',
-              width: 10.w,
-              height: 12.h,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        Positioned(
-          top: 30,
-          right: 1,
-          child: GestureDetector(
-            onTap: onNextPressed,
-            child: Image.asset(
-              'assets/icons/dt.png',
-              width: 10.w,
-              height: 12.h,
             ),
           ),
         ),

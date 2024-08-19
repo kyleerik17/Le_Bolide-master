@@ -1,7 +1,12 @@
 import 'dart:convert';
+import 'package:Bolide/screens/src/features/Pages/Home/widgets/bottom.dart';
 import 'package:Bolide/screens/src/features/Pages/Search/Pages/find_search_page.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/pages/details-produit_page.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/widgets/botom.dart';
+import 'package:Bolide/screens/src/features/Pages/commande/widgets/bottom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:Bolide/data/services/user.dart';
@@ -107,83 +112,82 @@ class _FavorisPageState extends State<FavorisPage> {
         child: Column(
           children: [
             SizedBox(height: 3.h),
-            AppBarWidget(partId: widget.partId, userId: widget.userId),
+            AppBarWidget(
+              partId: widget.partId,
+              userId: widget.userId,
+            ),
             SizedBox(height: 2.h),
             Padding(
               padding: EdgeInsets.all(4.w),
               child: Column(
                 children: [
-                   Container(
-        width: 358,
-        height: 40,
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: const Color(0xFFCED0D4)),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(4),
-          ),
-        ),
-        child: TextField(
-          onTap: () {
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                transitionDuration: const Duration(milliseconds: 300),
-                pageBuilder: (_, __, ___) => FindSearchPage(
-                  partId: widget.partId,
-                  userId: widget.userId,
-                ),
-                transitionsBuilder: (_, animation, __, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0.0, 1.0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                },
-              ),
-            );
-          },
-          decoration: const InputDecoration(
-            border: InputBorder.none,
-            filled: true,
-            fillColor: Colors.white,
-            hintText: 'Rechercher...',
-            hintStyle: TextStyle(
-              color: Color(0xFF737373),
-              fontFamily: 'Poppins',
-              fontSize: 14,
-            ),
-            prefixIcon: Padding(
-              padding: EdgeInsets.only(left: 0),
-              child: ImageIcon(
-                AssetImage('assets/icons/search.png'),
-                size: 16,
-                color: Colors.black,
-              ),
-            ),
-            suffixIcon: Padding(
-              padding: EdgeInsets.only(right: 0),
-              child: ImageIcon(
-                AssetImage('assets/icons/mc.png'),
-                size: 16,
-                color: Colors.black,
-              ),
-            ),
-            contentPadding: EdgeInsets.symmetric(vertical: 9),
-          ),
-          style: const TextStyle(
-            color: Color(0xFF737373),
-          ),
-        ),
-      ),
+                  Container(
+                    width: 92.w,
+                    height: 40,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFCED0D4)),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                      ),
+                    ),
+                    child: TextField(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            transitionDuration:
+                                const Duration(milliseconds: 300),
+                            pageBuilder: (_, __, ___) => FindSearchPage(
+                              partId: widget.partId,
+                              userId: widget.userId,
+                            ),
+                            transitionsBuilder: (_, animation, __, child) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(0.0, 1.0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Rechercher...',
+                        hintStyle: const TextStyle(
+                          color: Color(0xFF737373),
+                          fontFamily: 'Cabin',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                        ),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(left: 0),
+                          child: SvgPicture.asset(
+                            'assets/icons/search.svg',
+                            width: 16,
+                            height: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                      ),
+                      style: const TextStyle(
+                        color: Color(0xFF737373),
+                      ),
+                    ),
+                  ),
                   FutureBuilder<List<Item>>(
                     future: _futureFavorites,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         print('Snapshot error: ${snapshot.error}');
                         return Center(child: Text('Error: ${snapshot.error}'));
@@ -201,7 +205,7 @@ class _FavorisPageState extends State<FavorisPage> {
                       } else {
                         return ListView.builder(
                           shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             print('Building item at index: $index');
@@ -217,11 +221,11 @@ class _FavorisPageState extends State<FavorisPage> {
           ],
         ),
       ),
-      bottomNavigationBar: FavorisBottomNavBar(
-        onTap: (int) {},
-        partId: widget.partId,
-        userId: widget.userId,
-      ),
+      // bottomNavigationBar: FavorisBottomNavBar(
+      //   partId: widget.partId,
+      //   userId: user.id,
+      //   onTap: (int) {},
+      // ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
         child: Container(
@@ -266,20 +270,18 @@ class _FavorisPageState extends State<FavorisPage> {
   }
 
   Widget _buildItem(BuildContext context, Item item) {
-    print(
-        'Building item with partId: ${item.partId}'); // Impression du partId de l'article
+    print('Building item with partId: ${item.partId}');
     return Container(
       padding: EdgeInsets.all(0.w),
-      margin: EdgeInsets.symmetric(
-          vertical: 1.h), // Réduit l'espace vertical entre les éléments
-      color: Colors.white, // Fond blanc pour le conteneur principal
+      margin: EdgeInsets.symmetric(vertical: 1.h),
+      color: Colors.white,
       child: Row(
         children: [
           Container(
-            width: 25.w, // Ajuste la largeur pour éviter les débordements
+            width: 25.w,
             height: 30.w,
             decoration: BoxDecoration(
-              color: Colors.white, // Fond blanc pour le conteneur de l'image
+              color: Colors.white,
               borderRadius: BorderRadius.circular(0.5.h),
             ),
             padding: EdgeInsets.all(1.w),
@@ -287,89 +289,115 @@ class _FavorisPageState extends State<FavorisPage> {
               borderRadius: BorderRadius.circular(0.5.h),
               child: Image.network(
                 item.imagePath,
-                fit: BoxFit.contain, // Ajuste la couverture de l'image
+                fit: BoxFit.contain,
               ),
             ),
           ),
           Expanded(
-            child: Container(
-              color: Colors.white, // Fond blanc pour le conteneur du texte
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          item.title,
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            fontFamily: "Cabin",
-                            fontWeight: FontWeight.w500,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 300),
+                    pageBuilder: (_, __, ___) => DetailsProduitsPage(
+                      partId: widget.partId,
+                      userId: user.id,
+                      price: item.price,
+                      description: item.subtitle,
+                      categoryName: item.sousCategoryName,
+                      iconUrl: item.categoryImg,
+                      imageUrl: item.imagePath,
+                      sousCategoryName: item.sousCategoryName,
+                      sousCategoryImg: item.sousCategoryImg,
+                      categoryImg: item.categoryImg,
+                      title: item.title,
+                      libelle: item.title,
+                    ),
+                    transitionsBuilder: (_, animation, __, child) {
+                      return SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(1.0, 0.0),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              },
+              child: Container(
+                color: Colors.white,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(height: 0.5.h),
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              fontFamily: "Cabin",
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          print('Icon tapped for partId: ${item.partId}');
-                          if (item.iconPath == 'assets/icons/hrt2.png') {
-                            _removeFavorite(item.partId);
-                          } else {
-                            print('Error: partId is null');
-                          }
-                        },
-                        child: Image.asset(
-                          item.iconPath,
-                          width: 6.w,
-                          height: 6.w,
+                        GestureDetector(
+                          onTap: () {
+                            print('Icon tapped for partId: ${item.partId}');
+                            if (item.iconPath == 'assets/icons/hrt2.png') {
+                              _removeFavorite(item.partId);
+                            } else {
+                              print('Error: partId is null');
+                            }
+                          },
+                          child: Image.asset(
+                            item.iconPath,
+                            width: 6.w,
+                            height: 6.w,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                      height: 0.5
-                          .h), // Réduit l'espace entre le titre et la description
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/icons/ar.png',
-                        width: 4.w,
-                        height: 8.w,
-                      ),
-                      SizedBox(width: 1.w),
-                      Expanded(
-                        child: Text(
-                          item.subtitle,
+                      ],
+                    ),
+                    SizedBox(height: 0.5.h),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.network(
+                          item.sousCategoryImg,
+                        ),
+                        Text(
+                          item.sousCategoryName,
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontFamily: "Cabin",
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        item.price,
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontFamily: "Cabin",
-                          fontWeight: FontWeight.w500,
+                      ],
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${item.price} F',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontFamily: "Cabin",
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const Spacer(), // Pour aligner le widget de quantité à droite
-                      Quantity1Widget(
-                        userId: widget.userId,
-                        partId: item.partId, // Utilisation de item.partId
-                      ),
-                    ],
-                  ),
-                ],
+                        SizedBox(width: 12.w),
+                        Quantity1Widget(
+                          userId: widget.userId,
+                          partId: item.partId,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -385,8 +413,12 @@ class Item {
   final String subtitle;
   final String subtitleIconPath;
   final String price;
-  final int partId; // Assurez-vous que partId est un entier
-  String iconPath = 'assets/icons/hrt2.png';
+  final int partId;
+  String iconPath;
+  final String sousCategoryName;
+  final String sousCategoryImg;
+  final String categoryImg;
+  final String categoryName;
 
   Item({
     required this.title,
@@ -395,20 +427,45 @@ class Item {
     required this.subtitleIconPath,
     required this.price,
     required this.partId,
-    required this.iconPath, // Ajoutez iconPath comme argument requis
+    required this.iconPath,
+    required this.sousCategoryName,
+    required this.sousCategoryImg,
+    required this.categoryImg,
+    required this.categoryName, // Ajout du nouvel argument ici
   });
+
   factory Item.fromJson(Map<String, dynamic> json) {
-    print('Parsing JSON: $json'); // Impression des données JSON
+    print('Parsing JSON: $json');
     return Item(
       title: json['libelle'] ?? '',
-      imagePath: json['img'], // Concatène la base URL avec le chemin de l'image
+      imagePath: json['img'] ?? 'assets/images/pn2.png',
       subtitle: json['description'] ?? '',
-      subtitleIconPath: '', // Peut être laissé vide si non utilisé
-      price: json['price'] ?? '',
-      partId: int.tryParse(json['id'].toString()) ??
-          0, // Convertir la valeur en entier
-      iconPath: 'assets/icons/hrt2.png', // Initialisation de l'icône
+      subtitleIconPath:
+          (json['category'] != null && json['category']['img'] != null)
+              ? json['category']['img']
+              : 'assets/icons/default_category.png',
+      price: _formatPrice(json['price']?.toString() ?? '0'),
+      partId: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      iconPath: 'assets/icons/hrt2.png',
+      sousCategoryName: json['sous_category']?['name'] ?? '',
+      sousCategoryImg: json['sous_category']?['img'] ?? '',
+      categoryImg: json['category']?['img'] ?? '',
+      categoryName:
+          json['category']?['libelle'] ?? '', // Ajout du nouvel argument ici
     );
+  }
+
+  static String _formatPrice(String price) {
+    // Convertir le prix en double
+    double priceValue = double.tryParse(price) ?? 0.0;
+
+    // Arrondir à l'entier si le prix est un nombre entier
+    if (priceValue == priceValue.roundToDouble()) {
+      return priceValue.toInt().toString();
+    }
+
+    // Sinon, retourner le prix avec un maximum de 2 décimales
+    return priceValue.toStringAsFixed(0).replaceAll(RegExp(r'\.00$'), '');
   }
 
   void toggleIcon() {

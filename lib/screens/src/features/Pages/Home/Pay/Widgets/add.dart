@@ -110,9 +110,6 @@ class _AddPageState extends State<AddPage> {
     _sendQuantityUpdate().then((_) {
       print(
           'user_id: ${user.id}, part_id: ${widget.partId}, quantity: $_quantity');
-      if (_quantity >= 8) {
-        _navigateToPay1Page();
-      }
     });
   }
 

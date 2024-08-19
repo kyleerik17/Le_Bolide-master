@@ -67,6 +67,9 @@ class $AssetsImagesGen {
   SvgGenImage get closeOrange =>
       const SvgGenImage('assets/images/close_orange.svg');
 
+  /// File path: assets/images/close_orange.svg
+  SvgGenImage get Search => const SvgGenImage('assets/icons/search.svg');
+
   /// File path: assets/images/code.svg
   SvgGenImage get code => const SvgGenImage('assets/images/code.svg');
 

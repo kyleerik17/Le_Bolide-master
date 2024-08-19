@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:Bolide/data/services/user.dart';
@@ -9,7 +10,6 @@ import 'package:Bolide/screens/src/features/Pages/Home/widgets/detail_produit.da
 import 'package:Bolide/screens/src/features/Pages/profile/pages/pages.dart';
 import 'package:sizer/sizer.dart';
 import 'dart:convert';
-
 import '../../../../../../../data/models/api_services.dart';
 import '../../pages/home_page.dart';
 import '../Widgets/horizon_container.dart';
@@ -223,7 +223,7 @@ class _PayPageState extends State<PayPage> {
                                 children: [
                                   SizedBox(height: 1.h),
                                   Padding(
-                                    padding: EdgeInsets.all(2.w),
+                                    padding: EdgeInsets.all(4.w),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -250,8 +250,6 @@ class _PayPageState extends State<PayPage> {
                                     ),
                                   ),
                                   SizedBox(height: 1.h),
-                                  const PromoCodeWidget(),
-                                  SizedBox(height: 1.h),
                                   if (_cartItems.isNotEmpty)
                                     ..._cartItems.map((item) => CartItemWidget(
                                           img: item['img'],
@@ -267,87 +265,7 @@ class _PayPageState extends State<PayPage> {
                                           userId: widget.userId,
                                           onRemove: _removeItemAndRefresh,
                                         )),
-                                  if (_cartItems.isEmpty)
-                                    const Row(
-                                      children: [
-                                        Text(
-                                          '   *Vous serez notifié quand le produit sera en stock',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.red,
-                                            fontFamily: "Cabin",
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  SizedBox(height: 1.h),
-                                  Padding(
-                                    padding: EdgeInsets.all(3.w),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Souvent acheté ensemble...',
-                                          style: TextStyle(
-                                            fontSize: 13.sp,
-                                            fontFamily: "Poppins",
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Voir tout',
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            fontFamily: "Cabin",
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const ContaiRizon(),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 3.w),
-                                    child: Container(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 4.w),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: const Color(0xFFC9CDD2)),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Image.asset(
-                                            'assets/icons/pct.png',
-                                            width: 6.w,
-                                            height: 6.w,
-                                          ),
-                                          const SizedBox(width: 10),
-                                          const Expanded(
-                                            child: TextField(
-                                              decoration: InputDecoration(
-                                                hintText:
-                                                    'Entrez un code promo',
-                                                hintStyle: TextStyle(
-                                                  fontFamily: 'Cabin',
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14,
-                                                  color: Color(0xFF94979E),
-                                                ),
-                                                border: InputBorder.none,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 2.h),
+                                  SizedBox(height: 80.w),
                                   Container(
                                     height: 34.w,
                                     width: double.infinity,
@@ -365,7 +283,7 @@ class _PayPageState extends State<PayPage> {
                                               child: Text(
                                                 'Sous-total',
                                                 style: TextStyle(
-                                                  fontSize: 12.sp,
+                                                  fontSize: 13.sp,
                                                   fontWeight: FontWeight.w400,
                                                   fontFamily: 'Poppins',
                                                 ),
@@ -377,7 +295,7 @@ class _PayPageState extends State<PayPage> {
                                               child: Text(
                                                 '${_calculateTotal()} F',
                                                 style: TextStyle(
-                                                  fontSize: 12.sp,
+                                                  fontSize: 13.sp,
                                                   fontWeight: FontWeight.w600,
                                                   fontFamily: 'Cabin',
                                                 ),
@@ -396,7 +314,7 @@ class _PayPageState extends State<PayPage> {
                                               child: Text(
                                                 'Frais de livraison',
                                                 style: TextStyle(
-                                                  fontSize: 12.sp,
+                                                  fontSize: 13.sp,
                                                   fontWeight: FontWeight.w400,
                                                   fontFamily: 'Poppins',
                                                 ),
@@ -408,7 +326,7 @@ class _PayPageState extends State<PayPage> {
                                               child: Text(
                                                 'Gratuit',
                                                 style: TextStyle(
-                                                  fontSize: 12.sp,
+                                                  fontSize: 13.sp,
                                                   fontWeight: FontWeight.w600,
                                                   fontFamily: 'Cabin',
                                                 ),
@@ -625,9 +543,9 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                         ),
                         GestureDetector(
                           onTap: () => _showConfirmationDialog(context),
-                          child: Image.asset(
-                            'assets/icons/trash.png',
-                            width: 6.w,
+                          child: SvgPicture.asset(
+                            'assets/icons/trash.svg',
+                            width: 7.w,
                             height: 7.w,
                           ),
                         ),

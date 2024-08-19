@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:Bolide/data/models/api_services.dart';
 import 'package:Bolide/data/services/user.dart';
@@ -247,9 +248,11 @@ class _Pay2PageState extends State<Pay2Page> {
                         ),
                         Row(
                           children: [
-                            Image.asset(
-                              'assets/icons/lock.png',
-                              width: 8.w,
+                            SvgPicture.asset(
+                              'assets/icons/lock.svg',
+                              width: 16,
+                              height: 16,
+                              color: Colors.black,
                             ),
                             SizedBox(width: 2.w),
                             Text(
@@ -270,8 +273,10 @@ class _Pay2PageState extends State<Pay2Page> {
                       SizedBox(width: 2.h),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-                        child: Image.asset(
-                          'assets/icons/cs.png',
+                        child: SvgPicture.asset(
+                          'assets/icons/cs.svg',
+                          width: 7.w,
+                          height: 7.w,
                         ),
                       ),
                       SizedBox(
@@ -283,8 +288,10 @@ class _Pay2PageState extends State<Pay2Page> {
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-                        child: Image.asset(
-                          'assets/icons/cs1.png',
+                        child: SvgPicture.asset(
+                          'assets/icons/cs1.svg',
+                          width: 7.w,
+                          height: 7.w,
                         ),
                       ),
                       SizedBox(
@@ -296,8 +303,10 @@ class _Pay2PageState extends State<Pay2Page> {
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-                        child: Image.asset(
-                          'assets/icons/cs2.png',
+                        child: SvgPicture.asset(
+                          'assets/icons/cs2.svg',
+                          width: 7.w,
+                          height: 7.w,
                         ),
                       ),
                     ],

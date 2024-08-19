@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:Bolide/data/services/user.dart';
 import 'package:Bolide/screens/src/features/Pages/Favoris/Widgets/add3.dart';
@@ -100,8 +101,10 @@ class Pay3Page extends StatelessWidget {
                   SizedBox(width: 2.h),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-                    child: Image.asset(
-                      'assets/icons/cs.png',
+                    child: SvgPicture.asset(
+                      'assets/icons/cs.svg',
+                      width: 7.w,
+                      height: 7.w,
                     ),
                   ),
                   SizedBox(
@@ -113,8 +116,10 @@ class Pay3Page extends StatelessWidget {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-                    child: Image.asset(
-                      'assets/icons/cs.png',
+                    child: SvgPicture.asset(
+                      'assets/icons/cs.svg',
+                      width: 7.w,
+                      height: 7.w,
                     ),
                   ),
                   SizedBox(
@@ -126,8 +131,10 @@ class Pay3Page extends StatelessWidget {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 0.2.w),
-                    child: Image.asset(
-                      'assets/icons/cs1.png',
+                    child: SvgPicture.asset(
+                      'assets/icons/cs1.svg',
+                      width: 7.w,
+                      height: 7.w,
                     ),
                   ),
                 ],
@@ -141,7 +148,7 @@ class Pay3Page extends StatelessWidget {
                   buildStep('Confirmation'),
                 ],
               ),
-              SizedBox(height: 4.h),
+              SizedBox(height: 2.h),
               const Text(
                 "Commande validée",
                 style: TextStyle(
@@ -150,17 +157,17 @@ class Pay3Page extends StatelessWidget {
                   fontFamily: "Poppins",
                 ),
               ),
-              SizedBox(height: 2.h),
+              SizedBox(height: 1.h),
               Text(
                 "Merci, votre commande a été validée avec succès. Vous recevrez des notifications pour suivre l'évolution de votre commande, ou consultez l'onglet “Commandes”",
                 style: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 11.sp,
                   color: const Color(0xff1A1A1A),
                   fontWeight: FontWeight.w400,
                   fontFamily: "Cabin",
                 ),
               ),
-              SizedBox(height: 2.h),
+              SizedBox(height: 1.h),
               Container(
                 width: double.infinity,
                 color: Colors.white,
@@ -169,26 +176,22 @@ class Pay3Page extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(children: [
-                      Image.asset(
-                        'assets/icons/rec.png',
-                        width: 8.w,
+                      SvgPicture.asset(
+                        'assets/icons/receipt.svg',
+                        width: 7.w,
+                        height: 7.w,
+                      ),
+                      SizedBox(width: 1.w),
+                      Text(
+                        'Commande XDR 980 992',
+                        style: TextStyle(
+                            fontSize: 12.sp, fontWeight: FontWeight.w400),
                       ),
                     ]),
-                    SizedBox(width: 1.w),
-                    Row(
-                      children: [
-                        Text(
-                          'Commande XDR 980 992',
-                          style: TextStyle(
-                              fontSize: 12.sp, fontWeight: FontWeight.w400),
-                        ),
-                        SizedBox(width: 2.w),
-                        Image.asset(
-                          'assets/icons/fw.png',
-                          color: Colors.black,
-                          width: 2.5.w,
-                        ),
-                      ],
+                    Image.asset(
+                      'assets/icons/fw.png',
+                      color: Colors.black,
+                      width: 2.5.w,
                     ),
                   ],
                 ),
@@ -366,54 +369,60 @@ class Pay3Page extends StatelessWidget {
               ),
               SizedBox(height: 3.h),
               Center(
-  child: TextButton(
-    onPressed: () {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 300),
-          pageBuilder: (context, animation, secondaryAnimation) => HomePage(
-            userId: userId,
-            partId: partId,
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const offsetBegin = Offset(1.0, 0.0); // Commence de la droite
-            const offsetEnd = Offset.zero; // Finit à la position actuelle
-            const curve = Curves.easeInOutCubic; // Courbe plus fluide
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        transitionDuration: const Duration(milliseconds: 300),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            HomePage(
+                          userId: userId,
+                          partId: partId,
+                        ),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          const offsetBegin =
+                              Offset(-1.0, 0.0); // Commence de la droite
+                          const offsetEnd =
+                              Offset.zero; // Finit à la position actuelle
+                          const curve =
+                              Curves.easeInOutCubic; // Courbe plus fluide
 
-            var tween = Tween(begin: offsetBegin, end: offsetEnd)
-                .chain(CurveTween(curve: curve));
-            var offsetAnimation = animation.drive(tween);
+                          var tween = Tween(begin: offsetBegin, end: offsetEnd)
+                              .chain(CurveTween(curve: curve));
+                          var offsetAnimation = animation.drive(tween);
 
-            return SlideTransition(position: offsetAnimation, child: child);
-          },
-        ),
-      );
-    },
-    style: TextButton.styleFrom(
-      backgroundColor: const Color(0xFF1A1A1A),
-      padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 20.w),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(1.w),
-      ),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          "Terminer",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14.sp,
-            fontFamily: 'Cabin',
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    ),
-  ),
-)
-
+                          return SlideTransition(
+                              position: offsetAnimation, child: child);
+                        },
+                      ),
+                    );
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFF1A1A1A),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 1.h, horizontal: 20.w),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(1.w),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Terminer",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14.sp,
+                          fontFamily: 'Cabin',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
             ],
           ),
         ),
@@ -468,7 +477,7 @@ class _CartItem2WidgetState extends State<CartItem2Widget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 30.w,
+      height: 32.w,
       margin: EdgeInsets.symmetric(vertical: 0.5.w),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -491,7 +500,7 @@ class _CartItem2WidgetState extends State<CartItem2Widget> {
                       style: TextStyle(
                         fontFamily: "Poppins",
                         fontWeight: FontWeight.w600,
-                        fontSize: 14.sp,
+                        fontSize: 15.sp,
                       ),
                     ),
                   ],
@@ -500,7 +509,7 @@ class _CartItem2WidgetState extends State<CartItem2Widget> {
                 Row(
                   children: [
                     Image.asset(
-                      'assets/icons/ea.png',
+                      'assets/icons/sun.png',
                       color: const Color(0xFF1A1A1A),
                     ),
                     SizedBox(width: 1.w),

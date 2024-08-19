@@ -171,7 +171,7 @@ class _ModalPageState extends State<ModalPage> {
                       style: TextButton.styleFrom(
                         backgroundColor: const Color(0xFF1A1A1A),
                         padding: EdgeInsets.symmetric(
-                            vertical: 4.w, horizontal: 39.w),
+                            vertical: 1.h, horizontal: 39.w),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(2.w),
                         ),

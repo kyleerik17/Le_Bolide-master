@@ -11,11 +11,12 @@ import 'package:sizer/sizer.dart';
 
 class Article3Page extends StatefulWidget {
   final int categoryId;
+
   final int userId;
   const Article3Page({
     Key? key,
     required this.categoryId,
-    required this.userId,
+    required this.userId, 
   }) : super(key: key);
 
   @override
@@ -50,6 +51,11 @@ class _Article3PageState extends State<Article3Page> {
         setState(() {
           _pieces = jsonDecode(response.body);
           _isLoading = false;
+
+          // Afficher l'URL du logo pour chaque pièce
+          for (var piece in _pieces) {
+            print('Logo URL: ${piece['logo']}');
+          }
         });
       } else {
         throw Exception('Failed to load pieces');
@@ -76,10 +82,16 @@ class _Article3PageState extends State<Article3Page> {
             return _buildArticle(
               imageUrl: '${piece['img']}',
               libelle: piece['libelle'] ?? '',
-              iconUrl: 'assets/icons/sun.png',
+              iconUrl: piece['sous_category']['img'] ??
+                  '', // Utiliser l'image de sous-category
               description: piece['description'] ?? '',
               price: _formatPrice(piece['price']),
               categoryName: piece['category_name'] ?? '',
+              categoryImg: piece['category_img'] ?? '',
+              sousCategoryName: piece['sous_category']['name'] ??
+                  '', // Récupérer le nom de sous-category
+              sousCategoryImg: piece['sous_category']['img'] ??
+                  '', // Récupérer l'image de sous-category
               partId: piece['id'] != null
                   ? int.tryParse(piece['id'].toString()) ?? 0
                   : 0,
@@ -116,20 +128,33 @@ class _Article3PageState extends State<Article3Page> {
     required String description,
     required String price,
     required String categoryName,
-    required dynamic partId,
+    required String sousCategoryName,
+    required String sousCategoryImg,
+    required int partId,
+    required categoryImg,
   }) {
+    // Afficher l'URL du logo à chaque fois qu'un article est construit
+    print('Building article with icon URL: $iconUrl');
+
     return GestureDetector(
       onTap: () {
-        // Naviguer vers DetailsProduitPage en passant l'ID de l'article
+        // Naviguer vers DetailsProduitPage en passant les informations nécessaires
         Navigator.of(context).push(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 DetailsProduitsPage(
               partId: partId,
+              categoryName: categoryName,
+              iconUrl: iconUrl,
               userId: user.id,
               description: description,
               price: price,
+              imageUrl: imageUrl,
               libelle: libelle,
+              sousCategoryName:
+                  sousCategoryName, // Passer le nom de sous-category
+              sousCategoryImg: sousCategoryImg, categoryImg: categoryImg,
+               title: '',  // Passer l'image de sous-category
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -149,7 +174,7 @@ class _Article3PageState extends State<Article3Page> {
         );
       },
       child: Container(
-        width: 92.w,
+        width: 90.w,
         margin: EdgeInsets.only(bottom: 2.h),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -162,11 +187,11 @@ class _Article3PageState extends State<Article3Page> {
           children: [
             Container(
               width: 25.w,
-              height: 25.w,
+              height: 28.w,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(imageUrl),
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.circular(0.5.h),
               ),
@@ -186,18 +211,18 @@ class _Article3PageState extends State<Article3Page> {
                   SizedBox(height: 1.h),
                   Row(
                     children: [
-                      Image.asset(
-                        'assets/icons/sun.png',
-                        color: const Color(0xFF1A1A1A),
-                        width: 4.w,
+                      // Vérifier si l'URL commence par 'http' pour utiliser NetworkImage
+                      Image.network(
+                        iconUrl, // Utilisation de l'image de sous-category
+                        width: 5.w,
                       ),
                       SizedBox(width: 1.w),
                       Text(
-                        categoryName,
-                        style: const TextStyle(
+                        sousCategoryName, // Utilisation du nom de sous-category
+                        style: TextStyle(
                           fontFamily: "Cabin",
                           color: Color(0xFF1A1A1A),
-                          fontSize: 15,
+                          fontSize: 12.sp,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -205,19 +230,19 @@ class _Article3PageState extends State<Article3Page> {
                   ),
                   SizedBox(height: 0.5.h),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         price,
                         style: TextStyle(
-                          fontSize: 5.w,
+                          fontSize: 6.w,
                           fontFamily: "Cabin",
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      SizedBox(width: 10.w),
                       QuantityWidget(
                         userId: widget.userId,
-                        partId: int.parse(partId.toString()),
+                        partId: partId,
                       ),
                     ],
                   ),
