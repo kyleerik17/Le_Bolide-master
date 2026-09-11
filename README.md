@@ -1,16 +1,62 @@
 # Djassa
 
-A new Flutter project.
+Application e-commerce mobile mettant en relation trois types d'utilisateurs : **client**, **vendeur** et **livreur**. Achat, vente et livraison de produits, avec suivi de commande en temps réel.
 
-## Getting Started
+## ✨ Fonctionnalités
 
-This project is a starting point for a Flutter application.
+- **Multi-rôles** : une même app sert le client, le vendeur et le livreur, avec des parcours dédiés à chacun
+- **Paiement en ligne** intégré via GeniusPay
+- **Suivi de livraison** en temps réel avec cartes animées selon l'étape (préparation, en route, livré...)
+- **Comptes utilisateurs** isolés (données scoped par utilisateur, pas de fuite entre comptes)
+- **Avis, codes promo et zones de livraison** gérés côté backend
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ Stack technique
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter** — app multiplateforme (Android, iOS, Web, macOS, Linux, Windows)
+- **Riverpod** — gestion d'état
+- **GoRouter** — navigation
+- **Sizer** — UI responsive
+- **Supabase** — backend (base de données, authentification, Edge Functions)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🚀 Démarrer le projet
+
+### Prérequis
+
+- [Flutter SDK](https://docs.flutter.dev/get-started/install)
+- Un projet [Supabase](https://supabase.com) configuré (voir `supabase/`)
+
+### Installation
+
+```bash
+git clone https://github.com/kyleerik17/djassa.git
+cd djassa
+flutter pub get
+```
+
+### Configuration
+
+Renseigner les clés Supabase (URL + clé publique) dans la configuration du projet avant de lancer l'app.
+
+### Lancer l'app
+
+```bash
+flutter run
+```
+
+## 📁 Structure du projet
+
+```
+lib/            # Code source de l'application
+supabase/       # Schéma, migrations et Edge Functions
+test/           # Tests
+android/ ios/ web/ macos/ linux/ windows/   # Cibles de build par plateforme
+releases/       # Builds publiés
+```
+
+## 📌 Statut
+
+Projet en développement actif.
+
+## 📄 Licence
+
+_À définir._
